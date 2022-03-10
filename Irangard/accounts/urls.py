@@ -7,6 +7,7 @@ urlpatterns = [
     path('checkemail/', check_email, name="accounts-check_email"),
     path('checkusername/', check_username, name="accounts-check-username"),
     path('activate/', activate, name='accounts-activate'),
+    path('setpassword/', set_password, name='accounts-set-password'),
 ]
 # """Kooleposhti URL Configuration
 
