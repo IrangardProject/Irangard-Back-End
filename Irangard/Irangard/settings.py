@@ -10,9 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from pathlib import Path
+import sys
 import os
+from pathlib import Path
 from environs import Env
+import dj_database_url
+from datetime import timedelta
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -91,7 +96,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'dbIrangard', 
         'USER': 'postgres', 
-        'PASSWORD': env.str('DB_PASSWORD'),
+        # 'PASSWORD': env.str('DB_PASSWORD'),
+        'PASSWORD': 'e13m7944310020',
         'HOST': '127.0.0.1', 
         'PORT': '5432',
     },
@@ -150,3 +156,34 @@ MEDIA_URL = STATIC_HOST + "/media/"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# EMAIL
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_ID')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PW')
+
+
+# Rest Framework Settings
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False,
+    # 'PAGE_SIZE': 10,
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.IsAuthenticated'
+    ]
+}
+
+# request header prefix JWT
+# SIMPLE JWT
+SIMPLE_JWT = {
+    # JWT ACCESS_TOKEN
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+}

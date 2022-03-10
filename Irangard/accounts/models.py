@@ -10,7 +10,7 @@ class User(AbstractUser):
     phone_no = models.CharField(max_length=11, null=True, blank=True)
     is_special = models.BooleanField(default=False, blank=True)
 
-# class Verification(models.Model):
-#     email = models.EmailField(primary_key=True)
-#     token = models.CharField(max_length=6)
-#     create_time = models.DateTimeField(auto_now_add=True)
+class Verification(models.Model):
+    email = models.EmailField(primary_key=True)
+    token = models.CharField(max_length=6)
+    create_time = models.DateTimeField(auto_now_add=True)
