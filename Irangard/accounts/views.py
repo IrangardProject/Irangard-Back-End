@@ -7,10 +7,11 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from validate_email import validate_email
 import random
-from .serializers.user_serializers import UserSerializer
+from .serializers.user_serializers import *
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from accounts.models import User, Verification
+from rest_framework_simplejwt import views
 # Create your views here.
 
 
@@ -84,20 +85,17 @@ def check_username(request):
 
 @api_view(http_method_names=['POST'])
 def activate(request):
+    print(check_username(request._request).status_code)
     if request.method == 'POST':
-        try:
-            User.objects.get(email=request.data['email'])
-            return Response(f"email '{request.data['email']}' already exists!",
+
+        if(check_username(request._request).status_code == 400):
+            return Response(f"username '{request.data['username']}' already exists!",
                             status=status.HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
 
-            try:
-                User.objects.get(username=request.data['username'])
-                return Response(f"username '{request.data['username']}' is already taken!",
-                                status=status.HTTP_400_BAD_REQUEST)
-
-            except User.DoesNotExist:
-                return ActivationEmail(request._request)
+        if(check_email(request._request).status_code == 400):
+            return Response(f"email '{request.data['email']}' is already taken!",
+                            status=status.HTTP_400_BAD_REQUEST)
+        return ActivationEmail(request._request)
 
 
 @api_view(http_method_names=['POST'])
@@ -106,18 +104,13 @@ def set_password(request):
         try:
             user = User.objects.get(username=request.data['username'])
             if(request.data['password'] == request.data['re_password']):
-                updated_user = {"username": user.username,
-                                "email": user.email,
-                                "password":request.data['password']}
-                user_serializer = UserSerializer(user, data=updated_user)
-                if(user_serializer.is_valid()):
-                    user_serializer.save()                    
-                    return Response(user_serializer.data, status=status.HTTP_200_OK)
-                else:
-                    return Response(user_serializer.errors)
+                user.set_password(request.data['password'])
+                user.save()
+                return views.TokenObtainPairView().as_view()(request._request)
+
             else:
                 return Response(f"password and re-password are not same",
-                            status=status.HTTP_400_BAD_REQUEST)
+                                status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response(f"user with username '{request.data['username']}' doesn't exist",
                             status=status.HTTP_400_BAD_REQUEST)
