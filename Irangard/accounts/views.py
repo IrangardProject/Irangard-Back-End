@@ -45,12 +45,14 @@ def ActivationEmail(request):
                 # email resent
                 verification_obj = Verification.objects.get(email=user_email)
                 verification_obj.token = str(rnd_tok)
+                verification_obj.username = user_username
                 verification_obj.save()
 
             except Verification.DoesNotExist:
                 # email sent
                 verification_obj = Verification.objects.create(
                     email=user_email,
+                    username=user_username,
                     token=str(rnd_tok))
                 verification_obj.save()
 
@@ -122,7 +124,7 @@ def check_code(request):
         try:
             unregistered_user = Verification.objects.get(email=request.data['email'])
             if(unregistered_user.token == request.data['token']):
-                user = User.objects.create(username=request.data['username'], email=request.data['email'])
+                user = User.objects.create(username=unregistered_user.username, email=unregistered_user.email)
                 user.save()
                 unregistered_user.delete()
                 return Response(status=status.HTTP_200_OK, data='user registered successfully')
