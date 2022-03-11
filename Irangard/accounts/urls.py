@@ -1,4 +1,6 @@
 from django.urls import base, path
+from django.urls import re_path
+from rest_framework_simplejwt import views
 from .views import *
 
 app_name = 'accounts'
@@ -7,8 +9,17 @@ urlpatterns = [
     path('checkemail/', check_email, name="accounts-check_email"),
     path('checkusername/', check_username, name="accounts-check-username"),
     path('activate/', activate, name='accounts-activate'),
+    path('checkcode/', check_code, name='accounts-check-code'),
     path('setpassword/', set_password, name='accounts-set-password'),
+    re_path(r"^jwt/create/?", views.TokenObtainPairView.as_view(),
+            name="accounts-jwt-create"),
+    re_path(r"^jwt/refresh/?", views.TokenRefreshView.as_view(),
+            name="accounts-jwt-refresh"),
+    re_path(r"^jwt/verify/?", views.TokenVerifyView.as_view(),
+            name="accounts-jwt-verify"),
 ]
+
+
 # """Kooleposhti URL Configuration
 
 # The `urlpatterns` list routes URLs to views. For more information please see:
