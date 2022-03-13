@@ -11,6 +11,8 @@ urlpatterns = [
     path('activate/', activate, name='accounts-activate'),
     path('checkcode/', check_code, name='accounts-check-code'),
     path('setpassword/', set_password, name='accounts-set-password'),
+    path('reset-password/', reset_pass_email, name='reset-password'),
+    path('reset-password/confirm/', reset_pass_confirm, name='reset-password-confirm'),
     re_path(r"^jwt/create/?", views.TokenObtainPairView.as_view(),
             name="accounts-jwt-create"),
     re_path(r"^jwt/refresh/?", views.TokenRefreshView.as_view(),
