@@ -6,11 +6,11 @@ from .views import *
 app_name = 'accounts'
 
 urlpatterns = [
-    path('checkemail/', check_email, name="accounts-check_email"),
-    path('checkusername/', check_username, name="accounts-check-username"),
+    path('check-email/', check_email, name="accounts-check_email"),
+    path('check-username/', check_username, name="accounts-check-username"),
     path('activate/', activate, name='accounts-activate'),
-    path('checkcode/', check_code, name='accounts-check-code'),
-    path('setpassword/', set_password, name='accounts-set-password'),
+    path('check-code/', check_code, name='accounts-check-code'),
+    path('set-password/', set_password, name='accounts-set-password'),
     path('reset-password/', reset_pass_email, name='reset-password'),
     path('reset-password/confirm/', reset_pass_confirm, name='reset-password-confirm'),
     re_path(r"^jwt/create/?", views.TokenObtainPairView.as_view(),
