@@ -10,9 +10,18 @@ import random
 from .serializers.user_serializers import *
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
-from accounts.models import User, Verification
+from accounts.models import User, Verification, Token
 from rest_framework_simplejwt import views
-# Create your views here.
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from datetime import datetime, timedelta, timezone
+from rest_framework.permissions import SAFE_METHODS
+
+
+def remove_expired_token_uids():
+    time_threshold = datetime.now(timezone.utc) - timedelta(days=1)
+    Token.objects.filter(create_time__lte=time_threshold).delete()
 
 
 @api_view(http_method_names=['POST'])
@@ -134,4 +143,82 @@ def check_code(request):
         except Verification.DoesNotExist:
             return Response(f"email '{request.data['email']}' is invalid!",
                 status=status.HTTP_400_BAD_REQUEST)
-            
+
+
+@api_view(http_method_names=['PUT'])
+def reset_pass_email(request):
+    remove_expired_token_uids()
+    user_email = request.data['email']
+    # if validate_email(user_email):
+    try:
+        user = User.objects.get(email=request.data['email'])
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        template = render_to_string('myemail/reset_password.html',
+                                    {
+                                        'user': user,
+                                        'token': token,
+                                        'uid': uid,
+                                        'host': request.get_host(),
+                                        'port': request.get_port()
+                                    })
+
+        email = EmailMessage('بازنشانی رمز عبور در ایرانگرد',
+                            template,
+                            settings.EMAIL_HOST_USER,
+                            [user_email]
+                            )
+
+        email.content_subtype = "html"
+        email.fail_silently = False
+        email.send()
+
+        try:
+            token_obj = Token.objects.get(uid=uid)
+            token_obj.token = str(token)
+            token_obj.save()
+
+        except Token.DoesNotExist:
+            token_obj = Token.objects.create(token=str(token), uid=str(uid))                                     
+            token_obj.save()
+        return Response(status=status.HTTP_200_OK, data='Email sent successfully')
+
+    except User.DoesNotExist:
+        return Response(f"user with email {user_email} doesn't exist!", 
+                                status=status.HTTP_404_NOT_FOUND)
+    # else:
+    #     return Response(f"'{user_email}' is not a valid email.", 
+    #                                 status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(http_method_names=['PUT', *SAFE_METHODS])
+def reset_pass_confirm(request, *args, **kwargs):
+    uid = request.data.get('uid')
+    token = request.data.get('token')
+    new_password = request.data.get('password')
+
+    if uid is None or not uid:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data='uid is not Provided')
+    if token is None or not uid:
+        return Response(status=status.HTTP_400_BAD_REQUEST, data='token is not Provided')
+
+    try:
+        token_obj = Token.objects.get(uid=uid)
+        if token_obj.token == token:
+            user = User.objects.get(pk=urlsafe_base64_decode(uid))
+            if user.username != new_password:
+                user.set_password(new_password)
+                user.save()
+                token_obj.delete()
+                return Response(status=status.HTTP_200_OK, 
+                                        data='password successfuly changed.')
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST, 
+                                        data='password cannot be the same as username.')
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data='incorrect token.')
+
+    except Token.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND, data="token doesn't exist.")
+        

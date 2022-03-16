@@ -15,3 +15,8 @@ class Verification(models.Model):
     username =  models.CharField(max_length=255)
     token = models.CharField(max_length=6)
     create_time = models.DateTimeField(auto_now_add=True)
+
+class Token(models.Model):
+    uid = models.CharField(primary_key=True, max_length=100)
+    token = models.CharField(max_length=100)
+    create_time = models.DateTimeField(auto_now_add=True)
