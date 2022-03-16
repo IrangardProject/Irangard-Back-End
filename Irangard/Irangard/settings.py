@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_yasg',
     'accounts'
 ]
 
@@ -177,7 +178,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
         # 'rest_framework.permissions.IsAuthenticated'
-    ]
+    ],
+    
 }
 
 # request header prefix JWT
