@@ -1,6 +1,8 @@
+from unicodedata import name
 from django.urls import base, path
 from django.urls import re_path
 from rest_framework_simplejwt import views
+from accounts.serializers.serializersNew import myTokenObtainPairSerializer
 from .views import *
 
 app_name = 'accounts'
@@ -13,12 +15,14 @@ urlpatterns = [
     path('set-password/', set_password, name='accounts-set-password'),
     path('reset-password/', reset_pass_email, name='reset-password'),
     path('reset-password/confirm/', reset_pass_confirm, name='reset-password-confirm'),
-    re_path(r"^jwt/create/?", views.TokenObtainPairView.as_view(),
+#     path('login/', login, name='login'),
+    re_path(r"^jwt/create/?", views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer),
             name="accounts-jwt-create"),
     re_path(r"^jwt/refresh/?", views.TokenRefreshView.as_view(),
             name="accounts-jwt-refresh"),
     re_path(r"^jwt/verify/?", views.TokenVerifyView.as_view(),
             name="accounts-jwt-verify"),
+#     path(r'^jwt/token/?', views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer), name='accounts-jwt-token-new'),
 ]
 
 
