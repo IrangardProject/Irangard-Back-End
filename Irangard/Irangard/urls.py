@@ -32,7 +32,7 @@ schema_view = get_schema_view(  # swagger/redoc
         default_version="v1",
         description="irangard BackEnd",
         terms_of_service="Use it for good :)",
-        contact=openapi.Contact(email=settings.EMAIL_HOST_USER),
+        contact=openapi.Contact(email="morteza.shahrabii@gmail.com"),
         license=openapi.License(name="Irangard License"),
     ),
     public=True,
