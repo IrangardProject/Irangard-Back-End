@@ -4,7 +4,7 @@ from django.urls import re_path, include
 from rest_framework_simplejwt import views
 from rest_framework.routers import DefaultRouter, SimpleRouter
 from rest_framework_nested import routers
-from .accounts_auth import AccountAuthViewSet
+from .accounts_auth_views import AccountAuthViewSet
 from accounts.serializers.serializersNew import myTokenObtainPairSerializer
 from .views import *
 
