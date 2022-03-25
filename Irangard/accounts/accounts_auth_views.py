@@ -199,7 +199,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
     @swagger_auto_schema(request_body=reset_password_seriliazer)
     @action(detail=False, url_path='reset-password',  methods=['POST'], permission_classes=[permissions.AllowAny])
     def reset_pass_email(self, request):
-        remove_expired_token_uids()
+        self.remove_expired_token_uids(request)
         user_email = request.data['email']
         # if validate_email(user_email):
         try:
