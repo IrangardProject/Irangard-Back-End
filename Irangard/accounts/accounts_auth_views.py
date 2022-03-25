@@ -89,7 +89,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
 
             if validate_email(user_email):
                 rnd_tok = random.randrange(100000, 1000000)
-                template = render_to_string('myemail/new_activation.html',
+                template = render_to_string('myemail/activation.html',
                                             {
                                                 'username': user_username,
                                                 'code': rnd_tok,
@@ -207,7 +207,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))   
 
-            template = render_to_string('myemail/new_reset_password.html',
+            template = render_to_string('myemail/reset_password.html',
                                         {
                                             'user': user,
                                             'token': token,
