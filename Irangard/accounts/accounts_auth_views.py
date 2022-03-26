@@ -89,7 +89,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
 
             if validate_email(user_email):
                 rnd_tok = random.randrange(100000, 1000000)
-                template = render_to_string('myemail/new_activation.html',
+                template = render_to_string('myemail/new_file_for_activation.html',
                                             {
                                                 'username': user_username,
                                                 'code': rnd_tok,
