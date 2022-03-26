@@ -1,4 +1,5 @@
 from unicodedata import name
+
 from django.urls import base, path
 from django.urls import re_path, include
 from rest_framework_simplejwt import views
@@ -16,6 +17,7 @@ router.register('auth', AccountAuthViewSet,
 
 urlpatterns = [
     path('',include(router.urls)),
+    path("test", testHtml, name="test"),
     path("auth/jwt/create", views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer),
             name="accounts-jwt-create"),
     path("auth/jwt/refresh", views.TokenRefreshView.as_view(),

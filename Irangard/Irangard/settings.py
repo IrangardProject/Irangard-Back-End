@@ -16,6 +16,7 @@ from pathlib import Path
 from environs import Env
 import dj_database_url
 from datetime import timedelta
+import django_heroku
 
 
 
@@ -104,6 +105,7 @@ DATABASES = {
         'USER': env.str('HEROKU_DB_USER'), 
         'PASSWORD': env.str('HEROKU_DB_PASSWORD'),
         'HOST': env.str('HEROKU_DB_HOST'), 
+
         'PORT': '5432',
     },
     'TEST': {
@@ -156,6 +158,9 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = STATIC_HOST + "/media/"
+
+# ActivateDjango-Heroku
+django_heroku.settings(locals())
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
