@@ -173,7 +173,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
                     return Response(f"password and re-password are not same",
                                     status=status.HTTP_400_BAD_REQUEST)
             except User.DoesNotExist:
-                return Response(f"user with username '{request.data['username']}' doesn't exist",
+                return Response(f"user doesn't exist",
                                 status=status.HTTP_400_BAD_REQUEST) 
 
 

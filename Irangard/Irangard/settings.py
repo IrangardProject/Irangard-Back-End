@@ -41,7 +41,6 @@ DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
