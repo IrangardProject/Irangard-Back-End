@@ -14,11 +14,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'image', 'about_me', 'is_special']
+        fields = ['first_name', 'last_name', 'username', 'email', 'image', 'about_me', 'is_special', 'full_name']
         
     def get_fullname(self, user):
-        first_name = user.get('first_name')
-        last_name = user.get('last_name')
+        first_name = str(user.first_name)
+        last_name = str(user.last_name)
         full_name = first_name + ' ' + last_name
         return full_name
     
