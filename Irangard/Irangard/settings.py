@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'accounts',
     'corsheaders',
+    'django_jenkins'
 ]
 
 ALLOWED_HOSTS=['*']
@@ -197,3 +198,9 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+JENKINS_TASKS = (
+‘django_jenkins.tasks.run_pep8’,
+‘django_jenkins.tasks.run_pyflakes’
+)
+
