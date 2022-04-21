@@ -45,6 +45,8 @@ class set_password_seriliazer(serializers.Serializer):
     username = serializers.CharField(max_length=50, help_text="user username")
     password = serializers.CharField(max_length=50, help_text="user password")
     re_password = serializers.CharField(max_length=50, help_text="user re_password")
+    email = serializers.CharField(max_length=50, help_text="user email")
+    token = serializers.CharField(max_length=6, help_text="sent token")
 
 class reset_password_seriliazer(serializers.Serializer):
     email = serializers.CharField(max_length=50, help_text="user email")
@@ -163,14 +165,21 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
     def set_password(self, request):
         if request.method == 'POST':
             try:
-                user = User.objects.get(username=request.data['username'])
-                if(request.data['password'] == request.data['re_password']):
+                #user = User.objects.get(username=request.data['username'])
+                try :
+                    unregistered_user = Verification.objects.get(email=request.data['email'])
+                except Verification.DoesNotExist:
+                    return Response(f"user with email '{request.data['email']}' doesn't exist",
+                                status=status.HTTP_400_BAD_REQUEST) 
+                if(unregistered_user.token == request.data['token'] and request.data['password'] == request.data['re_password']):
+                    user = User.objects.create(username=unregistered_user.username, email=unregistered_user.email)
                     user.set_password(request.data['password'])
                     user.save()
+                    unregistered_user.delete()
                     return views.TokenObtainPairView().as_view()(request._request)  
 
                 else:
-                    return Response(f"password and re-password are not same",
+                    return Response(f"password and re-password are not same or token is correct",
                                     status=status.HTTP_400_BAD_REQUEST)
             except User.DoesNotExist:
                 return Response(f"user doesn't exist",
@@ -184,10 +193,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
             try:
                 unregistered_user = Verification.objects.get(email=request.data['email'])
                 if(unregistered_user.token == request.data['token']):
-                    user = User.objects.create(username=unregistered_user.username, email=unregistered_user.email)
-                    user.save()
-                    unregistered_user.delete()
-                    return Response(status=status.HTTP_200_OK, data='user registered successfully')
+                    return Response(status=status.HTTP_200_OK, data='token matched successfully')
                 else:
                     return Response(f"token '{request.data['token']}' is invalid!",
                         status=status.HTTP_400_BAD_REQUEST)               

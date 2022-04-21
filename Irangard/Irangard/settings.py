@@ -105,7 +105,6 @@ DATABASES = {
         'USER': env.str('HEROKU_DB_USER'), 
         'PASSWORD': env.str('HEROKU_DB_PASSWORD'),
         'HOST': env.str('HEROKU_DB_HOST'), 
-
         'PORT': '5432',
     },
     'TEST': {
