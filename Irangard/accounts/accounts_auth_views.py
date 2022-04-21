@@ -89,7 +89,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
 
             if validate_email(user_email):
                 rnd_tok = random.randrange(100000, 1000000)
-                template = render_to_string('myemail/activation.html',
+                template = render_to_string('myemail/new_activation.html',
                                             {
                                                 'username': user_username,
                                                 'code': rnd_tok,
@@ -163,14 +163,21 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
     def set_password(self, request):
         if request.method == 'POST':
             try:
-                user = User.objects.get(username=request.data['username'])
-                if(request.data['password'] == request.data['re_password']):
+                #user = User.objects.get(username=request.data['username'])
+                try :
+                    unregistered_user = Verification.objects.get(email=request.data['email'])
+                except Verification.DoesNotExist:
+                    return Response(f"user with email '{request.data['email']}' doesn't exist",
+                                status=status.HTTP_400_BAD_REQUEST) 
+                if(unregistered_user.token == request.data['token'] and request.data['password'] == request.data['re_password']):
+                    user = User.objects.create(username=unregistered_user.username, email=unregistered_user.email)
                     user.set_password(request.data['password'])
                     user.save()
+                    unregistered_user.delete()
                     return views.TokenObtainPairView().as_view()(request._request)  
 
                 else:
-                    return Response(f"password and re-password are not same",
+                    return Response(f"password and re-password are not same or token is correct",
                                     status=status.HTTP_400_BAD_REQUEST)
             except User.DoesNotExist:
                 return Response(f"user with username '{request.data['username']}' doesn't exist",
@@ -184,10 +191,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
             try:
                 unregistered_user = Verification.objects.get(email=request.data['email'])
                 if(unregistered_user.token == request.data['token']):
-                    user = User.objects.create(username=unregistered_user.username, email=unregistered_user.email)
-                    user.save()
-                    unregistered_user.delete()
-                    return Response(status=status.HTTP_200_OK, data='user registered successfully')
+                    return Response(status=status.HTTP_200_OK, data='token matched successfully')
                 else:
                     return Response(f"token '{request.data['token']}' is invalid!",
                         status=status.HTTP_400_BAD_REQUEST)               
@@ -199,7 +203,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
     @swagger_auto_schema(request_body=reset_password_seriliazer)
     @action(detail=False, url_path='reset-password',  methods=['POST'], permission_classes=[permissions.AllowAny])
     def reset_pass_email(self, request):
-        remove_expired_token_uids()
+        self.remove_expired_token_uids(request)
         user_email = request.data['email']
         # if validate_email(user_email):
         try:

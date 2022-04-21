@@ -16,6 +16,7 @@ from pathlib import Path
 from environs import Env
 import dj_database_url
 from datetime import timedelta
+import django_heroku
 
 
 
@@ -62,6 +63,7 @@ ALLOWED_HOSTS=['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -156,6 +158,9 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = STATIC_HOST + "/media/"
+
+# ActivateDjango-Heroku
+django_heroku.settings(locals())
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
