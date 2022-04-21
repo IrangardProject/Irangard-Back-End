@@ -45,6 +45,8 @@ class set_password_seriliazer(serializers.Serializer):
     username = serializers.CharField(max_length=50, help_text="user username")
     password = serializers.CharField(max_length=50, help_text="user password")
     re_password = serializers.CharField(max_length=50, help_text="user re_password")
+    email = serializers.CharField(max_length=50, help_text="user email")
+    token = serializers.CharField(max_length=6, help_text="sent token")
 
 class reset_password_seriliazer(serializers.Serializer):
     email = serializers.CharField(max_length=50, help_text="user email")
