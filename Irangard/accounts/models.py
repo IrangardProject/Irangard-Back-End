@@ -9,6 +9,7 @@ class User(AbstractUser):
         upload_to='images/users/', blank=True, null=True)
     phone_no = models.CharField(max_length=11, null=True, blank=True)
     is_special = models.BooleanField(default=False, blank=True)
+    about_me = models.TextField(null=True, blank=True)
 
 class Verification(models.Model):
     email = models.EmailField(primary_key=True)

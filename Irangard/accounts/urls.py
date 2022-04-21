@@ -5,6 +5,8 @@ from django.urls import re_path, include
 from rest_framework_simplejwt import views
 from rest_framework.routers import DefaultRouter, SimpleRouter
 from rest_framework_nested import routers
+
+from .user_views import UserProfile
 from .accounts_auth_views import AccountAuthViewSet
 from accounts.serializers.serializersNew import myTokenObtainPairSerializer
 from .views import *
@@ -17,7 +19,7 @@ router.register('auth', AccountAuthViewSet,
 
 urlpatterns = [
     path('',include(router.urls)),
-    path("test", testHtml, name="test"),
+    path('profile/<int:id>/', UserProfile.as_view(), name='user-profile'),
     path("auth/jwt/create", views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer),
             name="accounts-jwt-create"),
     path("auth/jwt/refresh", views.TokenRefreshView.as_view(),

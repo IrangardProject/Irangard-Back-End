@@ -89,7 +89,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
 
             if validate_email(user_email):
                 rnd_tok = random.randrange(100000, 1000000)
-                template = render_to_string('myemail/new_activation.html',
+                template = render_to_string('myemail/activation.html',
                                             {
                                                 'username': user_username,
                                                 'code': rnd_tok,
@@ -180,7 +180,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
                     return Response(f"password and re-password are not same or token is correct",
                                     status=status.HTTP_400_BAD_REQUEST)
             except User.DoesNotExist:
-                return Response(f"user with username '{request.data['username']}' doesn't exist",
+                return Response(f"user doesn't exist",
                                 status=status.HTTP_400_BAD_REQUEST) 
 
 
