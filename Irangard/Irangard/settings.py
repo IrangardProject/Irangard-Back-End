@@ -101,10 +101,10 @@ WSGI_APPLICATION = 'Irangard.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env.str('DB_NAME'), 
-        'USER': env.str('DB_USER'), 
-        'PASSWORD': env.str('DB_PASSWORD'),
-        'HOST': env.str('DB_HOST'), 
+        'NAME': env.str('HEROKU_DB_NAME'), 
+        'USER': env.str('HEROKU_DB_USER'), 
+        'PASSWORD': env.str('HEROKU_DB_PASSWORD'),
+        'HOST': env.str('HEROKU_DB_HOST'), 
         'PORT': '5432',
     },
     'TEST': {
