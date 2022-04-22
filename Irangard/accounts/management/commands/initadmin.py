@@ -6,7 +6,7 @@ from accounts.models import User
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        if User.objects.count() != 0:
+        if User.objects.count() == 0:
             username = 'admin'
             email = 'admin@gmail.com'
             password = 'admin'
