@@ -10,9 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from pathlib import Path
+import sys
 import os
+from pathlib import Path
 from environs import Env
+import dj_database_url
+from datetime import timedelta
+import django_heroku
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,10 +54,16 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     'django.contrib.staticfiles',
     'rest_framework',
-    'accounts'
+    'drf_yasg',
+    'accounts',
+    'corsheaders',
 ]
 
+ALLOWED_HOSTS=['*']
+CORS_ORIGIN_ALLOW_ALL = True
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -89,10 +101,10 @@ WSGI_APPLICATION = 'Irangard.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dbIrangard', 
-        'USER': 'postgres', 
-        'PASSWORD': env.str('DB_PASSWORD'),
-        'HOST': '127.0.0.1', 
+        'NAME': env.str('HEROKU_DB_NAME'), 
+        'USER': env.str('HEROKU_DB_USER'), 
+        'PASSWORD': env.str('HEROKU_DB_PASSWORD'),
+        'HOST': env.str('HEROKU_DB_HOST'), 
         'PORT': '5432',
     },
     'TEST': {
@@ -146,7 +158,45 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = STATIC_HOST + "/media/"
 
+# ActivateDjango-Heroku
+django_heroku.settings(locals())
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# EMAIL
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_ID')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PW')
+
+
+# Rest Framework Settings
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False,
+    # 'PAGE_SIZE': 10,
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.IsAuthenticated'
+    ],
+    
+}
+
+# request header prefix JWT
+# SIMPLE JWT
+SIMPLE_JWT = {
+    # JWT ACCESS_TOKEN
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+
+#test_for_jenkins_5

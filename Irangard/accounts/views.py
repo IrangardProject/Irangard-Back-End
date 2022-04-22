@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def testHtml(request):
+    return render(request, 'myemail/new_activation.html')
