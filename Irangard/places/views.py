@@ -1,3 +1,66 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpRequest, HttpResponse
+from rest_framework.decorators import permission_classes
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import status
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from .pagination import DefaultPagination
+from places.models import Place
+from .serializers import *
+from .permissions import *
 
-# Create your views here.
+
+class PlaceViewSet(ModelViewSet):
+	queryset = Place.objects.all()
+	serializer_class = PlaceSerializer
+	filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+	filterset_fields = ['place_type']
+	search_fields = ['title']  # space comma seprator
+	ordering_fields = ['-rate']  
+	pagination_class = DefaultPagination 
+	permission_classes = [IsIsAuthenticatedOrReadOnly]
+
+	# def get_serializer_class(self):
+	# 	place = self.get_object()
+	# 	if place.place_type == 1: 
+	# 		return ResidenceSerializer
+	# 	if place.place_type == 2:
+	# 		return RecreationSerializer
+	# 	if place.place_type == 3:
+	# 		return AttractionSerializer
+	#  	return super().get_serializer_class()
+	
+	def create(self, request, *args, **kwargs):
+		user = request.user
+		place = self.get_object()
+		data = request.data
+		images = data.pop('images', [])
+		tags = data.pop('tags', [])
+
+		# contact = ContactSerializer(place=place, data=data)
+		# contact.is_valid(raise_exception=True)
+		# contact.save()
+		# for image in images:
+		# 	Image.objects.create(place=place, **image)
+		# for tag in tags:
+		# 	Tag.objects.create(place=place, **tag)
+		
+		return super().create(request, *args, **kwargs)
+
+	# def update(self, request, *args, **kwargs):
+	# 	place = self.get_object()
+	# 	if not place.is_owner(request.user):
+	# 		return Response('you do not have permission to edit this place.',
+	# 						 status=status.HTTP_403_FORBIDDEN)
+	#  	return super().update(request, *args, **kwargs)
+
+
+	# def destroy(self, request, *args, **kwargs):
+	# 	if not request.user.IsAuthenticated:
+	# 		return Response('Only admin can remove places.', 
+	# 			status=status.HTTP_403_FORBIDDEN)
+	#  	return super().destroy(request, *args, **kwargs)

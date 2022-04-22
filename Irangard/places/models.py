@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Place(models.Model):
@@ -16,9 +17,13 @@ class Place(models.Model):
         max_digits=2, decimal_places=1, default=5, blank=True)
     rate_no = models.IntegerField(default=0, blank=True)
     is_free = models.BooleanField(default=False, blank=True)
+    added_by = models.ForeignKey(User, related_name='added_places')
 
     def __str__(self):
         return f'{self.title} => {self.place_type}'
+
+    def is_owner(self, user):
+        return self.added_by == user
     
     def update_rate(self):
         rates = self.rates.all()
@@ -45,7 +50,8 @@ class Rate(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='rates')
     rate = models.DecimalField(
-        max_digits=2, decimal_places=1, default=0)
+        max_digits=2, decimal_places=1, default=0, 
+        validators=[MinValueValidator(0), MaxValueValidator(5)])
 
     def __str__(self):
         return f"{user.username} rated {self.rate} to {self.place.title}"

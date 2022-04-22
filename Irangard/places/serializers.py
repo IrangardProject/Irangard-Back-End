@@ -20,7 +20,14 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['place', 'name']
         extra_kwargs = {'place': {'write_only': True}}
 
+class LocationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Location
+        fields = ['x', 'y']
+
 class ContactSerializer(serializers.ModelSerializer):
+    location = LocationSerializer()
 
     class Meta:
         model = Contact
@@ -50,31 +57,40 @@ class OptionalSerializer(serializers.ModelSerializer):
 
 
 class PlaceSerializer(serializers.ModelSerializer):
-    images = ImageSerializer(many=True, read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
-    contact = ContactSerializer(read_only=True)
+    images = ImageSerializer(many=True)
+    tags = TagSerializer(many=True)
+    contact = ContactSerializer() #read_only=True
+
+    features = FeatureSerializer(many=True, read_only=True)
+    rooms = TagSerializer(many=True, read_only=True)
+    optional_costs = OptionalSerializer(many=True, read_only=True)
 
     class Meta:
         model = Place
         fields = ('title', 'place_type', 'description', 
-        'rate', 'rate_no', 'contact', 'images', 'tags')
+        'rate', 'rate_no', 'contact', 'images', 'tags', 'is_free')
         read_only_fields = ('id', 'rate', 'rate_no')
 
+    def create(self, validated_data):
+        request = self.context.get("request")
+        validated_data['added_by'] = request.user
+        return super().create(validated_data)
 
-class ResidenceSerializer(PlaceSerializer):
-    features = FeatureSerializer(many=True, read_only=True)
-    rooms = TagSerializer(many=True, read_only=True)
 
-class RecreationSerializer(PlaceSerializer):
-    optional_costs = OptionalSerializer(many=True, read_only=True)
+# class ResidenceSerializer(PlaceSerializer):
+#     features = FeatureSerializer(many=True, read_only=True)
+#     rooms = TagSerializer(many=True, read_only=True)
 
-    class Meta(PlaceSerializer.Meta):
-        fields = fields + ['is_free']
+# class RecreationSerializer(PlaceSerializer):
+#     optional_costs = OptionalSerializer(many=True, read_only=True)
 
-class AttractionSerializer(PlaceSerializer):
-    optional_costs = OptionalSerializer(many=True, read_only=True)
+#     class Meta(PlaceSerializer.Meta):
+#         fields = fields + ['is_free']
 
-    class Meta(PlaceSerializer.Meta):
-        fields = fields + ['is_free']
+# class AttractionSerializer(PlaceSerializer):
+#     optional_costs = OptionalSerializer(many=True, read_only=True)
+
+#     class Meta(PlaceSerializer.Meta):
+#         fields = fields + ['is_free']
 
  
