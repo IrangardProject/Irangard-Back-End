@@ -74,7 +74,7 @@ class Contact(models.Model):
     end_time = models.TimeField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.place.title} {self.name}"
+        return f"{self.place.title} {self.province} {self.city}"
 
 
 class Location(models.Model):
@@ -83,11 +83,17 @@ class Location(models.Model):
     x = models.DecimalField(max_digits=6, decimal_places=3)
     y = models.DecimalField(max_digits=6, decimal_places=3)
 
+    def __str__(self):
+        return f"{self.contact.place.title}: {self.x}, {self.y}"
+
 
 class Feature(models.Model):
     place = models.OneToOneField(
         Place, on_delete=models.CASCADE, related_name='features')
     title = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.place.title} {self.title}"
 
 
 class Room(models.Model):
@@ -97,11 +103,17 @@ class Room(models.Model):
     capacity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=3)
 
+    def __str__(self):
+        return f"{self.place.title} {self.room_type}"
+
 
 class Optional(models.Model):
     place = models.OneToOneField(
         Place, on_delete=models.CASCADE, related_name='optional_costs')
     title = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=3)
+
+    def __str__(self):
+        return f"{self.place.title} {self.title}"
     
 
