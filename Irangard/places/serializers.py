@@ -9,8 +9,8 @@ class ImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Image
-        fields = ('image', 'upload_date')
-        read_only_fields = ('upload_date')
+        fields = ['image', 'upload_date']
+        read_only_fields = ['upload_date']
         extra_kwargs = {'place': {'write_only': True}}
 
 class TagSerializer(serializers.ModelSerializer):
@@ -20,14 +20,14 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['place', 'name']
         extra_kwargs = {'place': {'write_only': True}}
 
-class LocationSerializer(serializers.ModelSerializer):
+# class LocationSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Location
-        fields = ['x', 'y']
+#     class Meta:
+#         model = Location
+#         fields = ['x', 'y']
 
 class ContactSerializer(serializers.ModelSerializer):
-    location = LocationSerializer()
+    # location = LocationSerializer()
 
     class Meta:
         model = Contact
@@ -38,38 +38,39 @@ class FeatureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feature
-        fields = ('place', 'title')
+        fields = ['place', 'title']
         extra_kwargs = {'place': {'write_only': True}}
 
 class RoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ('place', 'room_type', 'capacity', 'price')
+        fields = ['place', 'room_type', 'capacity', 'price']
         extra_kwargs = {'place': {'write_only': True}}
 
 class OptionalSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Room
-        fields = ('place', 'title', 'price')
+        model = Optional
+        fields = ['place', 'title', 'price']
         extra_kwargs = {'place': {'write_only': True}}
 
 
 class PlaceSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True)
     tags = TagSerializer(many=True)
-    contact = ContactSerializer() #read_only=True
+    contact = ContactSerializer(many= False) #read_only=True
 
-    features = FeatureSerializer(many=True, read_only=True)
-    rooms = TagSerializer(many=True, read_only=True)
-    optional_costs = OptionalSerializer(many=True, read_only=True)
+    features = FeatureSerializer(many=True)
+    rooms = TagSerializer(many=True)
+    optional_costs = OptionalSerializer(many=True) #required=False
 
     class Meta:
         model = Place
-        fields = ('title', 'place_type', 'description', 
-        'rate', 'rate_no', 'contact', 'images', 'tags', 'is_free')
-        read_only_fields = ('id', 'rate', 'rate_no')
+        fields = ['id', 'title', 'place_type', 'description', 
+        'rate', 'rate_no', 'contact', 'images', 'tags', 
+        'is_free', 'features', 'rooms', 'optional_costs']
+        read_only_fields = ['id', 'rate', 'rate_no']
 
     def create(self, validated_data):
         request = self.context.get("request")

@@ -37,8 +37,7 @@ class Place(models.Model):
 class Image(models.Model):
     place = models.ForeignKey(
         Place, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(
-        upload_to=f'images/places')
+    image = models.ImageField(upload_to=f'images/places')
     upload_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -51,7 +50,7 @@ class Rate(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='rates')
     rate = models.DecimalField(
-        max_digits=2, decimal_places=1, default=0, 
+        max_digits=2, decimal_places=1, default=5, 
         validators=[MinValueValidator(0), MaxValueValidator(5)])
 
     def __str__(self):
@@ -70,6 +69,8 @@ class Tag(models.Model):
 class Contact(models.Model):
     place = models.OneToOneField(
         Place, on_delete=models.CASCADE, related_name='contact')
+    x_location = models.DecimalField(max_digits=6, decimal_places=3)
+    y_location = models.DecimalField(max_digits=6, decimal_places=3)
     province = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     address = models.TextField(blank=True, null=True)
@@ -118,6 +119,7 @@ class Optional(models.Model):
     place = models.OneToOneField(
         Place, on_delete=models.CASCADE, related_name='optional_costs')
     title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=3)
 
     def __str__(self):

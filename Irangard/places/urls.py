@@ -7,7 +7,7 @@ from .views import *
 app_name = 'places'
 
 router = routers.DefaultRouter()
-router.register('places', PlaceViewSet)
+router.register('', PlaceViewSet)
 
 
 urlpatterns = [

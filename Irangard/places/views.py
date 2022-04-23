@@ -35,21 +35,37 @@ class PlaceViewSet(ModelViewSet):
 	#  	return super().get_serializer_class()
 	
 	def create(self, request, *args, **kwargs):
-		user = request.user
-		place = self.get_object()
 		data = request.data
 		images = data.pop('images', [])
 		tags = data.pop('tags', [])
+		features = data.pop('features', [])
+		rooms = data.pop('rooms', [])
+		optional_costs = data.pop('optional_costs', [])
+		contact_data = data.pop('contact', None)
 
-		# contact = ContactSerializer(place=place, data=data)
+		serializer = self.get_serializer(data=request.data)
+		serializer.is_valid(raise_exception=True)
+		place = serializer.save()
+
+		# contact_data['place'] = place.pk
+		# contact = ContactSerializer(data=contact_data)
 		# contact.is_valid(raise_exception=True)
 		# contact.save()
-		# for image in images:
-		# 	Image.objects.create(place=place, **image)
-		# for tag in tags:
-		# 	Tag.objects.create(place=place, **tag)
 		
-		return super().create(request, *args, **kwargs)
+		Contact.objects.create(place=place, **contact_data)
+		for image in images:
+			Image.objects.create(place=place, **image)
+		for tag in tags:
+			Tag.objects.create(place=place, **tag)
+		for feature in features:
+			Feature.objects.create(place=place, **feature)
+		for room in rooms:
+			Room.objects.create(place=place, **room)
+		for optional_cost in optional_costs:
+			Optional.objects.create(place=place, **optional_cost)
+		
+		headers = self.get_success_headers(serializer.data)
+		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 	# def update(self, request, *args, **kwargs):
 	# 	place = self.get_object()
