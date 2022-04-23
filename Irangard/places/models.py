@@ -17,7 +17,8 @@ class Place(models.Model):
         max_digits=2, decimal_places=1, default=5, blank=True)
     rate_no = models.IntegerField(default=0, blank=True)
     is_free = models.BooleanField(default=False, blank=True)
-    added_by = models.ForeignKey(User, related_name='added_places')
+    added_by = models.ForeignKey(
+        User, related_name='added_places', on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return f'{self.title} => {self.place_type}'
@@ -35,9 +36,9 @@ class Place(models.Model):
 
 class Image(models.Model):
     place = models.ForeignKey(
-        related_name='images', on_delete=models.CASCADE)
+        Place, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(
-        upload_to=f'images/places/{place.place_type}')
+        upload_to=f'images/places')
     upload_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
