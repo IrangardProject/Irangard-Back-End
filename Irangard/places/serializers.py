@@ -52,18 +52,18 @@ class OptionalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Optional
-        fields = ['place', 'title', 'price']
+        fields = ['place', 'title', 'description', 'price']
         extra_kwargs = {'place': {'write_only': True}}
 
 
 class PlaceSerializer(serializers.ModelSerializer):
-    images = ImageSerializer(many=True)
-    tags = TagSerializer(many=True)
-    contact = ContactSerializer(many= False) #read_only=True
+    images = ImageSerializer(many=True, required=False)
+    tags = TagSerializer(many=True, required=False)
+    contact = ContactSerializer(required=False) #read_only=True
 
-    features = FeatureSerializer(many=True)
-    rooms = TagSerializer(many=True)
-    optional_costs = OptionalSerializer(many=True) #required=False
+    features = FeatureSerializer(many=True, required=False)
+    rooms = RoomSerializer(many=True, required=False)
+    optional_costs = OptionalSerializer(many=True, required=False) #required=False
 
     class Meta:
         model = Place
