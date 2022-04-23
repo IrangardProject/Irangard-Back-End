@@ -11,6 +11,8 @@ class User(AbstractUser):
     phone_no = models.CharField(max_length=11, null=True, blank=True)
     is_special = models.BooleanField(default=False, blank=True)
     about_me = models.TextField(null=True, blank=True)
+    following_number = models.IntegerField(default=0)
+    follower_number = models.IntegerField(default=0)
 
 class Verification(models.Model):
     email = models.EmailField(primary_key=True)
