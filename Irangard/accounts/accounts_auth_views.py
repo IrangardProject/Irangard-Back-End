@@ -163,14 +163,21 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
     def set_password(self, request):
         if request.method == 'POST':
             try:
-                user = User.objects.get(username=request.data['username'])
-                if(request.data['password'] == request.data['re_password']):
+                #user = User.objects.get(username=request.data['username'])
+                try :
+                    unregistered_user = Verification.objects.get(email=request.data['email'])
+                except Verification.DoesNotExist:
+                    return Response(f"user with email '{request.data['email']}' doesn't exist",
+                                status=status.HTTP_400_BAD_REQUEST) 
+                if(unregistered_user.token == request.data['token'] and request.data['password'] == request.data['re_password']):
+                    user = User.objects.create(username=unregistered_user.username, email=unregistered_user.email)
                     user.set_password(request.data['password'])
                     user.save()
+                    unregistered_user.delete()
                     return views.TokenObtainPairView().as_view()(request._request)  
 
                 else:
-                    return Response(f"password and re-password are not same",
+                    return Response(f"password and re-password are not same or token is correct",
                                     status=status.HTTP_400_BAD_REQUEST)
             except User.DoesNotExist:
                 return Response(f"user with username '{request.data['username']}' doesn't exist",
@@ -184,10 +191,7 @@ class AccountAuthViewSet(GenericViewSet,mixins.CreateModelMixin,mixins.RetrieveM
             try:
                 unregistered_user = Verification.objects.get(email=request.data['email'])
                 if(unregistered_user.token == request.data['token']):
-                    user = User.objects.create(username=unregistered_user.username, email=unregistered_user.email)
-                    user.save()
-                    unregistered_user.delete()
-                    return Response(status=status.HTTP_200_OK, data='user registered successfully')
+                    return Response(status=status.HTTP_200_OK, data='token matched successfully')
                 else:
                     return Response(f"token '{request.data['token']}' is invalid!",
                         status=status.HTTP_400_BAD_REQUEST)               
