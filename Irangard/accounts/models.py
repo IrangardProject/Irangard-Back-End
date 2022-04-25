@@ -3,13 +3,16 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=255, null=True, blank=True)
-    last_name = models.CharField(max_length=255, null=True, blank=True)
+    # first_name = models.CharField(max_length=255, null=True, blank=True)
+    # last_name = models.CharField(max_length=255, null=True, blank=True)
+    full_name = models.CharField(max_length=255, null=True, blank=True)
     image = models.ImageField(
         upload_to='images/users/', blank=True, null=True)
     phone_no = models.CharField(max_length=11, null=True, blank=True)
     is_special = models.BooleanField(default=False, blank=True)
     about_me = models.TextField(null=True, blank=True)
+    following_number = models.IntegerField(default=0)
+    follower_number = models.IntegerField(default=0)
 
 class Verification(models.Model):
     email = models.EmailField(primary_key=True)

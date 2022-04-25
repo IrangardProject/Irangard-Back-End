@@ -19,7 +19,7 @@ router.register('auth', AccountAuthViewSet,
 
 urlpatterns = [
     path('',include(router.urls)),
-    path('profile/<int:id>/', UserProfile.as_view(), name='user-profile'),
+    path('profile/<username>/', UserProfile.as_view(), name='user-profile'),
     path("auth/jwt/create", views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer),
             name="accounts-jwt-create"),
     path("auth/jwt/refresh", views.TokenRefreshView.as_view(),

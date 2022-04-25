@@ -44,6 +44,7 @@ schema_view = get_schema_view(  # swagger/redoc
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls'), name='accounts'),
+    path('places/', include('places.urls'), name='places'),
     
     path('swagger/', schema_view.with_ui('swagger',
                                          cache_timeout=0), name='schema-swagger-ui'),
