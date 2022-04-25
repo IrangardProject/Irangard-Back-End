@@ -96,7 +96,7 @@ class Location(models.Model):
 
 
 class Feature(models.Model):
-    place = models.OneToOneField(
+    place = models.ForeignKey(
         Place, on_delete=models.CASCADE, related_name='features')
     title = models.CharField(max_length=255)
 
@@ -105,7 +105,7 @@ class Feature(models.Model):
 
 
 class Room(models.Model):
-    place = models.OneToOneField(
+    place = models.ForeignKey(
         Place, on_delete=models.CASCADE, related_name='rooms')
     room_type = models.CharField(max_length=255) #mishe choices gozasht
     capacity = models.IntegerField()
@@ -116,7 +116,7 @@ class Room(models.Model):
 
 
 class Optional(models.Model):
-    place = models.OneToOneField(
+    place = models.ForeignKey(
         Place, on_delete=models.CASCADE, related_name='optional_costs')
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
