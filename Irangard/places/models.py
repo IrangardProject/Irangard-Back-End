@@ -69,8 +69,8 @@ class Tag(models.Model):
 class Contact(models.Model):
     place = models.OneToOneField(
         Place, on_delete=models.CASCADE, related_name='contact')
-    x_location = models.DecimalField(max_digits=6, decimal_places=3)
-    y_location = models.DecimalField(max_digits=6, decimal_places=3)
+    x_location = models.DecimalField(max_digits=15, decimal_places=10)
+    y_location = models.DecimalField(max_digits=15, decimal_places=10)
     province = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     address = models.TextField(blank=True, null=True)
