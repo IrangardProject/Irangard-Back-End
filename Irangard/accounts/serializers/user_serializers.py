@@ -5,25 +5,26 @@ from rest_framework import serializers
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = "__all__"
+        fields = "all"
         
         
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for user profile"""
-    full_name = serializers.SerializerMethodField('get_fullname')
+    is_owner = serializers.SerializerMethodField('get_is_owner')
     
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'image', 'about_me', 'is_special', 'full_name']
-        read_only_fields = ('email',)
+        fields = ['full_name', 'is_special', 'email', 'image', 'username', 'about_me', 'following_number', 'follower_number', 'is_owner']
+        read_only_fields = ('email', 'following_number', 'follower_number', 'is_owner')
         
-    def get_fullname(self, user):
-        first_name = str(user.first_name)
-        last_name = str(user.last_name)
-        full_name = first_name + ' ' + last_name
-        return full_name
-    
-   
+    def get_is_owner(self, user):
+        request_user = self.context['user']
+        if str(request_user) == str(user.username):
+            # print("HHHLHLKJ:LDKJ:LJ")
+            return True
+        else:
+            # print("HHHLHLKJ:LDKJ:LJ")
+            return False
         
     
     

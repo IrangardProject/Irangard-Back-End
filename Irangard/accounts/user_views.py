@@ -4,38 +4,34 @@ from rest_framework.views import APIView
 from .models import User
 from .serializers.user_serializers import UserProfileSerializer
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser
 
-class UserProfile(APIView):
-    # serializer_class = UserProfileSerializer
+class UserProfile(APIView): 
+    queryset = User.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     
-    def get(self, request, id, *args, **kwargs):
-        permission_classes = [IsAuthenticated]
+    def get(self, request, username, *args, **kwargs):
         parser_classes = [MultiPartParser, FormParser]
         
         try:
-            user = User.objects.get(pk=id)
+            user = User.objects.get(username=username)
         except User.DoesNotExist:
             return Response({'error': 'User does not exist!'}, status=status.HTTP_400_BAD_REQUEST)
         
-        serializer = UserProfileSerializer(user)
+        print(request.data)
+        serializer = UserProfileSerializer(user, context = {'user': request.user})
+        print(serializer.data)
+            
         return Response(serializer.data)
     
-    def put(self, request, id, *args, **kwargs):
-        user = User.objects.get(pk=id)
-        serializer = UserProfileSerializer(user, data=request.data)
-        print(request.data)
+    def put(self, request, username, *args, **kwargs):
+        parser_classes = [MultiPartParser, FormParser]
+        user = User.objects.get(username=username)
+        serializer = UserProfileSerializer(user, data=request.data, context = {'user': request.user})
         if serializer.is_valid():
             serializer.save()
-            fullname_parts = request.data['full_name'].split(' ')
-            first_name = fullname_parts[0]
-            if len(fullname_parts) > 1:
-                last_name = fullname_parts[1]
-                for i in range(2, len(fullname_parts)):
-                    last_name += ' ' + fullname_parts[i]
-
-                User.objects.filter(pk=id).update(first_name=first_name, last_name=last_name)
                 
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
