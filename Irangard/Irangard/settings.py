@@ -199,4 +199,4 @@ SIMPLE_JWT = {
 }
 
 
-#test_for_jenkins_7
+#test_for_jenkins_10
