@@ -67,12 +67,44 @@ class PlaceViewSet(ModelViewSet):
 		headers = self.get_success_headers(serializer.data)
 		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-	# def update(self, request, *args, **kwargs):
-	# 	place = self.get_object()
-	# 	if not place.is_owner(request.user):
-	# 		return Response('you do not have permission to edit this place.',
-	# 						 status=status.HTTP_403_FORBIDDEN)
-	#  	return super().update(request, *args, **kwargs)
+
+	def update(self, request, *args, **kwargs):
+		place = self.get_object()
+		if not place.is_owner(request.user):
+			return Response('you do not have permission to edit this place.',
+							 status=status.HTTP_403_FORBIDDEN)
+		data = request.data
+		images = data.pop('images', None)
+		tags = data.pop('tags', None)
+		features = data.pop('features', None)
+		rooms = data.pop('rooms', None)
+		optional_costs = data.pop('optional_costs', None)
+		contact_data = data.pop('contact', None)
+
+		if contact_data:
+			ContactSerializer().update(place.contact, contact_data)
+		if images:
+			place.images.all().delete()
+			for image in images:
+				Image.objects.create(place=place, **image)
+		if tags:
+			place.tags.all().delete()
+			for tag in tags:
+				Tag.objects.create(place=place, **tag)
+		if features:
+			place.features.all().delete()
+			for feature in features:
+				Feature.objects.create(place=place, **feature)
+		if rooms:
+			place.rooms.all().delete()
+			for room in rooms:
+				Room.objects.create(place=place, **room)
+		if optional_costs:
+			place.optional_costs.all().delete()
+			for optional_cost in optional_costs:
+				Optional.objects.create(place=place, **optional_cost)
+				
+		return super().update(request, *args, **kwargs)
 
 
 	# def destroy(self, request, *args, **kwargs):
