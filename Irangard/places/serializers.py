@@ -20,19 +20,11 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['place', 'name']
         extra_kwargs = {'place': {'write_only': True}}
 
-# class LocationSerializer(serializers.ModelSerializer):
-
-#     class Meta:
-#         model = Location
-#         fields = ['x', 'y']
-
 class ContactSerializer(serializers.ModelSerializer):
-    # location = LocationSerializer()
 
     class Meta:
         model = Contact
         fields = '__all__'
-        read_only_fields = ['id']
         extra_kwargs = {'place': {'write_only': True}}
 
 class FeatureSerializer(serializers.ModelSerializer):
