@@ -162,11 +162,15 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
         if request.method == 'POST':
             try:
                 #user = User.objects.get(username=request.data['username'])
+
                 try:
                     unregistered_user = Verification.objects.get(
                         email=request.data['email'])
                 except Verification.DoesNotExist:
                     return Response(f"user with email '{request.data['email']}' doesn't exist",
+                                    status=status.HTTP_400_BAD_REQUEST)
+                except:
+                    return Response(f"no email sent",
                                     status=status.HTTP_400_BAD_REQUEST)
 
                 if(unregistered_user.username != request.data['username']):
@@ -185,7 +189,7 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
                 else:
                     return Response(f"password and re-password are not same or token is correct",
                                     status=status.HTTP_400_BAD_REQUEST)
-            except:
+            except User.DoesNotExist:
                 return Response(f"user with username '{request.data['username']}' doesn't exist",
                                 status=status.HTTP_401_UNAUTHORIZED)
 
