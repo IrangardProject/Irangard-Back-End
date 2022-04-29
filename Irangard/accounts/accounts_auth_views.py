@@ -161,13 +161,6 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
     def set_password(self, request):
         if request.method == 'POST':
             try:
-<<<<<<< HEAD
-                user = User.objects.get(username=request.data['username'])
-                if(request.data['password'] == request.data['re_password']):
-                    user.set_password(request.data['password'])
-                    user.save()
-                    return views.TokenObtainPairView().as_view()(request._request)  
-=======
                 #user = User.objects.get(username=request.data['username'])
                 try:
                     unregistered_user = Verification.objects.get(
@@ -188,7 +181,6 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
                     result = views.TokenObtainPairView().as_view()(request._request)
                     unregistered_user.delete()
                     return result
->>>>>>> 54c360c ([feat] add tests for account_auth_viewset and fix a bug about set_password)
 
                 else:
                     return Response(f"password and re-password are not same",
