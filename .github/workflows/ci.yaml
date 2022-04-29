@@ -6,6 +6,29 @@ on:
   pull_request:
     branches: [ master ]
 
+
+env:
+  DEBUG: True
+
+  SECRET_KEY: django-insecure-g&@l9t5+dmgmtyi7p=@qby8d&+%@pgsd1v&0njdhfd@q6=w1ks
+
+  DB_PASSWORD: hunter2
+
+  WEBSITE_URL: http://127.0.0.1:8000
+
+  EMAIL_ID: no.reply.irangard.official@gmail.com
+
+  EMAIL_PW: emg123456789gme
+
+  HEROKU_DB_PASSWORD: hunter2
+
+  HEROKU_DB_NAME: irangard
+
+  HEROKU_DB_USER: postgres
+
+  HEROKU_DB_HOST: localhost
+  
+
 jobs:
   build:
 
@@ -25,6 +48,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: hunter2
+          POSTGRES_DB: irangard
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
