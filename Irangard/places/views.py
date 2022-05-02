@@ -24,15 +24,6 @@ class PlaceViewSet(ModelViewSet):
 	pagination_class = DefaultPagination 
 	permission_classes = [IsIsAuthenticatedOrReadOnly]
 
-	# def get_serializer_class(self):
-	# 	place = self.get_object()
-	# 	if place.place_type == 1: 
-	# 		return ResidenceSerializer
-	# 	if place.place_type == 2:
-	# 		return RecreationSerializer
-	# 	if place.place_type == 3:
-	# 		return AttractionSerializer
-	#  	return super().get_serializer_class()
 	
 	def create(self, request, *args, **kwargs):
 		data = request.data
@@ -46,11 +37,6 @@ class PlaceViewSet(ModelViewSet):
 		serializer = self.get_serializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		place = serializer.save()
-
-		# contact_data['place'] = place.pk
-		# contact = ContactSerializer(data=contact_data)
-		# contact.is_valid(raise_exception=True)
-		# contact.save()
 		
 		Contact.objects.create(place=place, **contact_data)
 		for image in images:
@@ -112,3 +98,13 @@ class PlaceViewSet(ModelViewSet):
 	# 		return Response('Only admin can remove places.', 
 	# 			status=status.HTTP_403_FORBIDDEN)
 	#  	return super().destroy(request, *args, **kwargs)
+
+	# def get_serializer_class(self):
+	# 	place = self.get_object()
+	# 	if place.place_type == 1: 
+	# 		return ResidenceSerializer
+	# 	if place.place_type == 2:
+	# 		return RecreationSerializer
+	# 	if place.place_type == 3:
+	# 		return AttractionSerializer
+	#  	return super().get_serializer_class()
