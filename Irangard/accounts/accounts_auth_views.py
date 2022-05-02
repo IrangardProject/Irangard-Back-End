@@ -52,6 +52,7 @@ class set_password_seriliazer(serializers.Serializer):
     email = serializers.CharField(max_length=50, help_text="user email")
     token = serializers.CharField(max_length=6, help_text="sent token")
 
+
 class reset_password_seriliazer(serializers.Serializer):
     email = serializers.CharField(max_length=50, help_text="user email")
 
@@ -189,7 +190,7 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
                 else:
                     return Response(f"password and re-password are not same or token is correct",
                                     status=status.HTTP_400_BAD_REQUEST)
-            except User.DoesNotExist:
+            except:
                 return Response(f"user with username '{request.data['username']}' doesn't exist",
                                 status=status.HTTP_401_UNAUTHORIZED)
 
