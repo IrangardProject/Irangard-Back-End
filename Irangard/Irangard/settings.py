@@ -42,7 +42,6 @@ DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -56,6 +55,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'accounts',
+    'places',
     'corsheaders',
 ]
 
@@ -65,6 +65,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -101,10 +102,10 @@ WSGI_APPLICATION = 'Irangard.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env.str('DB_NAME'), 
-        'USER': env.str('DB_USER'), 
-        'PASSWORD': env.str('DB_PASSWORD'),
-        'HOST': env.str('DB_HOST'), 
+        'NAME': env.str('HEROKU_DB_NAME'), 
+        'USER': env.str('HEROKU_DB_USER'), 
+        'PASSWORD': env.str('HEROKU_DB_PASSWORD'),
+        'HOST': env.str('HEROKU_DB_HOST'), 
         'PORT': '5432',
     },
     'TEST': {

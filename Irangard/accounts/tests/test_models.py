@@ -15,7 +15,7 @@ class UserTestCase(TestCase):
         )
 
     def test_user_email(self):
-        user = User.objects.get(email='Ghazal')
+        user = User.objects.get(username='Ghazal')
         self.assertEqual(user.email, 'ghazal@gmail.com')
 
     def test_user_phone_no(self):
@@ -23,5 +23,5 @@ class UserTestCase(TestCase):
         self.assertEqual(user.phone_no, '09225678765')
     
     def test_user_password(self):
-        user = User.objects.get(email='Ghazal')
+        user = User.objects.get(username='Ghazal')
         self.assertEqual(user.password, '123456')
