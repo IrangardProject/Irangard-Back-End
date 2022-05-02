@@ -23,6 +23,7 @@ class TestUserProfile(APITestCase):
             'password':'mo1234',
         }
         
+        #doesn't work :(
         
         # self.token = models.Token.objects.get(user__username="morteza")
         # self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token.key)
