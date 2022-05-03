@@ -73,4 +73,5 @@ jobs:
         DB_PORT: ${{ matrix.db_port }}
         DB_PASSWORD: hunter2
       run: |
-        python ./Irangard/manage.py test
+        cd Irangard
+        python manage.py test
