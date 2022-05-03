@@ -1,2 +1,2 @@
 #just created to test ci pipeline2
-#test cd pipeline
+#test cd pipeline_2
