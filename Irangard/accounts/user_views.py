@@ -6,8 +6,9 @@ from .serializers.user_serializers import UserProfileSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.generics import GenericAPIView
 
-class UserProfile(APIView): 
+class UserProfile(GenericAPIView):
     queryset = User.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]

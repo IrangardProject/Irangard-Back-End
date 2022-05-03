@@ -1,6 +1,6 @@
 from django.db import models
-from Irangard.accounts.models import User
-from Irangard.places.models import Place
+from accounts.models import User
+from places.models import Place
 
 class Experience(models.Model):
     title = models.CharField(max_length=255)
