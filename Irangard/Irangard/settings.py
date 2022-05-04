@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     'places',
     'experience',
     'corsheaders',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 ALLOWED_HOSTS=['*']
@@ -201,11 +203,12 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-cloudinary.config(
-    cloud_name="dgwbbbisy",
-    api_key="681516956198644",
-    api_secret="I6ytAk4a-0sw1KyI4-tONQusnjc",
-    secure=True
-)
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dgwbbbisy',
+    'API_KEY':'681516956198644',
+    'API_SECRET':'I6ytAk4a-0sw1KyI4-tONQusnjc',
+}
 
 #test_for_jenkins_11

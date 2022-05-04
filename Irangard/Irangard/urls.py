@@ -46,7 +46,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls'), name='accounts'),
     path('places/', include('places.urls'), name='places'),
     path('experiences/', include('experience.urls'), name='experiences'),
-    
     path('swagger/', schema_view.with_ui('swagger',
                                          cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc',
