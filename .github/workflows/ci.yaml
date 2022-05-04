@@ -2,9 +2,8 @@ name: Django CI
 
 on:
   push:
-    branches: [ master, develop ]
-  pull_request:
-    branches: [ master, develop ]
+    branches: [ develop ]
+
 
 
 env:
@@ -74,11 +73,4 @@ jobs:
       run: |
         cd Irangard
         python manage.py test
-    - name: Push
-      uses: s0/git-publish-subdir-action@develop
-      env:
-        REPO: self
-        BRANCH: production 
-        FOLDER: .
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-        MESSAGE: "Build: ({sha}) {msg}" 
+
