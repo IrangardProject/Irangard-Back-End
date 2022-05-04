@@ -75,7 +75,7 @@ jobs:
             python manage.py test
             
         - name: git-checkout
-          uses: actions/checkout@develop
+          uses: actions/checkout@v2
         - name: Push
           uses: s0/git-publish-subdir-action@develop
           env:
