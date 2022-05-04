@@ -17,6 +17,7 @@ from environs import Env
 import dj_database_url
 from datetime import timedelta
 import django_heroku
+import cloudinary
 
 
 
@@ -200,5 +201,11 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
 
+cloudinary.config(
+    cloud_name="dgwbbbisy",
+    api_key="681516956198644",
+    api_secret="I6ytAk4a-0sw1KyI4-tONQusnjc",
+    secure=True
+)
 
 #test_for_jenkins_11

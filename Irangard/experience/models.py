@@ -4,11 +4,11 @@ from places.models import Place
 
 class Experience(models.Model):
     title = models.CharField(max_length=255)
-    image = models.CharField()
+    image = models.CharField(max_length=500, blank=True, null=True)
     like_number = models.IntegerField(default=0)
     comment_number = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
-    summary = models.TextField(blank=True, null=True, max_length=500)
+    summary = models.TextField(blank=True, null=True)
     place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name='experiences')
     date_created = models.CharField(max_length=255)
     
