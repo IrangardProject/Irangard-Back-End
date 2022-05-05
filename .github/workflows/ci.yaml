@@ -74,3 +74,8 @@ jobs:
             cd Irangard
             python manage.py test
              
+        - name: Push changes to production
+          uses: ad-m/github-push-action@master
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            branch: production
