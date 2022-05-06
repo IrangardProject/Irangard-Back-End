@@ -11,5 +11,6 @@ router = routers.DefaultRouter()
 router.register('', ExperienceViewSet)
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    # path('<int:id>/like', LikeViewSet.as_view(), name='like-experience'),
 ]

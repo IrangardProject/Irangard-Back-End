@@ -1,5 +1,7 @@
+from dataclasses import fields
+from pyexpat import model
 from rest_framework import serializers
-from .models import Experience
+from .models import Experience, Like
 
 class ExperienceSerializer(serializers.ModelSerializer):
     
@@ -25,3 +27,8 @@ class ExperienceSerializer(serializers.ModelSerializer):
         return user.image.url
         
         
+# class LikeSerializer(serializers.Serializer):
+    
+#     class Meta:
+#         model = Like
+#         fields = '__all__'
