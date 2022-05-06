@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.contrib.auth.models import User, AnonymousUser
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 
 class ExperienceViewSet(ModelViewSet):
@@ -14,6 +16,10 @@ class ExperienceViewSet(ModelViewSet):
     serializer_class = ExperienceSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = ExperiencePagination
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['date_created', 'like_number']
+    filterset_fields = ['place__title']
+    search_fields = ['title', 'body']
     
     def retrieve(self, request, pk=None):
         # Add field is_owner for retrieve method
@@ -39,13 +45,5 @@ class ExperienceViewSet(ModelViewSet):
         new_response.update(serializer.data)
         return Response(new_response)
     
-    # def list(self, request):
-    #     # pagination
-    #     # queryset = self.queryset
-    #     # parameters = get_request_params(self.request)
-        
-    #     experiences = Experience.objects.all()
-    #     serializer = ExperienceListSerializer(experiences, context = {'user': request.user}, many=True)
-    #     return Response(serializer.data)
     
     
