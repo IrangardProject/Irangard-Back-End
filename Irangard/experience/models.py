@@ -16,5 +16,5 @@ class Experience(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='experiences')
     
 class Like(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
-    experience = models.ForeignKey(Experience, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes_user')
+    experience = models.ForeignKey(Experience, on_delete=models.CASCADE, related_name='likes_experience')

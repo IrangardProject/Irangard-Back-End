@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from .pagination import ExperiencePagination
-from .serializers import ExperienceSerializer
+from .serializers import ExperienceSerializer, LikeSerializer
 from .models import Experience, Like
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -48,22 +48,26 @@ class ExperienceViewSet(ModelViewSet):
         return Response(new_response)
     
  
-# class LikeViewSet(GenericAPIView):
-#     queryset = Like.objects.all()
-#     serializer_class = ExperienceSerializer
-#     # permission_classes = [IsAuthenticated]   
+class LikeViewSet(GenericAPIView):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    # serializer_class = ExperienceSerializer
+    # permission_classes = [IsAuthenticated]   
     
-#     def post(self, request, id, *args, **kwargs):
-#         user = request.user
-#         experience = Experience.objects.get(pk=id)
-#         experience.like_number += 1
-#         serializer = ExperienceSerializer(experience, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response("Succesfull", status=status.HTTP_200_OK)
-#         else:
-#             print(experience.like_number)
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, id, *args, **kwargs):
+        user = request.user
+        experience = Experience.objects.get(pk=id)
+        serializer = LikeSerializer(data=request.data)
+        if serializer.is_valid():
+            user_likes = Like.objects.filter(user=user, experience=experience)
+            if user_likes.exists():
+                return Response("You have liked before", status=status.HTTP_400_BAD_REQUEST)
+            else:
+                experience.like_number += 1
+                experience.save()
+                serializer.save(user=user, experience=experience)
+                return Response("OK", status=status.HTTP_200_OK)
+                
     
     
     

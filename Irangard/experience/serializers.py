@@ -27,8 +27,8 @@ class ExperienceSerializer(serializers.ModelSerializer):
         return user.image.url
         
         
-# class LikeSerializer(serializers.Serializer):
+class LikeSerializer(serializers.ModelSerializer):
     
-#     class Meta:
-#         model = Like
-#         fields = '__all__'
+    class Meta:
+        model = Like
+        fields = '__all__'

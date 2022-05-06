@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
-from .views import ExperienceViewSet
+from .views import ExperienceViewSet, LikeViewSet
 from django.urls.conf import include
 
 
@@ -12,5 +12,5 @@ router.register('', ExperienceViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    # path('<int:id>/like', LikeViewSet.as_view(), name='like-experience'),
+    path('<int:id>/like', LikeViewSet.as_view(), name='like-experience'),
 ]
