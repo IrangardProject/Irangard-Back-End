@@ -52,7 +52,7 @@ class LikeViewSet(GenericAPIView):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
     # serializer_class = ExperienceSerializer
-    # permission_classes = [IsAuthenticated]   
+    permission_classes = [IsAuthenticated]   
     
     def post(self, request, id, *args, **kwargs):
         user = request.user
