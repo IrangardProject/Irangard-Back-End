@@ -5,7 +5,7 @@ from cloudinary.models import CloudinaryField
 
 class Experience(models.Model):
     title = models.CharField(max_length=255)
-    image = models.ImageField(upload_to=f'images/experiences')
+    image = models.ImageField(upload_to=f'images/experiences', null=True, blank=True)
     like_number = models.IntegerField(default=0)
     comment_number = models.IntegerField(default=0)
     rate = models.IntegerField(default=5)
@@ -18,3 +18,5 @@ class Experience(models.Model):
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes_user')
     experience = models.ForeignKey(Experience, on_delete=models.CASCADE, related_name='likes_experience')
+    
+
