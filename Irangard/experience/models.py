@@ -24,8 +24,8 @@ class Comment(models.Model):
         Experience, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments')
-    parent = models.OneToOneField('Comment', on_delete=models.CASCADE, 
-                        related_name='reply', null=True, blank=True)
+    parent = models.ForeignKey('Comment', on_delete=models.CASCADE, 
+                        related_name='replies', null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     text = models.TextField()
 
