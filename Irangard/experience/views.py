@@ -21,7 +21,8 @@ class ExperienceViewSet(ModelViewSet):
 	pagination_class = ExperiencePagination
 	filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter]
 	ordering_fields = ['date_created', 'like_number']
-	filterset_fields = ['place__title', 'place__contact__city', 'place__contact__province']
+	filterset_fields = ['place__title', 'place__contact__city', 
+				'place__contact__province', 'user__username', 'user__id']
 	search_fields = ['title', 'body']
 	
 	def retrieve(self, request, pk=None):
