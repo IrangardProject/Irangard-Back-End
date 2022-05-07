@@ -9,7 +9,7 @@ from rest_framework_nested import routers
 from .user_views import UserProfile
 from .accounts_auth_views import AccountAuthViewSet
 from accounts.serializers.serializersNew import myTokenObtainPairSerializer
-from .views import *
+from .views import Pay
 
 app_name = 'accounts'
 
@@ -27,5 +27,6 @@ urlpatterns = [
     path("auth/jwt/verify", views.TokenVerifyView.as_view(),
             name="accounts-jwt-verify"),
 #     path(r'^jwt/token/?', views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer), name='accounts-jwt-token-new'),
+    path('/webhook/pay', Pay.as_view(), name='payment'),
 ]
 
