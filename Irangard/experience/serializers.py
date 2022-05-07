@@ -35,8 +35,33 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class UserCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'image', 'full_name']
+
+
+class ReplySerializer(serializers.ModelSerializer):
+    user = UserCommentSerializer(read_only=True)
+    class Meta:
+        model = Comment
+        fields = ['id', 'created_date', 'text', 'user']
+        read_only_fields = ['id', 'created_date', 'user']
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        validated_data['experience_id'] = self.context.get("experience")
+        validated_data['parent_id'] = self.context.get("parent")
+        validated_data['user'] = request.user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data['created_date'] = datetime.now()
+        return super().update(instance, validated_data)
+
+
 class CommentSerializer(serializers.ModelSerializer):
-    reply = ReplySerializer(read_only=True)
+    reply = ReplySerializer(read_only=True, many=True)
     user = UserCommentSerializer(read_only=True)
     class Meta:
         model = Comment
