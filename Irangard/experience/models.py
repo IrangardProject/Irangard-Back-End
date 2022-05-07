@@ -8,21 +8,16 @@ class Experience(models.Model):
     image = models.ImageField(upload_to=f'images/experiences')
     like_number = models.IntegerField(default=0)
     comment_number = models.IntegerField(default=0)
-    views = models.IntegerField(default=0)
-    rate_no = models.IntegerField(default=0)
-    rate = models.IntegerField(default=0)
+    rate = models.IntegerField(default=5)
     summary = models.TextField(blank=True, null=True)
-    date_created = models.CharField(max_length=255)
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    body = models.TextField(blank=True, null=True)
     place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name='experiences')
-    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='experiences')
     
 class Like(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
-    experience = models.ForeignKey(Experience, on_delete=models.CASCADE, related_name='likes')
-    
-# class Rate(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rates')
-#     experience = models.ForeignKey(Experience, on_delete=models.CASCADE, related_name='rates')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes_user')
+    experience = models.ForeignKey(Experience, on_delete=models.CASCADE, related_name='likes_experience')
 
 class Comment(models.Model):
     experience = models.ForeignKey(
@@ -39,5 +34,3 @@ class Comment(models.Model):
 
     def is_owner(self, user):
         return self.user == user
-    
-    
