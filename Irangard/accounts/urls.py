@@ -9,6 +9,7 @@ from rest_framework_nested import routers
 from .user_views import UserProfile
 from .accounts_auth_views import AccountAuthViewSet
 from accounts.serializers.serializersNew import myTokenObtainPairSerializer
+from .admin_views import AdminViewSet
 from .views import *
 
 app_name = 'accounts'
@@ -16,6 +17,7 @@ app_name = 'accounts'
 router =  routers.DefaultRouter()
 router.register('auth', AccountAuthViewSet,
                 basename='accounts-auth')
+router.register('admin', AdminViewSet)
 
 urlpatterns = [
     path('',include(router.urls)),
