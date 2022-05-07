@@ -23,5 +23,21 @@ class Like(models.Model):
 # class Rate(models.Model):
 #     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rates')
 #     experience = models.ForeignKey(Experience, on_delete=models.CASCADE, related_name='rates')
+
+class Comment(models.Model):
+    experience = models.ForeignKey(
+        Experience, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comments')
+    parent = models.OneToOneField('Comment', on_delete=models.CASCADE, 
+                        related_name='reply', null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    text = models.TextField()
+
+    def __str__(self):
+        return f"{self.experience.title} {self.user.username}"
+
+    def is_owner(self, user):
+        return self.user == user
     
     
