@@ -80,12 +80,12 @@ class PayViewSet(GenericViewSet):
             try:
                 user = StagedPayments.objects.get(
                     transaction_id=request.data['id'])
-                sp_user = SpecialUser.objects.create(user=user)
+                sp_user = SpecialUser.objects.create(user=user.user)
                 sp_user.save()
-                st_payment = StagedPayments.objects.get(user=user)
+                st_payment = StagedPayments.objects.get(user=user.user)
                 st_payment.delete()
                 return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
-            except User.DoesNotExist:
+            except StagedPayments.DoesNotExist:
                 return Response(f"bad request", status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(f"transaction is not verified", status=status.HTTP_405_METHOD_NOT_ALLOWED)

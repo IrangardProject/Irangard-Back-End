@@ -14,7 +14,7 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=False, blank=True)
     
 
-class SpecialUser(User):
+class SpecialUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='special_users')
 
 class Verification(models.Model):
