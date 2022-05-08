@@ -127,7 +127,7 @@ class ReplytViewSet(CommentViewSet):
 
 	def create(self, request, *args, **kwargs):
 		get_object_or_404(Experience.objects, pk=self.kwargs.get('experience_pk'))
-		get_object_or_404(Comment.objects, pk=self.kwargs.get('comment_pk'))
+		get_object_or_404(Comment.objects, pk=self.kwargs.get('parent_pk'))
 		return super().create(request, *args, **kwargs)
 
 
