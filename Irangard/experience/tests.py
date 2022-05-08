@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APITestCase
-from . import models
+# from . import models
 
 
 # Create your tests here.
@@ -11,10 +11,10 @@ class TestUserProfile(APITestCase):
         self.user = models.User.objects.create(username='morteza', full_name='Morteza Shaharabi', email='Morteza.shsh@gmail.com', password='mo1234')
         self.user.save()
         
-    def test_getProfile(self):
+    # def test_getProfile(self):
         
-        response = self.client.get(reverse('accounts:user-profile', args=(self.user.username,)))
-        self.assertEqual(response.status_code, 200)
+    #     response = self.client.get(reverse('accounts:user-profile', args=(self.user.username,)))
+    #     self.assertEqual(response.status_code, 200)
         
     # def test_putProfile(self):
         
