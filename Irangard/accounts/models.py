@@ -22,3 +22,8 @@ class Token(models.Model):
     uid = models.CharField(primary_key=True, max_length=100)
     token = models.CharField(max_length=100)
     create_time = models.DateTimeField(auto_now_add=True)
+
+class StagedPayments(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='staged_payments_info')
+    transaction_id = models.CharField(max_length=50)
+    order_id = models.CharField(max_length=50)
