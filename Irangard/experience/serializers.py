@@ -61,11 +61,11 @@ class ReplySerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    reply = ReplySerializer(read_only=True, many=True)
+    replies = ReplySerializer(read_only=True, many=True)
     user = UserCommentSerializer(read_only=True)
     class Meta:
         model = Comment
-        fields = ['id', 'created_date', 'text', 'user', 'reply']
+        fields = ['id', 'created_date', 'text', 'user', 'replies']
         read_only_fields = ['id', 'created_date']
 
     def create(self, validated_data):
