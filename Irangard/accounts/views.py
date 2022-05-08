@@ -10,13 +10,13 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.decorators import action, api_view, permission_classes
 from .models import StagedPayments, SpecialUser
 from django.contrib.auth import authenticate, login
-from accounts.serializers.user_serializers import UserSerializer
+from accounts.serializers.payment_serializers import VerifiedPaymentSerializer
 
 
 class PayViewSet(GenericViewSet):
 
     permission_classes = [permissions.AllowAny]
-    serializer_class = UserSerializer
+    serializer_class = VerifiedPaymentSerializer
     
     # def get_serializer(self, *args, **kwargs):
     #     return None
@@ -29,15 +29,15 @@ class PayViewSet(GenericViewSet):
         order_id = str(uuid.uuid4())
         my_data = {
             "order_id": order_id,
-            "amount": 50000,
+            "amount": 10000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": "http://188.121.123.141:8000/accounts/pay/verify/"
+            "callback": "http://127.0.0.1:8000/accounts/pay/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
                       'X-API-KEY': '3394842f-7407-4598-8c48-499a15c8d0b7',
-                      'X-SANDBOX': '0'}
+                      'X-SANDBOX': '1'}
 
         response = requests.post(url="https://api.idpay.ir/v1.1/payment", data=json.dumps(my_data),
                                  headers=my_headers)
@@ -61,12 +61,6 @@ class PayViewSet(GenericViewSet):
     @action(detail=False, url_path='verify', methods=['POST','GET'], permission_classes=[permissions.AllowAny])
     def verify(self, request):
 
-        username = 'emad12'
-        password = 'emad1234'
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-
         my_data = {
             "order_id": f'{request.user.staged_payments_info.order_id}',
             "id": f'{request.user.staged_payments_info.transaction_id}',
@@ -81,7 +75,7 @@ class PayViewSet(GenericViewSet):
         response = requests.post(url="https://api.idpay.ir/v1.1/payment/verify", data=json.dumps(my_data),
                                  headers=my_headers)
         response.raise_for_status()
-        print(response.content, ' ', response.status_code)
+        #print(response.content, ' ', response.status_code)
 
         if(response.status_code == 200):
             sp_user = SpecialUser.objects.create(user = request.user)
