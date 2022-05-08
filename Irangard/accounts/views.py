@@ -56,7 +56,7 @@ class PayViewSet(GenericViewSet):
 
         return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
 
-    @action(detail=False, url_path='verify', methods=['POST'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, url_path='verify', methods=['POST','GET'], permission_classes=[permissions.AllowAny])
     def verify(self, request):
 
         username = 'emad12'
