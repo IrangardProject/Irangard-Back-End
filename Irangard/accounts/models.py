@@ -11,6 +11,11 @@ class User(AbstractUser):
     about_me = models.TextField(null=True, blank=True)
     following_number = models.IntegerField(default=0)
     follower_number = models.IntegerField(default=0)
+    is_admin = models.BooleanField(default=False, blank=True)
+    
+
+class SpecialUser(User):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='special_users')
 
 class Verification(models.Model):
     email = models.EmailField(primary_key=True)
