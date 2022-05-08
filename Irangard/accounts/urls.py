@@ -9,13 +9,17 @@ from rest_framework_nested import routers
 from .user_views import UserProfile
 from .accounts_auth_views import AccountAuthViewSet
 from accounts.serializers.serializersNew import myTokenObtainPairSerializer
-from .views import *
+from .admin_views import AdminViewSet
+from .views import PayViewSet
 
 app_name = 'accounts'
 
 router =  routers.DefaultRouter()
 router.register('auth', AccountAuthViewSet,
                 basename='accounts-auth')
+router.register('pay',PayViewSet , basename='accounts-pay')
+router.register('admin', AdminViewSet)
+
 
 urlpatterns = [
     path('',include(router.urls)),
@@ -23,9 +27,8 @@ urlpatterns = [
     path("auth/jwt/create", views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer),
             name="accounts-jwt-create"),
     path("auth/jwt/refresh", views.TokenRefreshView.as_view(),
-            name="accounts-jwt-refresh"),
+            name="accounts-jwt-refresh"), 
     path("auth/jwt/verify", views.TokenVerifyView.as_view(),
             name="accounts-jwt-verify"),
 #     path(r'^jwt/token/?', views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer), name='accounts-jwt-token-new'),
 ]
-
