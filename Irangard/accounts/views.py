@@ -17,14 +17,12 @@ class PayViewSet(GenericViewSet):
 
     permission_classes = [permissions.AllowAny]
     serializer_class = VerifiedPaymentSerializer
-    
+
     # def get_serializer(self, *args, **kwargs):
     #     return None
 
-    @action(detail=False, url_path='pay', methods=['POST','GET'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, url_path='pay', methods=['POST', 'GET'], permission_classes=[permissions.AllowAny])
     def pay(self, request):
-
-
 
         order_id = str(uuid.uuid4())
         my_data = {
@@ -53,17 +51,17 @@ class PayViewSet(GenericViewSet):
             obj = StagedPayments.objects.create(transaction_id=json.loads(response.content)[
                 'id'], order_id=order_id, user=request.user)
             obj.save()
-        except :
+        except:
             return Response(f"bad request", status=status.HTTP_400_BAD_REQUEST)
 
         return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
 
-    @action(detail=False, url_path='verify', methods=['POST','GET'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, url_path='verify', methods=['POST', 'GET'], permission_classes=[permissions.AllowAny])
     def verify(self, request):
 
         my_data = {
-            "order_id": f'{request.user.staged_payments_info.order_id}',
-            "id": f'{request.user.staged_payments_info.transaction_id}',
+            "order_id": request.data['order_id'],
+            "id": request.data['id'],
 
         }
 
@@ -78,9 +76,9 @@ class PayViewSet(GenericViewSet):
         #print(response.content, ' ', response.status_code)
 
         if(response.status_code == 200):
-            sp_user = SpecialUser.objects.create(user = request.user)
+            sp_user = SpecialUser.objects.create(user=request.user)
             sp_user.save()
-            st_payment = StagedPayments.objects.get(user = request.user)
+            st_payment = StagedPayments.objects.get(user=request.user)
             st_payment.delete()
             return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
 
