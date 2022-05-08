@@ -63,7 +63,7 @@ class ReplySerializer(serializers.ModelSerializer):
 class CommentSerializer(ReplySerializer):
     replies = ReplySerializer(read_only=True, many=True)
     class Meta(ReplySerializer.Meta):
-        fields = super().fields + ['replies']
+        fields = ReplySerializer.Meta.fields + ['replies']
 
     def create(self, validated_data):
         request = self.context.get("request")
