@@ -32,7 +32,7 @@ class PayViewSet(GenericViewSet):
             "amount": 50000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": "https://api.irangard.ml/accounts/pay/verify/"
+            "callback": "http://188.121.123.141:8000/accounts/pay/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
@@ -87,3 +87,6 @@ class PayViewSet(GenericViewSet):
             st_payment = StagedPayments.objects.get(user = request.user)
             st_payment.delete()
             return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
+
+        else:
+            return Response(f"transaction is not verified", status=status.HTTP_405_METHOD_NOT_ALLOWED)
