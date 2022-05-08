@@ -10,20 +10,21 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.decorators import action, api_view, permission_classes
 from .models import StagedPayments
 from django.contrib.auth import authenticate, login
+from accounts.serializers.user_serializers import UserSerializer
 
 
 class PayViewSet(GenericViewSet):
 
     permission_classes = [permissions.AllowAny]
+    serializer_class = None
+    
+    # def get_serializer(self, *args, **kwargs):
+    #     return None
 
-    @action(detail=False, url_path='pay', methods=['POST'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, url_path='pay', methods=['POST','GET'], permission_classes=[permissions.AllowAny])
     def pay(self, request):
 
-        username = 'emad12'
-        password = 'emad1234'
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
+
 
         order_id = str(uuid.uuid4())
         my_data = {
@@ -31,7 +32,7 @@ class PayViewSet(GenericViewSet):
             "amount": 50000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": "https://api.irangard.ml/accounts/pay/verify/"
+            "callback": "http://188.121.123.141:8000/accounts/pay/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
@@ -79,4 +80,6 @@ class PayViewSet(GenericViewSet):
                                  headers=my_headers)
         response.raise_for_status()
         print(response.content, ' ', response.status_code)
+
+                
         return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
