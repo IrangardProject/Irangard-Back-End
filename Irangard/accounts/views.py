@@ -24,6 +24,8 @@ class PayViewSet(GenericViewSet):
     @action(detail=False, url_path='pay', methods=['POST', 'GET'], permission_classes=[permissions.AllowAny])
     def pay(self, request):
 
+        if(hasattr(request.user, 'special_users')):
+            return Response(f"user {request.user.username} is already a special user", status=status.HTTP_400_BAD_REQUEST)
         order_id = str(uuid.uuid4())
         my_data = {
             "order_id": order_id,
@@ -37,6 +39,7 @@ class PayViewSet(GenericViewSet):
                       'X-API-KEY': '3394842f-7407-4598-8c48-499a15c8d0b7',
                       'X-SANDBOX': '0'}
 
+        
         response = requests.post(url="https://api.idpay.ir/v1.1/payment", data=json.dumps(my_data),
                                  headers=my_headers)
         response.raise_for_status()
@@ -84,8 +87,12 @@ class PayViewSet(GenericViewSet):
                 sp_user.save()
                 st_payment = StagedPayments.objects.get(user=user.user)
                 st_payment.delete()
-                return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
+                verified_payment_serializer = VerifiedPaymentSerializer(data = json.loads(response.content)) 
+                verified_payment_serializer.is_valid(raise_exception=True)
+                return Response(verified_payment_serializer.data, status=status.HTTP_200_OK)
             except StagedPayments.DoesNotExist:
                 return Response(f"bad request", status=status.HTTP_400_BAD_REQUEST)
+            except:
+                return Response(f"user {user.user.username} is already a special user", status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(f"transaction is not verified", status=status.HTTP_405_METHOD_NOT_ALLOWED)
