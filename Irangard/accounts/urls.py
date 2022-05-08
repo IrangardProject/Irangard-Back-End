@@ -29,4 +29,3 @@ urlpatterns = [
             name="accounts-jwt-verify"),
 #     path(r'^jwt/token/?', views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer), name='accounts-jwt-token-new'),
 ]
-
