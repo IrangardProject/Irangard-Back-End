@@ -16,7 +16,7 @@ from accounts.serializers.user_serializers import UserSerializer
 class PayViewSet(GenericViewSet):
 
     permission_classes = [permissions.AllowAny]
-    serializer_class = None
+    serializer_class = UserSerializer
     
     # def get_serializer(self, *args, **kwargs):
     #     return None
@@ -53,6 +53,8 @@ class PayViewSet(GenericViewSet):
             obj = StagedPayments.objects.create(transaction_id=json.loads(response.content)[
                 'id'], order_id=order_id, user=request.user)
             obj.save()
+        except :
+            return Response(f"bad request", status=status.HTTP_400_BAD_REQUEST)
 
         return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
 
