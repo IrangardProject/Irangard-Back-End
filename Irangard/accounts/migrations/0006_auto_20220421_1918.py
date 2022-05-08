@@ -11,21 +11,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='user',
-            name='full_name',
-            field=models.CharField(blank=True, max_length=255, null=True),
-        ),
-        migrations.AlterField(
-            model_name='user',
-            name='first_name',
-            field=models.CharField(blank=True, default=django.utils.timezone.now, max_length=150, verbose_name='first name'),
-            preserve_default=False,
-        ),
-        migrations.AlterField(
-            model_name='user',
-            name='last_name',
-            field=models.CharField(blank=True, default=django.utils.timezone.now, max_length=150, verbose_name='last name'),
-            preserve_default=False,
-        ),
+
     ]

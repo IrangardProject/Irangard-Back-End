@@ -10,14 +10,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='user',
-            name='follower_number',
-            field=models.IntegerField(default=0),
-        ),
-        migrations.AddField(
-            model_name='user',
-            name='following_number',
-            field=models.IntegerField(default=0),
-        ),
+
     ]

@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.decorators import action, api_view, permission_classes
-from .models import StagedPayments
+from .models import StagedPayments, SpecialUser
 from django.contrib.auth import authenticate, login
 from accounts.serializers.user_serializers import UserSerializer
 
@@ -32,7 +32,7 @@ class PayViewSet(GenericViewSet):
             "amount": 50000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": "http://188.121.123.141:8000/accounts/pay/verify/"
+            "callback": "https://api.irangard.ml/accounts/pay/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
@@ -81,5 +81,9 @@ class PayViewSet(GenericViewSet):
         response.raise_for_status()
         print(response.content, ' ', response.status_code)
 
-                
-        return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
+        if(response.status_code == 200):
+            sp_user = SpecialUser.objects.create(user = request.user)
+            sp_user.save()
+            st_payment = StagedPayments.objects.get(user = request.user)
+            st_payment.delete()
+            return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
