@@ -19,7 +19,7 @@ class PlaceViewSet(ModelViewSet):
 	queryset = Place.objects.all()
 	serializer_class = PlaceSerializer
 	filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-	filterset_fields = ['place_type']
+	# filterset_fields = ['place_type']
 	filterset_class = PlaceFilter
 	search_fields = ['title']  # space comma seprator
 	ordering_fields = ['-rate']  
