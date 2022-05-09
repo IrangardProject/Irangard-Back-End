@@ -8,30 +8,29 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.decorators import action, api_view, permission_classes
-from .models import StagedPayments
+from .models import StagedPayments, SpecialUser
 from django.contrib.auth import authenticate, login
+from accounts.serializers.payment_serializers import VerifiedPaymentSerializer
 
 
 class PayViewSet(GenericViewSet):
 
     permission_classes = [permissions.AllowAny]
+    serializer_class = VerifiedPaymentSerializer
 
-    @action(detail=False, url_path='pay', methods=['POST'], permission_classes=[permissions.AllowAny])
+    # def get_serializer(self, *args, **kwargs):
+    #     return None
+
+    @action(detail=False, url_path='pay', methods=['POST', 'GET'], permission_classes=[permissions.AllowAny])
     def pay(self, request):
-
-        username = 'emad12'
-        password = 'emad1234'
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
 
         order_id = str(uuid.uuid4())
         my_data = {
             "order_id": order_id,
-            "amount": 50000,
+            "amount": 10000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": "https://api.irangard.ml/accounts/pay/verify/"
+            "callback": "http://188.121.123.141:8000/accounts/pay/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
@@ -52,21 +51,17 @@ class PayViewSet(GenericViewSet):
             obj = StagedPayments.objects.create(transaction_id=json.loads(response.content)[
                 'id'], order_id=order_id, user=request.user)
             obj.save()
+        except:
+            return Response(f"bad request", status=status.HTTP_400_BAD_REQUEST)
 
         return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
 
-    @action(detail=False, url_path='verify', methods=['POST'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, url_path='verify', methods=['POST', 'GET'], permission_classes=[permissions.AllowAny])
     def verify(self, request):
 
-        username = 'emad12'
-        password = 'emad1234'
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-
         my_data = {
-            "order_id": f'{request.user.staged_payments_info.order_id}',
-            "id": f'{request.user.staged_payments_info.transaction_id}',
+            "order_id": request.data['order_id'],
+            "id": request.data['id'],
 
         }
 
@@ -78,5 +73,19 @@ class PayViewSet(GenericViewSet):
         response = requests.post(url="https://api.idpay.ir/v1.1/payment/verify", data=json.dumps(my_data),
                                  headers=my_headers)
         response.raise_for_status()
-        print(response.content, ' ', response.status_code)
-        return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
+        #print(response.content, ' ', response.status_code)
+
+        if(response.status_code == 200):
+
+            try:
+                user = StagedPayments.objects.get(
+                    transaction_id=request.data['id'])
+                sp_user = SpecialUser.objects.create(user=user.user)
+                sp_user.save()
+                st_payment = StagedPayments.objects.get(user=user.user)
+                st_payment.delete()
+                return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
+            except StagedPayments.DoesNotExist:
+                return Response(f"bad request", status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(f"transaction is not verified", status=status.HTTP_405_METHOD_NOT_ALLOWED)
