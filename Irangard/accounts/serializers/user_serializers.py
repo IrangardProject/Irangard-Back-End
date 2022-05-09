@@ -23,6 +23,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
             return True
         else:
             return False
+
+class UserFeedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"
     
    
         

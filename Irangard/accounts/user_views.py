@@ -2,10 +2,11 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import User
-from .serializers.user_serializers import UserProfileSerializer
+from .serializers.user_serializers import UserProfileSerializer, UserFeedSerializer
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.decorators import action
 
 class UserProfile(APIView): 
     queryset = User.objects.all()
@@ -33,5 +34,13 @@ class UserProfile(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, permission_classes=[AllowAny],
+			url_name="get-followers", url_path="followers")
+    def get_followers(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = Userf(user.followers, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
         
     
