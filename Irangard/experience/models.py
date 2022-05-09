@@ -5,7 +5,7 @@ from cloudinary.models import CloudinaryField
 
 class Experience(models.Model):
     title = models.CharField(max_length=255)
-    image = models.ImageField(upload_to=f'images/experiences')
+    image = models.ImageField(upload_to=f'images/experiences', blank=True, null=True)
     like_number = models.IntegerField(default=0)
     comment_number = models.IntegerField(default=0)
     rate = models.IntegerField(default=5)
