@@ -39,7 +39,7 @@ class UserProfile(APIView):
 			url_name="get-followers", url_path="followers")
     def get_followers(self, request, *args, **kwargs):
         user = self.get_object()
-        serializer = Userf(user.followers, many=True)
+        serializer = UserFeedSerializer(user.followers, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
         
