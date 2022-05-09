@@ -13,7 +13,7 @@ class ExperienceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experience     
         fields = "__all__"  
-        read_only_fields = ['like_number', 'comment_number', 'views', 'rate', 'rate_no', 'place_title', 'user_username', 'user_image']
+        read_only_fields = ['like_number', 'comment_number', 'views', 'rate', 'rate_no', 'place_title', 'user_username', 'user_image', 'user']
         
     def get_place_title(self, experience):
         place = experience.place
@@ -25,7 +25,16 @@ class ExperienceSerializer(serializers.ModelSerializer):
     
     def get_user_image(self, experience):
         user = experience.user
-        return user.image.url
+        print(user.image)
+        if user.image != "":
+            return user.image.url
+        else:
+            return ""
+    
+    def create(self, validated_data):
+        request = self.context.get("request")
+        validated_data['user'] = request.user
+        return super().create(validated_data)
         
         
 class LikeSerializer(serializers.ModelSerializer):
