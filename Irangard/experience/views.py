@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from rest_framework.viewsets import ModelViewSet
+
+from .filters import ExperienceFilterSet
 from .pagination import ExperiencePagination
 from .serializers import *
 from .models import *
@@ -21,9 +23,10 @@ class ExperienceViewSet(ModelViewSet):
 	pagination_class = ExperiencePagination
 	filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter]
 	ordering_fields = ['date_created', 'like_number']
-	filterset_fields = ['place__title', 'place__contact__city', 
+	filterset_fields = ['place__title', 'place__contact__city',
 				'place__contact__province', 'user__username', 'user__id']
 	search_fields = ['title', 'body']
+	filterset_class = ExperienceFilterSet
 	
 	def retrieve(self, request, pk=None):
 		# Add field is_owner for retrieve method

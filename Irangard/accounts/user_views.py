@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import User
-from .serializers.user_serializers import UserProfileSerializer, UserFeedSerializer
+from .serializers.user_serializers import *
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -68,5 +68,24 @@ class UserProfile(GenericAPIView):
                         status=status.HTTP_400_BAD_REQUEST)
         user.followers.delete(request.user)
         return Response(status=status.HTTP_200_OK)
+        
+        
+class UserInformation(GenericAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserProfileSerializer
+    
+    def get(self, request, *args, **kwargs):
+        request_user = request.user
+        
+        try:
+            username = request_user.username
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({'error': 'User does not exist!'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = UserInformationSerializer(user)
+        return Response(serializer.data)
+    
+    
         
     

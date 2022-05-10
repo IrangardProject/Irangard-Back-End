@@ -6,7 +6,7 @@ from rest_framework_simplejwt import views
 from rest_framework.routers import DefaultRouter, SimpleRouter
 from rest_framework_nested import routers
 
-from .user_views import UserProfile
+from .user_views import UserProfile, UserInformation
 from .accounts_auth_views import AccountAuthViewSet
 from accounts.serializers.serializersNew import myTokenObtainPairSerializer
 from .admin_views import AdminViewSet
@@ -24,6 +24,7 @@ router.register('admin', AdminViewSet)
 urlpatterns = [
     path('',include(router.urls)),
     path('profile/<username>/', UserProfile.as_view(), name='user-profile'),
+    path('information/', UserInformation.as_view(), name='user-information'),
     path("auth/jwt/create", views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer),
             name="accounts-jwt-create"),
     path("auth/jwt/refresh", views.TokenRefreshView.as_view(),
