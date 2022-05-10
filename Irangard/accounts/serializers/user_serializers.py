@@ -25,9 +25,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
             return False
 
 class UserFeedSerializer(serializers.ModelSerializer):
+    following = serializers.SerializerMethodField()
+
+    def get_following(self, user):
+        status = None
+        request_user = self.context.get("request").user
+        if request_user.IsAuthenticated:
+            status =  request_user.follows(user)
+        return status
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ['username', 'image', 'full_name', 'following']
     
    
         

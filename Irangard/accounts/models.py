@@ -15,6 +15,9 @@ class User(AbstractUser):
     following_number = models.IntegerField(default=0)
     follower_number = models.IntegerField(default=0)
 
+    def follows(self, user):
+        return user in self.following
+
 class Verification(models.Model):
     email = models.EmailField(primary_key=True)
     username =  models.CharField(max_length=255)
