@@ -29,8 +29,7 @@ class UserFeedSerializer(serializers.ModelSerializer):
 
     def get_following(self, user):
         status = None
-        request = self.context.get("request")
-        request_user = request.user
+        request_user = self.context['user']
         if request_user.IsAuthenticated:
             status =  request_user.follows(user)
         return status
