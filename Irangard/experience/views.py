@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from rest_framework.viewsets import ModelViewSet
+
+from .filters import ExperienceFilterSet
 from .pagination import ExperiencePagination
 from .serializers import *
 from .models import *
@@ -21,9 +23,10 @@ class ExperienceViewSet(ModelViewSet):
 	pagination_class = ExperiencePagination
 	filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter]
 	ordering_fields = ['date_created', 'like_number']
-	filterset_fields = ['place__title', 'place__contact__city', 
+	filterset_fields = ['place__title', 'place__contact__city',
 				'place__contact__province', 'user__username', 'user__id']
 	search_fields = ['title', 'body']
+	filterset_class = ExperienceFilterSet
 	
 	def retrieve(self, request, pk=None):
 		# Add field is_owner for retrieve method
@@ -51,25 +54,26 @@ class ExperienceViewSet(ModelViewSet):
 	
  
 class LikeViewSet(GenericAPIView):
-	queryset = Like.objects.all()
-	serializer_class = LikeSerializer
-	# serializer_class = ExperienceSerializer
-	# permission_classes = [IsAuthenticated]   
-	
-	def post(self, request, id, *args, **kwargs):
-		user = request.user
-		experience = Experience.objects.get(pk=id)
-		serializer = LikeSerializer(data=request.data)
-		if serializer.is_valid():
-			user_likes = Like.objects.filter(user=user, experience=experience)
-			if user_likes.exists():
-				return Response("You have liked before", status=status.HTTP_400_BAD_REQUEST)
-			else:
-				experience.like_number += 1
-				experience.save()
-				serializer.save(user=user, experience=experience)
-				return Response("OK", status=status.HTTP_200_OK)
-
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    # serializer_class = ExperienceSerializer
+    permission_classes = [IsAuthenticated]   
+    
+    def post(self, request, id, *args, **kwargs):
+        user = request.user
+        experience = Experience.objects.get(pk=id)
+        serializer = LikeSerializer(data=request.data)
+        if serializer.is_valid():
+            user_likes = Like.objects.filter(user=user, experience=experience)
+            if user_likes.exists():
+                return Response("You have liked before", status=status.HTTP_400_BAD_REQUEST)
+            else:
+                experience.like_number += 1
+                experience.save()
+                serializer.save(user=user, experience=experience)
+                return Response("OK", status=status.HTTP_200_OK)
+                
+    
 
 class CommentViewSet(ModelViewSet):
 	queryset = Comment.objects.select_related('experience').all()
