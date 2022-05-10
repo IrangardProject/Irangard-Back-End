@@ -22,7 +22,7 @@ class SpecialUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='special_users')
 
     def follows(self, user):
-        return user in self.following
+        return user in self.following.all()
 
 class Verification(models.Model):
     email = models.EmailField(primary_key=True)
