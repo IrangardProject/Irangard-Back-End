@@ -6,7 +6,7 @@ from rest_framework_simplejwt import views
 from rest_framework.routers import DefaultRouter, SimpleRouter
 from rest_framework_nested import routers
 
-from .user_views import UserProfile, UserInformation
+from .user_views import *
 from .accounts_auth_views import AccountAuthViewSet
 from accounts.serializers.serializersNew import myTokenObtainPairSerializer
 from .admin_views import AdminViewSet
@@ -19,7 +19,7 @@ router.register('auth', AccountAuthViewSet,
                 basename='accounts-auth')
 router.register('pay',PayViewSet , basename='accounts-pay')
 router.register('admin', AdminViewSet)
-
+router.register('feed', FeediewSet)
 
 urlpatterns = [
     path('',include(router.urls)),
