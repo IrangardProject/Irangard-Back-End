@@ -30,7 +30,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             return True
         else:
             return False
-<<<<<<< HEAD
 
 class UserFeedSerializer(serializers.ModelSerializer):
     following = serializers.SerializerMethodField()
@@ -44,7 +43,6 @@ class UserFeedSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'image', 'full_name', 'following']
-=======
         
         
 class UserInformationSerializer(serializers.ModelSerializer):
@@ -52,7 +50,6 @@ class UserInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
->>>>>>> 1663e1b37d635a0fc10648d3bd7f07c55f542d5e
     
    
         
