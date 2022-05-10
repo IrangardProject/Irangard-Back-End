@@ -62,8 +62,6 @@ class TestUserProfile(TestCase):
         url = reverse('accounts:accounts-jwt-create')
         response = self.client.post(url, {"username":"morteza","password":"mo1234"}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-<<<<<<< HEAD
-=======
         self.assertTrue('refresh' in response.data)
         self.assertTrue('access' in response.data)
         
@@ -368,4 +366,3 @@ class TestUserProfile(TestCase):
         response = self.client.put(url, data=put_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
->>>>>>> feature/experience
