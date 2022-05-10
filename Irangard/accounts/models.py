@@ -15,7 +15,7 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=False, blank=True)
 
     def follows(self, user):
-        return user in self.following
+        return user in self.following.all()
     
 
 class SpecialUser(models.Model):
