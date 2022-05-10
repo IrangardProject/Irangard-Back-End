@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated, I
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.generics import GenericAPIView
 from rest_framework.decorators import action
+from rest_framework.viewsets import ModelViewSet
 
 class UserProfile(GenericAPIView):
 	queryset = User.objects.all()
@@ -57,7 +58,8 @@ class FeediewSet(ModelViewSet):
 		serializer = UserFeedSerializer(user.following, many=True)
 		return Response(status=status.HTTP_200_OK, data=serializer.data)
 
-	@action(detail=True, permission_classes=[IsAuthenticated])
+	@action(detail=True, permission_classes=[IsAuthenticated],
+			methods=['post'])
 	def follow(self, request, *args, **kwargs):
 		user = self.get_object()
 		if user.follows(request.user):
@@ -66,7 +68,8 @@ class FeediewSet(ModelViewSet):
 		user.followers.add(request.user)
 		return Response(status=status.HTTP_200_OK)
 
-	@action(detail=True, permission_classes=[IsAuthenticated])
+	@action(detail=True, permission_classes=[IsAuthenticated],
+			methods=['post'])
 	def unfollow(self, request, *args, **kwargs):
 		user = self.get_object()
 		if not user.follows(request.user):
