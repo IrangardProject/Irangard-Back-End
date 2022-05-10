@@ -20,7 +20,7 @@ from accounts.permissions import IsAdmin
 class ExperienceViewSet(ModelViewSet):
 	queryset = Experience.objects.all()
 	serializer_class = ExperienceSerializer
-	permission_classes = [IsAuthenticatedOrReadOnly, IsAdmin]
+	permission_classes = [IsAuthenticatedOrReadOnly]
 	pagination_class = ExperiencePagination
 	filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter]
 	ordering_fields = ['date_created', 'like_number']
