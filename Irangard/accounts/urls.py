@@ -17,7 +17,7 @@ app_name = 'accounts'
 router =  routers.DefaultRouter()
 router.register('auth', AccountAuthViewSet,
                 basename='accounts-auth')
-router.register('feed', FeediewSet)
+router.register('', FeediewSet)
 
 urlpatterns = [
     path('',include(router.urls)),
