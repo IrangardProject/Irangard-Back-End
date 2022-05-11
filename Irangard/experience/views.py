@@ -67,12 +67,12 @@ class ExperienceViewSet(ModelViewSet):
 			return super().update(request, *args, **kwargs)
 
 
-	def delete(self, request, *args, **kwargs):
+	def destroy(self, request, *args, **kwargs):
 		experience = self.get_object()
 		if experience.user.username != request.user.username:
-			return Response({'error': "you do not have permission to Edit this experience. Because you're not owner of this experience"}, status=status.HTTP_403_FORBIDDEN)
+			return Response({'error': "you do not have permission to Delete this experience. Because you're not owner of this experience"}, status=status.HTTP_403_FORBIDDEN)
 		else:
-			return super().delete(request, *args, **kwargs)
+			return super().destroy(request, *args, **kwargs)
 
  
 class LikeViewSet(GenericAPIView):
