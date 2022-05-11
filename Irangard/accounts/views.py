@@ -57,7 +57,7 @@ class PayViewSet(GenericViewSet):
         except:
             return Response(f"bad request", status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
+        return Response(json.loads(response.content), status=status.HTTP_200_OK)
 
     @action(detail=False, url_path='verify', methods=['POST', 'GET'], permission_classes=[permissions.AllowAny])
     def verify(self, request):
