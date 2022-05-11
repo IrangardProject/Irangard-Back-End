@@ -47,14 +47,16 @@ class FeediewSet(ModelViewSet):
 			url_name="get-followers", url_path="followers")
 	def get_followers(self, request, *args, **kwargs):
 		user = self.get_object()
-		serializer = UserFeedSerializer(user.followers, many=True)
+		serializer = UserFeedSerializer(
+			user.followers, context={'request': request}, many=True)
 		return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 	@action(detail=True, permission_classes=[AllowAny],
 			url_name="get-following", url_path="following")
 	def get_following(self, request, *args, **kwargs):
 		user = self.get_object()
-		serializer = UserFeedSerializer(user.following, many=True)
+		serializer = UserFeedSerializer(
+			user.following, context={'request': request}, many=True)
 		return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 	@action(detail=True, permission_classes=[IsAuthenticated],
