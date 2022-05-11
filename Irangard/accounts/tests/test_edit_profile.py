@@ -4,6 +4,9 @@ from accounts.models import User
 from rest_framework.test import APIClient
 import json
 from rest_framework import status
+import io
+from PIL import Image
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 # Create your tests here.
@@ -25,6 +28,12 @@ class TestUserProfile(TestCase):
             return access_token
         else:
             return "incorrect"
+        
+    def temporary_image(self):
+        bts = io.BytesIO()
+        img = Image.new("RGB", (100, 100))
+        img.save(bts, 'jpeg')
+        return SimpleUploadedFile("test.jpg", bts.getvalue())
         
     def test_incorrect_login_incorrect_email(self):
         
@@ -89,9 +98,11 @@ class TestUserProfile(TestCase):
         
         #correct login with username
         access_token = self.login("morteza", "mo1234")
+        image_file = self.temporary_image()
         
         put_data = {
             "username":"morteza", 
+            "image": image_file,
             "about_me":"I'm Morteza Shahrabi Farahani. Backend developer at Irangard.",
             "is_special": True,
             "full_name": "Morteza Shahrabi Farahani",
@@ -101,7 +112,7 @@ class TestUserProfile(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + access_token)
         
         url = reverse('accounts:user-profile', args=(self.user.username,))
-        response = self.client.put(url, data=put_data, format='json')
+        response = self.client.put(url, data=put_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_incorrect_putProfile_incorrect_token(self):
@@ -109,9 +120,11 @@ class TestUserProfile(TestCase):
         #correct login with username but incorrect token
         access_token = self.login("morteza", "mo1234")
         new_access_token = access_token + "a"
+        image_file = self.temporary_image()
     
         put_data = {
             "username":"morteza", 
+            "image": image_file,
             "about_me":"I'm Morteza Shahrabi Farahani. Backend developer at Irangard.",
             "is_special": True,
             "full_name": "Morteza Shahrabi Farahani",
@@ -121,7 +134,7 @@ class TestUserProfile(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + new_access_token)
         
         url = reverse('accounts:user-profile', args=(self.user.username,))
-        response = self.client.put(url, data=put_data, format='json')
+        response = self.client.put(url, data=put_data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         
     def test_incorrect_putProfile_without_token(self):
@@ -158,9 +171,11 @@ class TestUserProfile(TestCase):
         
         #correct login with username
         access_token = self.login("morteza", "mo1234")
+        image_file = self.temporary_image()
         
         put_data = {
             "username":"morteza1", 
+            "image": image_file,
             "about_me":"I'm Morteza Shahrabi Farahani. Backend developer at Irangard.",
             "is_special": True,
             "full_name": "Morteza Shahrabi Farahani",
@@ -169,7 +184,7 @@ class TestUserProfile(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + access_token)
         
         url = reverse('accounts:user-profile', args=(self.user.username,))
-        response = self.client.put(url, data=put_data, format='json')
+        response = self.client.put(url, data=put_data)
         # print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], "morteza1")
@@ -178,9 +193,11 @@ class TestUserProfile(TestCase):
         
         #correct login with username
         access_token = self.login("morteza", "mo1234")
+        image_file = self.temporary_image()
         
         put_data = {
             "username":"morteza", 
+            "image": image_file,
             "about_me":"I'm Morteza Shahrabi Farahani. Backend developer at Irangard. Computer enginering student at IUST",
             "is_special": True,
             "full_name": "Morteza Shahrabi Farahani",
@@ -189,8 +206,7 @@ class TestUserProfile(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + access_token)
         
         url = reverse('accounts:user-profile', args=(self.user.username,))
-        response = self.client.put(url, data=put_data, format='json')
-        # print(response.data)
+        response = self.client.put(url, data=put_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['about_me'], "I'm Morteza Shahrabi Farahani. Backend developer at Irangard. Computer enginering student at IUST")
         
@@ -198,9 +214,11 @@ class TestUserProfile(TestCase):
         
         #correct login with username
         access_token = self.login("morteza", "mo1234")
+        image_file = self.temporary_image()
         
         put_data = {
             "username":"morteza1", 
+            "image": image_file,
             "about_me":"I'm Morteza Shahrabi Farahani. Backend developer at Irangard.",
             "is_special": False,
             "full_name": "Morteza Shahrabi Farahani",
@@ -209,7 +227,7 @@ class TestUserProfile(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + access_token)
         
         url = reverse('accounts:user-profile', args=(self.user.username,))
-        response = self.client.put(url, data=put_data, format='json')
+        response = self.client.put(url, data=put_data)
         # print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['is_special'], False)
@@ -218,9 +236,11 @@ class TestUserProfile(TestCase):
         
         #correct login with username
         access_token = self.login("morteza", "mo1234")
+        image_file = self.temporary_image()
         
         put_data = {
             "username":"morteza1", 
+            "image": image_file,
             "about_me":"I'm Morteza Shahrabi Farahani. Backend developer at Irangard.",
             "is_special": False,
             "full_name": "Morteza Shahrabi Farahani test",
@@ -229,19 +249,21 @@ class TestUserProfile(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + access_token)
         
         url = reverse('accounts:user-profile', args=(self.user.username,))
-        response = self.client.put(url, data=put_data, format='json')
+        response = self.client.put(url, data=put_data)
         # print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['full_name'], "Morteza Shahrabi Farahani test")
         
         
-    def test_correct_putProfile_change_full_name(self):
+    def test_correct_putProfile_change_image(self):
         
         #correct login with username
         access_token = self.login("morteza", "mo1234")
+        image_file = self.temporary_image()
         
         put_data = {
             "username":"morteza1", 
+            "image": image_file,
             "about_me":"I'm Morteza Shahrabi Farahani. Backend developer at Irangard.",
             "is_special": False,
             "full_name": "Morteza Shahrabi Farahani test",
@@ -250,18 +272,20 @@ class TestUserProfile(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + access_token)
         
         url = reverse('accounts:user-profile', args=(self.user.username,))
-        response = self.client.put(url, data=put_data, format='json')
+        response = self.client.put(url, data=put_data)
         # print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['full_name'], "Morteza Shahrabi Farahani test")
+        self.assertEqual(response.data['image'].startswith("https://res.cloudinary.com/dgwbbbisy/image/upload/v1/media/images"), True)
         
     def test_correct_putProfile_all(self):
         
         #correct login with username
         access_token = self.login("morteza", "mo1234")
+        image_file = self.temporary_image()
         
         put_data = {
             "username":"morteza1", 
+            "image": image_file,
             "about_me":"I'm Morteza Shahrabi Farahani. Backend developer at Irangard. 1",
             "is_special": False,
             "full_name": "Morteza Shahrabi Farahani test",
@@ -270,13 +294,14 @@ class TestUserProfile(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + access_token)
         
         url = reverse('accounts:user-profile', args=(self.user.username,))
-        response = self.client.put(url, data=put_data, format='json')
+        response = self.client.put(url, data=put_data)
         # print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['full_name'], "Morteza Shahrabi Farahani test")
         self.assertEqual(response.data['is_special'], False)
         self.assertEqual(response.data['about_me'], "I'm Morteza Shahrabi Farahani. Backend developer at Irangard. 1")
         self.assertEqual(response.data['username'], "morteza1")
+        self.assertEqual(response.data['image'].startswith("https://res.cloudinary.com/dgwbbbisy/image/upload/v1/media/images"), True)
         
         
     def test_incorrect_putProfile_incorrect_data(self):
@@ -333,6 +358,21 @@ class TestUserProfile(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_correct_putProfile_without_full_name(self):
+        
+        #correct login with username
+        access_token = self.login("morteza", "mo1234")
+        
+        put_data = {
+            "username":"morteza", 
+        }
+        
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + access_token)
+        
+        url = reverse('accounts:user-profile', args=(self.user.username,))
+        response = self.client.put(url, data=put_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_correct_putProfile_without_image(self):
         
         #correct login with username
         access_token = self.login("morteza", "mo1234")

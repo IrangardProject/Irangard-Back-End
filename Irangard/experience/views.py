@@ -30,7 +30,13 @@ class ExperienceViewSet(ModelViewSet):
 	
 	def retrieve(self, request, pk=None):
 		# Add field is_owner for retrieve method
-		experience = Experience.objects.get(pk=pk)
+  
+		# Check if experience exists or not
+		try:
+			experience = Experience.objects.get(pk=pk)
+		except Experience.DoesNotExist:
+			return Response({'error': "Experience with given ID does not exist"}, status= status.HTTP_400_BAD_REQUEST)
+
 		serializer = ExperienceSerializer(experience)
 		# Check if user is anonymous or not
 		if request.user.is_anonymous == False:
@@ -51,7 +57,23 @@ class ExperienceViewSet(ModelViewSet):
 			new_response = {"is_owner":False}
 		new_response.update(serializer.data)
 		return Response(new_response)
-	
+
+
+	def update(self, request, *args, **kwargs):
+		experience = self.get_object()
+		if experience.user.username != request.user.username:
+			return Response({'error': "you do not have permission to Edit this experience. Because you're not owner of this experience"}, status=status.HTTP_403_FORBIDDEN)
+		else:
+			return super().update(request, *args, **kwargs)
+
+
+	def delete(self, request, *args, **kwargs):
+		experience = self.get_object()
+		if experience.user.username != request.user.username:
+			return Response({'error': "you do not have permission to Edit this experience. Because you're not owner of this experience"}, status=status.HTTP_403_FORBIDDEN)
+		else:
+			return super().delete(request, *args, **kwargs)
+
  
 class LikeViewSet(GenericAPIView):
     queryset = Like.objects.all()
