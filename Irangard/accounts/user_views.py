@@ -49,7 +49,7 @@ class FeediewSet(ModelViewSet):
 	def get_followers(self, request, *args, **kwargs):
 		user = self.get_object()
 		serializer = UserFeedSerializer(
-			user.followers, context={'request': request}, many=True)
+			user.followers, context={'user': request.user}, many=True)
 		return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 	@action(detail=True, permission_classes=[AllowAny],
@@ -57,7 +57,7 @@ class FeediewSet(ModelViewSet):
 	def get_following(self, request, *args, **kwargs):
 		user = self.get_object()
 		serializer = UserFeedSerializer(
-			user.following, context={'request': request}, many=True)
+			user.following, context={'user': request.user}, many=True)
 		return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 	@action(detail=True, permission_classes=[IsAuthenticated],
