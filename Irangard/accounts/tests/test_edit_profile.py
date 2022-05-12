@@ -106,7 +106,6 @@ class TestUserProfile(TestCase):
             "about_me":"I'm Morteza Shahrabi Farahani. Backend developer at Irangard.",
             "is_special": True,
             "full_name": "Morteza Shahrabi Farahani",
-            
         }
         
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + access_token)

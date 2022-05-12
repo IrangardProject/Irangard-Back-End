@@ -1,3 +1,4 @@
+from asyncore import read
 from dataclasses import fields
 from pyexpat import model
 from rest_framework import serializers
@@ -42,6 +43,13 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = '__all__'
+        read_only_fields = ['user', 'experience']
+        
+    def create(self, validated_data):
+        request = self.context.get("request")
+        validated_data['user'] = self.context['user']
+        validated_data['experience'] = self.context['experience']
+        return super().create(validated_data)
 
 
 class UserCommentSerializer(serializers.ModelSerializer):

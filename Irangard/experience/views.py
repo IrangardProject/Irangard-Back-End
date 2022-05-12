@@ -53,7 +53,6 @@ class ExperienceViewSet(ModelViewSet):
 			else:
 				new_response = {"is_owner":False}
 		else:
-			print(serializer.data["user_username"])
 			new_response = {"is_owner":False}
 		new_response.update(serializer.data)
 		return Response(new_response)
@@ -78,13 +77,12 @@ class ExperienceViewSet(ModelViewSet):
 class LikeViewSet(GenericAPIView):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
-    # serializer_class = ExperienceSerializer
     permission_classes = [IsAuthenticated]   
     
     def post(self, request, id, *args, **kwargs):
         user = request.user
         experience = Experience.objects.get(pk=id)
-        serializer = LikeSerializer(data=request.data)
+        serializer = LikeSerializer(data=request.data, context = {'experience': experience, 'user': request.user})
         if serializer.is_valid():
             user_likes = Like.objects.filter(user=user, experience=experience)
             if user_likes.exists():
@@ -93,7 +91,7 @@ class LikeViewSet(GenericAPIView):
                 experience.like_number += 1
                 experience.save()
                 serializer.save(user=user, experience=experience)
-                return Response("OK", status=status.HTTP_200_OK)
+                return Response(serializer.data, status=status.HTTP_200_OK)
                 
     
 
