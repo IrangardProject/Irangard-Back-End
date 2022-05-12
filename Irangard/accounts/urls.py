@@ -19,7 +19,7 @@ router.register('auth', AccountAuthViewSet,
                 basename='accounts-auth')
 router.register('pay',PayViewSet , basename='accounts-pay')
 router.register('admin', AdminViewSet)
-router.register('feed', FeediewSet)
+router.register('', FeediewSet)
 
 urlpatterns = [
     path('',include(router.urls)),

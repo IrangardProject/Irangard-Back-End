@@ -14,7 +14,7 @@ from rest_framework import filters
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
 from django.db.models import Q
-from accounts.permissions import IsAdmin
+# from accounts.permissions import IsAdmin
 
 
 class ExperienceViewSet(ModelViewSet):
@@ -31,7 +31,13 @@ class ExperienceViewSet(ModelViewSet):
 	
 	def retrieve(self, request, pk=None):
 		# Add field is_owner for retrieve method
-		experience = Experience.objects.get(pk=pk)
+  
+		# Check if experience exists or not
+		try:
+			experience = Experience.objects.get(pk=pk)
+		except Experience.DoesNotExist:
+			return Response({'error': "Experience with given ID does not exist"}, status= status.HTTP_400_BAD_REQUEST)
+
 		serializer = ExperienceSerializer(experience)
 		# Check if user is anonymous or not
 		if request.user.is_anonymous == False:
@@ -48,22 +54,36 @@ class ExperienceViewSet(ModelViewSet):
 			else:
 				new_response = {"is_owner":False}
 		else:
-			print(serializer.data["user_username"])
 			new_response = {"is_owner":False}
 		new_response.update(serializer.data)
 		return Response(new_response)
-	
+
+
+	def update(self, request, *args, **kwargs):
+		experience = self.get_object()
+		if experience.user.username != request.user.username:
+			return Response({'error': "you do not have permission to Edit this experience. Because you're not owner of this experience"}, status=status.HTTP_403_FORBIDDEN)
+		else:
+			return super().update(request, *args, **kwargs)
+
+
+	def destroy(self, request, *args, **kwargs):
+		experience = self.get_object()
+		if experience.user.username != request.user.username:
+			return Response({'error': "you do not have permission to Delete this experience. Because you're not owner of this experience"}, status=status.HTTP_403_FORBIDDEN)
+		else:
+			return super().destroy(request, *args, **kwargs)
+
  
 class LikeViewSet(GenericAPIView):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
-    # serializer_class = ExperienceSerializer
     permission_classes = [IsAuthenticated]   
     
     def post(self, request, id, *args, **kwargs):
         user = request.user
         experience = Experience.objects.get(pk=id)
-        serializer = LikeSerializer(data=request.data)
+        serializer = LikeSerializer(data=request.data, context = {'experience': experience, 'user': request.user})
         if serializer.is_valid():
             user_likes = Like.objects.filter(user=user, experience=experience)
             if user_likes.exists():
@@ -72,7 +92,7 @@ class LikeViewSet(GenericAPIView):
                 experience.like_number += 1
                 experience.save()
                 serializer.save(user=user, experience=experience)
-                return Response("OK", status=status.HTTP_200_OK)
+                return Response(serializer.data, status=status.HTTP_200_OK)
                 
     
 
