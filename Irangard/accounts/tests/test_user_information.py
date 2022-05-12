@@ -38,7 +38,7 @@ class UserInformationTest(TestCase):
         
         url = reverse('accounts:user-information')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         
         
     def test_incorrect_user_informations_incorrect_token(self):
