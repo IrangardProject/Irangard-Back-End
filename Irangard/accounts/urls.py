@@ -23,8 +23,8 @@ router.register('', FeediewSet)
 
 urlpatterns = [
     path('',include(router.urls)),
-    path('profile/<username>/', UserProfile.as_view(), name='user-profile'),
-    path('information/', UserInformation.as_view(), name='user-information'),
+    path('profile/<username>', UserProfile.as_view(), name='user-profile'),
+    path('information', UserInformation.as_view(), name='user-information'),
     path("auth/jwt/create", views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer),
             name="accounts-jwt-create"),
     path("auth/jwt/refresh", views.TokenRefreshView.as_view(),
