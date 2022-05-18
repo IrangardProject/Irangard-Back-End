@@ -32,12 +32,12 @@ class PayViewSet(GenericViewSet):
             "amount": 10000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": "http://188.121.123.141:8000/accounts/pay/verify/"
+            "callback": "http://127.0.0.1:8000/accounts/pay/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
                       'X-API-KEY': '3394842f-7407-4598-8c48-499a15c8d0b7',
-                      'X-SANDBOX': '0'}
+                      'X-SANDBOX': '1'}
 
         
         response = requests.post(url="https://api.idpay.ir/v1.1/payment", data=json.dumps(my_data),
@@ -71,7 +71,7 @@ class PayViewSet(GenericViewSet):
 
             my_headers = {"Content-Type": "application/json",
                           'X-API-KEY': '3394842f-7407-4598-8c48-499a15c8d0b7',
-                          'X-SANDBOX': '0'
+                          'X-SANDBOX': '1'
                           }
 
             response = requests.post(url="https://api.idpay.ir/v1.1/payment/verify", data=json.dumps(my_data),
