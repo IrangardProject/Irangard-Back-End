@@ -9,7 +9,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = "__all__"
         
-        
+class UserBasicInfoSerializer(serializers.ModelSerializer):
+    """Serializer for user basic info """
+    class Meta:
+        model = User
+        fields = ['email', 'username']
+   
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for user profile"""
     is_owner = serializers.SerializerMethodField('get_is_owner')

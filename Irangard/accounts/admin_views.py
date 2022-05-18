@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import User, SpecialUser
-from .serializers.user_serializers import UserProfileSerializer
+from .serializers.user_serializers import UserProfileSerializer, UserBasicInfoSerializer
 from rest_framework import status, permissions
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -10,7 +10,9 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from . permissions import IsAdmin
 from rest_framework.decorators import action, api_view, permission_classes
 from .models import SpecialUser, User
-
+from rest_framework.test import APIClient
+from django.urls import reverse
+import json
 
 class AdminViewSet(GenericViewSet):
     queryset = User.objects.filter(is_admin=True)
@@ -44,3 +46,50 @@ class AdminViewSet(GenericViewSet):
             return Response(f'special user with username {user.username} deleted', status=status.HTTP_200_OK)
         except SpecialUser.DoesNotExist:
             return Response(f'special user with username {user.username} doesn not exist', status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, url_path='remove-user', methods=['POST'], permission_classes=[IsAdmin])
+    def removeUser(self, request):
+        try:
+            if('username' not in request.data):
+                return Response(f'no usernmae is provieded', status=status.HTTP_400_BAD_REQUEST)
+            user = User.objects.get(username=request.data['username'])
+            if(user.is_admin):
+                return Response(f'admin user can not be removed', status=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS)
+            if(user.is_special):
+                return Response(f'special user can not be removed', status=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS)
+            user.delete()
+            return Response(f'user with username {user.username} deleted', status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(f'user with username {user.username} doesn not exist', status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, url_path='add-user', methods=['POST'], permission_classes=[IsAdmin])
+    def addUser(self, request):
+
+        if('username' not in request.data):
+            return Response(f'no usernmae is provieded', status=status.HTTP_400_BAD_REQUEST)
+        if('email' not in request.data):
+            return Response(f'no email is provieded', status=status.HTTP_400_BAD_REQUEST)
+        if('password' not in request.data):
+            return Response(f'no password is provieded', status=status.HTTP_400_BAD_REQUEST)
+        if(request.data['re_password'] != request.data['password']):
+            return Response(f'password and re_password are not same', status=status.HTTP_400_BAD_REQUEST)
+        
+        client = APIClient()
+        url = reverse('accounts:accounts-auth-check-username')
+        response = client.post(url, json.dumps({"username":request.data['username']}), content_type='application/json')
+        if response.status_code == status.HTTP_400_BAD_REQUEST:
+            return Response(f'username already exists', status=status.HTTP_400_BAD_REQUEST)
+        
+        url = reverse('accounts:accounts-auth-check-email')
+        response = client.post(url, json.dumps({"email":request.data['email']}), content_type='application/json')
+        if response.status_code == status.HTTP_400_BAD_REQUEST:
+            return Response(f'email already exists', status=status.HTTP_400_BAD_REQUEST)
+        
+        
+        user = User.objects.create(
+            username=request.data['username'], email=request.data['email'])
+        user.set_password(request.data['password'])
+        user.save()
+        serializer = UserBasicInfoSerializer(data=request.data)
+        serializer.is_valid()
+        return Response(serializer.data, status=status.HTTP_200_OK)
