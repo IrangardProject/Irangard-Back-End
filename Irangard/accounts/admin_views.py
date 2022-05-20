@@ -304,6 +304,21 @@ class AdminViewSet(GenericViewSet):
 
     @action(detail=False, url_path='individual-statistics', methods=['POST'], permission_classes=[IsAdmin])
     def individualStatistics(self, request):
-        statistics = defaultdict(int)
+        
+        try:
+            statistics = defaultdict(int)
 
-        pass
+            user = User.objects.get(username=request.data['username'])
+            statistics['date-joined'] = user.date_joined.strftime('%Y-%m-%d')
+            statistics['experiences-no'] = len(user.experiences.all())
+            statistics['created-tours'] = 0
+            if(user.is_special):
+                special_user = SpecialUser.objects.get(user = user)
+                statistics['created-tours'] = len(special_user.tours.all())
+            statistics['top_10_liked_experiences'] = ExperienceSerializer(
+                user.experiences.all().order_by('-like_number')[:10], many=True).data
+
+            return Response(statistics, status=status.HTTP_200_OK)
+        except Exception as error:
+            print(error)
+            return Response(f'bad request', status=status.HTTP_400_BAD_REQUEST)

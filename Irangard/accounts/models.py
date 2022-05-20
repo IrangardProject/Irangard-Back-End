@@ -28,6 +28,9 @@ class SpecialUser(models.Model):
 
     def follows(self, user):
         return user in self.following.all()
+    
+    def __str__(self):
+        return self.user.username
 
 
 class Tour(models.Model):
@@ -68,6 +71,8 @@ class Verification(models.Model):
     token = models.CharField(max_length=6)
     create_time = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.username
 
 class Token(models.Model):
     uid = models.CharField(primary_key=True, max_length=100)
@@ -80,3 +85,6 @@ class StagedPayments(models.Model):
         User, on_delete=models.CASCADE, related_name='staged_payments_info')
     transaction_id = models.CharField(max_length=50)
     order_id = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.user.username
