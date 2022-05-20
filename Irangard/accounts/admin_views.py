@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import User, SpecialUser
-from .serializers.user_serializers import UserProfileSerializer, UserBasicInfoSerializer
+from .serializers.user_serializers import UserProfileSerializer, UserBasicInfoSerializer, UserSerializer
 from rest_framework import status, permissions
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -19,6 +19,8 @@ from places.serializers import *
 from places.models import *
 from experience.models import *
 from accounts.models import *
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 
 class AdminViewSet(GenericViewSet):
@@ -110,17 +112,195 @@ class AdminViewSet(GenericViewSet):
         statistics['places_no'] = len(Place.objects.all())
         statistics['experiences_no'] = len(Experience.objects.all())
         statistics['tour_no'] = len(Tour.objects.all())
-        statistics['top_10_liked_experiences'] = ExperienceSerializer(Experience.objects.all().order_by('-like_number')[:10],many=True).data
+        statistics['top_10_liked_experiences'] = ExperienceSerializer(
+            Experience.objects.all().order_by('-like_number')[:10], many=True).data
 
         return Response(statistics, status=status.HTTP_200_OK)
 
-    @action(detail=False, url_path='periodic-statistics', methods=['POST'], permission_classes=[IsAdmin])
-    def periodicStatistics(self, request):
+    @action(detail=False, url_path='daily-statistics', methods=['POST'], permission_classes=[IsAdmin])
+    def dailyStatistics(self, request):
         statistics = defaultdict(int)
-        start_date = request.data['start_date']
-        end_date = request.data['end_date']
+        start_date = datetime.strptime(
+            request.data['start_date'], "%Y-%m-%d").date()
+        end_date = datetime.strptime(
+            request.data['end_date'], "%Y-%m-%d").date()
+        delta = timedelta(days=1)
 
-        pass
+        try:
+            # start find count of added user per day in range of strart_date and end-date
+            added_daily_user = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = User.objects.filter(
+                        date_joined__day=start.day)
+                    queryset = queryset.filter(
+                        date_joined__month=start.month)
+                    queryset = queryset.filter(
+                        date_joined__year=start.year)
+                    if(len(queryset) > 0):
+                        added_daily_user[f'{start}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_daily_user'] = added_daily_user
+
+            # finish find count of added user per day in range of strart_date and end-date
+            
+            #start find count of added special user per day in range of strart_date and end-date
+            
+            added_daily_special_user = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = SpecialUser.objects.filter(
+                        user__date_joined__day=start.day)
+                    queryset = queryset.filter(
+                        user__date_joined__month=start.month)
+                    queryset = queryset.filter(
+                        user__date_joined__year=start.year)
+                    if(len(queryset) > 0):
+                        added_daily_special_user[f'{start}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_daily_special_user'] = added_daily_special_user
+            
+            #filter find count of added special users per day in range of strart_date and end-date
+            
+
+        except Exception as error:
+            return Response(f'bad request', status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(statistics, status=status.HTTP_200_OK)
+
+    @action(detail=False, url_path='weekly-statistics', methods=['POST'], permission_classes=[IsAdmin])
+    def weeklyStatistics(self, request):
+        statistics = defaultdict(int)
+        start_date = datetime.strptime(
+            request.data['start_date'], "%Y-%m-%d").date()
+        end_date = datetime.strptime(
+            request.data['end_date'], "%Y-%m-%d").date()
+        delta = timedelta(weeks=1)
+
+        try:
+            # start find count of added user per day in range of strart_date and end-date
+            added_weekly_user = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = User.objects.filter(
+                        date_joined__day__gte=start.day).filter(date_joined__day__lte=(start+delta).day)
+                    queryset = queryset.filter(
+                        date_joined__month=start.month)
+                    queryset = queryset.filter(
+                        date_joined__year=start.year)
+                    if(len(queryset) > 0):
+                        added_weekly_user[f'{start} - {start+delta}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_weekly_user'] = added_weekly_user
+
+            # finish find count of added user per day in range of strart_date and end-date
+            
+            #start find count of added special user per day in range of strart_date and end-date
+            
+            added_weekly_special_user = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = SpecialUser.objects.filter(
+                        user__date_joined__day__gte=start.day).filter(user__date_joined__day__lte=(start+delta).day)
+                    queryset = queryset.filter(
+                        user__date_joined__month=start.month)
+                    queryset = queryset.filter(
+                        user__date_joined__year=start.year)
+                    if(len(queryset) > 0):
+                        added_weekly_special_user[f'{start} - {start+delta}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_weekly_special_user'] = added_weekly_special_user
+            
+            #filter find count of added special users per day in range of strart_date and end-date
+            
+
+        except Exception as error:
+            return Response(f'bad request', status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(statistics, status=status.HTTP_200_OK)
+
+    @action(detail=False, url_path='monthly-statistics', methods=['POST'], permission_classes=[IsAdmin])
+    def monthlyStatistics(self, request):
+        statistics = defaultdict(int)
+        start_date = datetime.strptime(
+            request.data['start_date'], "%Y-%m-%d").date()
+        end_date = datetime.strptime(
+            request.data['end_date'], "%Y-%m-%d").date()
+        delta = relativedelta(months=1)
+
+        try:
+            # start find count of added user per day in range of strart_date and end-date
+            added_monthly_user = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = User.objects.filter(
+                        date_joined__month=start.month)
+                    queryset = queryset.filter(
+                        date_joined__year=start.year)
+                    if(len(queryset) > 0):
+                        added_monthly_user[f'{start.strftime("%B")}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_monthly_user'] = added_monthly_user
+
+            # finish find count of added user per day in range of strart_date and end-date
+            
+            #start find count of added special user per day in range of strart_date and end-date
+            
+            added_monthly_special_user = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = SpecialUser.objects.filter(
+                        user__date_joined__month=start.month)
+                    queryset = queryset.filter(
+                        user__date_joined__year=start.year)
+                    if(len(queryset) > 0):
+                        added_monthly_special_user[f'{start.strftime("%B")}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_monthly_special_user'] = added_monthly_special_user
+            
+            #filter find count of added special users per day in range of strart_date and end-date
+            
+
+        except Exception as error:
+            return Response(f'bad request', status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(statistics, status=status.HTTP_200_OK)
 
     @action(detail=False, url_path='individual-statistics', methods=['POST'], permission_classes=[IsAdmin])
     def individualStatistics(self, request):
