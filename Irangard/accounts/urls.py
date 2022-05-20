@@ -18,7 +18,7 @@ router =  routers.DefaultRouter()
 router.register('auth', AccountAuthViewSet,
                 basename='accounts-auth')
 router.register('pay',PayViewSet , basename='accounts-pay')
-router.register('admin', AdminViewSet)
+router.register('admin', AdminViewSet, basename='accounts-admin')
 router.register('', FeediewSet)
 
 urlpatterns = [

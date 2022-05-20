@@ -5,12 +5,14 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import permissions
 from rest_framework.response import Response
+from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.decorators import action, api_view, permission_classes
 from .models import StagedPayments, SpecialUser, User
 from django.contrib.auth import authenticate, login
 from accounts.serializers.payment_serializers import VerifiedPaymentSerializer
+from django.template.loader import render_to_string
 
 
 class PayViewSet(GenericViewSet):
@@ -93,11 +95,18 @@ class PayViewSet(GenericViewSet):
                     st_payment.delete()
                     verified_payment_serializer = VerifiedPaymentSerializer(data = json.loads(response.content)) 
                     verified_payment_serializer.is_valid(raise_exception=True)
-                    return Response(verified_payment_serializer.data, status=status.HTTP_200_OK)
+                    template = render_to_string('success_payment.html',
+                            {
+                                'username': user.username,
+                                'code': '123',
+                                'WEBSITE_URL': 'kooleposhti.tk',
+                            })
+                    return HttpResponse(template)
+                    #return Response(verified_payment_serializer.data, status=status.HTTP_200_OK)
                 except StagedPayments.DoesNotExist:
                     return Response(f"there is no corresponding payment to be verified", status=status.HTTP_400_BAD_REQUEST)
                 except Exception as error:
-                    print(error)
+                    print(erro.messages)
                     return Response(f"user {user.username} is already a special user", status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(f"transaction is not verified", status=status.HTTP_405_METHOD_NOT_ALLOWED)

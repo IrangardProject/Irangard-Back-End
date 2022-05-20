@@ -1,4 +1,7 @@
+import json
+from collections import defaultdict
 from django.shortcuts import render
+from django.urls import reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import User, SpecialUser
@@ -7,12 +10,13 @@ from rest_framework import status, permissions
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from . permissions import IsAdmin
 from rest_framework.decorators import action, api_view, permission_classes
-from .models import SpecialUser, User
 from rest_framework.test import APIClient
-from django.urls import reverse
-import json
+from . permissions import IsAdmin
+from .serializers.serializers import *
+from places.models import *
+from experience.models import *
+from accounts.models import *
 
 class AdminViewSet(GenericViewSet):
     queryset = User.objects.filter(is_admin=True)
@@ -40,7 +44,6 @@ class AdminViewSet(GenericViewSet):
             user = User.objects.get(username=request.data['username'])
             sp_user = SpecialUser.objects.get(user=user)
             sp_user.delete()
-            user = User.objects.get(username=request.user.username)
             user.is_special = False
             user.save()
             return Response(f'special user with username {user.username} deleted', status=status.HTTP_200_OK)
@@ -93,3 +96,17 @@ class AdminViewSet(GenericViewSet):
         serializer = UserBasicInfoSerializer(data=request.data)
         serializer.is_valid()
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=False, url_path='basic-statistics', methods=['POST'], permission_classes=[IsAdmin])
+    def basicStatistics(self, request):
+        statistics = defaultdict(int)
+        
+        statistics['users_no'] = len(User.objects.all())
+        statistics['special-users_no'] = len(SpecialUser.objects.all())
+        statistics['places_no'] = len(Place.objects.all())
+        statistics['experiences_no'] = len(Experience.objects.all())
+        statistics['tour_no'] = len(Tour.objects.all())
+        
+ 
+        return Response(statistics,status=status.HTTP_200_OK)
+        
