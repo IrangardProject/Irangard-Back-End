@@ -34,7 +34,7 @@ class Tour(models.Model):
     title = models.CharField(max_length=255)
     cost = models.IntegerField(default=0)
     capacity = models.IntegerField(default=0)
-    
+    remaining = models.IntegerField(default=0)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     owner = models.ForeignKey("SpecialUser",related_name="tours",on_delete=models.CASCADE)
