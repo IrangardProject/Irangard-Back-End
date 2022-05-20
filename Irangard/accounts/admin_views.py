@@ -13,10 +13,13 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.test import APIClient
 from . permissions import IsAdmin
-from .serializers.serializers import *
+from accounts.serializers.serializers import *
+from experience.serializers import *
+from places.serializers import *
 from places.models import *
 from experience.models import *
 from accounts.models import *
+
 
 class AdminViewSet(GenericViewSet):
     queryset = User.objects.filter(is_admin=True)
@@ -76,19 +79,20 @@ class AdminViewSet(GenericViewSet):
             return Response(f'no password is provieded', status=status.HTTP_400_BAD_REQUEST)
         if(request.data['re_password'] != request.data['password']):
             return Response(f'password and re_password are not same', status=status.HTTP_400_BAD_REQUEST)
-        
+
         client = APIClient()
         url = reverse('accounts:accounts-auth-check-username')
-        response = client.post(url, json.dumps({"username":request.data['username']}), content_type='application/json')
+        response = client.post(url, json.dumps(
+            {"username": request.data['username']}), content_type='application/json')
         if response.status_code == status.HTTP_400_BAD_REQUEST:
             return Response(f'username already exists', status=status.HTTP_400_BAD_REQUEST)
-        
+
         url = reverse('accounts:accounts-auth-check-email')
-        response = client.post(url, json.dumps({"email":request.data['email']}), content_type='application/json')
+        response = client.post(url, json.dumps(
+            {"email": request.data['email']}), content_type='application/json')
         if response.status_code == status.HTTP_400_BAD_REQUEST:
             return Response(f'email already exists', status=status.HTTP_400_BAD_REQUEST)
-        
-        
+
         user = User.objects.create(
             username=request.data['username'], email=request.data['email'])
         user.set_password(request.data['password'])
@@ -96,17 +100,30 @@ class AdminViewSet(GenericViewSet):
         serializer = UserBasicInfoSerializer(data=request.data)
         serializer.is_valid()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(detail=False, url_path='basic-statistics', methods=['POST'], permission_classes=[IsAdmin])
     def basicStatistics(self, request):
         statistics = defaultdict(int)
-        
+
         statistics['users_no'] = len(User.objects.all())
         statistics['special-users_no'] = len(SpecialUser.objects.all())
         statistics['places_no'] = len(Place.objects.all())
         statistics['experiences_no'] = len(Experience.objects.all())
         statistics['tour_no'] = len(Tour.objects.all())
-        
- 
-        return Response(statistics,status=status.HTTP_200_OK)
-        
+        statistics['top_10_liked_experiences'] = ExperienceSerializer(Experience.objects.all().order_by('-like_number')[:10],many=True).data
+
+        return Response(statistics, status=status.HTTP_200_OK)
+
+    @action(detail=False, url_path='periodic-statistics', methods=['POST'], permission_classes=[IsAdmin])
+    def periodicStatistics(self, request):
+        statistics = defaultdict(int)
+        start_date = request.data['start_date']
+        end_date = request.data['end_date']
+
+        pass
+
+    @action(detail=False, url_path='individual-statistics', methods=['POST'], permission_classes=[IsAdmin])
+    def individualStatistics(self, request):
+        statistics = defaultdict(int)
+
+        pass
