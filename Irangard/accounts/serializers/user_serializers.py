@@ -1,12 +1,19 @@
 from dataclasses import fields
 from pyexpat import model
-from accounts.models import User
+from accounts.models import User, SpecialUser
 from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
+        fields = "__all__"
+        
+class SpecialUserSerializer(serializers.ModelSerializer):
+    
+    # user = UserSerializer(read_only=True)
+    class Meta:
+        model = SpecialUser
         fields = "__all__"
         
 class UserBasicInfoSerializer(serializers.ModelSerializer):

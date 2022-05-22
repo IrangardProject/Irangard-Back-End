@@ -23,16 +23,22 @@ class TourViewSet(ModelViewSet):
     permission_classes = [IsOwnerOrReadOnly]
 
     def create(self, request, *args, **kwargs):
-        data = request.data
-        title = data.pop('title', None)
-        cost = data.pop('cost', None)
-        capacity = data.pop('capacity', None)
-        start_date = data.pop('start_date', None)
-        end_date = data.pop('end_date', None)
+        data = request.data.copy()
+        data['owner'] = request.user
 
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         tour = serializer.save()
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def update(self, request, *args, **kwargs):
+    
+        tour = self.get_object()
+        serializer = self.get_serializer(tour, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
