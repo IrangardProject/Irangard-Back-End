@@ -42,8 +42,7 @@ class UserFeedSerializer(serializers.ModelSerializer):
         return status
     class Meta:
         model = User
-<<<<<<< HEAD
-        fields = ['username', 'image', 'full_name', 'following']
+        fields = ['id', 'username', 'image', 'full_name', 'following']
         
         
 class UserInformationSerializer(serializers.ModelSerializer):
@@ -51,9 +50,6 @@ class UserInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ('password',)
-=======
-        fields = ['id', 'username', 'image', 'full_name', 'following']
->>>>>>> feature/feed
     
    
         
