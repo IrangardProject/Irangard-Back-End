@@ -29,7 +29,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         status = None
         request_user = self.context['user']
         if request_user.is_authenticated:
-            status =  request_user.follows(user)
+            status =  request_user.follows(user) or request_user == user
         return status
 
 class UserFeedSerializer(serializers.ModelSerializer):
@@ -39,7 +39,7 @@ class UserFeedSerializer(serializers.ModelSerializer):
         status = None
         request_user = self.context['user']
         if request_user.is_authenticated:
-            status =  request_user.follows(user)
+            status =  request_user.follows(user) or request_user == user
         return status
     class Meta:
         model = User
