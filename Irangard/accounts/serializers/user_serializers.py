@@ -16,7 +16,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['full_name', 'is_special', 'email', 'image', 'username', 'about_me', 'following_number', 'follower_number', 'is_owner','is_admin']
+        fields = ['id', 'full_name', 'is_special', 'email', 'image', 'username', 'about_me', 'following_number', 'follower_number', 'is_owner','is_admin']
         read_only_fields = ('email', 'following_number', 'follower_number', 'is_owner','is_admin', 'image')
         
         extra_kwargs = {
@@ -42,6 +42,7 @@ class UserFeedSerializer(serializers.ModelSerializer):
         return status
     class Meta:
         model = User
+<<<<<<< HEAD
         fields = ['username', 'image', 'full_name', 'following']
         
         
@@ -50,6 +51,9 @@ class UserInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ('password',)
+=======
+        fields = ['id', 'username', 'image', 'full_name', 'following']
+>>>>>>> feature/feed
     
    
         
