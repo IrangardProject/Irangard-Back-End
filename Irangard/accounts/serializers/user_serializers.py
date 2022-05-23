@@ -14,7 +14,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['full_name', 'is_special', 'email', 'image', 'username', 'about_me', 'is_owner', 'following_number', 'follower_number']
+        fields = ['id', 'full_name', 'is_special', 'email', 'image', 'username', 'about_me', 'is_owner', 'following_number', 'follower_number']
         read_only_fields = ('email', 'following_number', 'follower_number', 'is_owner')
         
     def get_is_owner(self, user):
@@ -35,7 +35,7 @@ class UserFeedSerializer(serializers.ModelSerializer):
         return status
     class Meta:
         model = User
-        fields = ['username', 'image', 'full_name', 'following']
+        fields = ['id', 'username', 'image', 'full_name', 'following']
     
    
         
