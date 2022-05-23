@@ -68,6 +68,7 @@ class FeediewSet(ModelViewSet):
 			return Response("you already follows this user.", 
 						status=status.HTTP_400_BAD_REQUEST)
 		user.followers.add(request.user)
+		user.update_follower_no()
 		return Response(status=status.HTTP_200_OK)
 
 	@action(detail=True, permission_classes=[IsAuthenticated],
@@ -78,6 +79,7 @@ class FeediewSet(ModelViewSet):
 			return Response("you are not following this user.", 
 						status=status.HTTP_400_BAD_REQUEST)
 		user.followers.remove(request.user)
+		user.update_follower_no()
 		return Response(status=status.HTTP_200_OK)
 		
 		
