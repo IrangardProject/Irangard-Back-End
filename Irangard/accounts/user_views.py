@@ -64,7 +64,7 @@ class FeediewSet(ModelViewSet):
 			methods=['post'])
 	def follow(self, request, *args, **kwargs):
 		user = self.get_object()
-		if user.follows(request.user):
+		if request.user.follows(user):
 			return Response("you already follows this user.", 
 						status=status.HTTP_400_BAD_REQUEST)
 		request.user.following.add(user)
@@ -76,7 +76,7 @@ class FeediewSet(ModelViewSet):
 			methods=['post'])
 	def unfollow(self, request, *args, **kwargs):
 		user = self.get_object()
-		if not user.follows(request.user):
+		if not request.user.follows(user):
 			return Response("you are not following this user.", 
 						status=status.HTTP_400_BAD_REQUEST)
 		request.user.following.remove(user)
