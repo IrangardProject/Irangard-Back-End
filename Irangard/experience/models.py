@@ -17,6 +17,7 @@ class Experience(models.Model):
 
     def update_comment_no(self):
         self.comment_number = self.comments.count()
+        self.save()
     
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes_user')
