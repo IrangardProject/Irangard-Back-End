@@ -16,6 +16,10 @@ class User(AbstractUser):
 
     def follows(self, user):
         return user in self.following.all()
+
+    def update_follower_no(self):
+        self.follower_number = self.followers.count()
+        self.save()
     
 
 class SpecialUser(models.Model):
