@@ -125,12 +125,15 @@ class CommentViewSet(ModelViewSet):
 	def perform_change(self, request, action, *args, **kwargs):
 		user = request.user
 		comment = self.get_object()
+		experience = comment.experience
 		if not comment.is_owner(user):
 			return Response('you do not have permission to change this comment.',
 							 status=status.HTTP_403_FORBIDDEN)
 		if action == 'update':
 			return super().update(request, *args, **kwargs)
-		return super().destroy(request, *args, **kwargs)
+		response = super().destroy(request, *args, **kwargs)
+		experience.update_comment_no()
+		return response
 
 
 

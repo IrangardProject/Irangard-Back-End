@@ -89,7 +89,9 @@ class CommentSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         validated_data['experience_id'] = self.context.get("experience")
         validated_data['user'] = request.user
-        return super().create(validated_data)
+        instance = super().create(validated_data)
+        instance.experience.update_comment_no()
+        return instance
 
     def update(self, instance, validated_data):
         validated_data['created_date'] = datetime.now()

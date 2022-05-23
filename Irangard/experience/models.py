@@ -14,6 +14,9 @@ class Experience(models.Model):
     body = models.TextField(blank=True, null=True)
     place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name='experiences')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='experiences')
+
+    def update_comment_no(self):
+        self.comment_number = self.comments.count()
     
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes_user')
