@@ -13,11 +13,12 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for user profile"""
     is_owner = serializers.SerializerMethodField('get_is_owner')
+    following = serializers.SerializerMethodField('get_following')
     
     class Meta:
         model = User
-        fields = ['id', 'full_name', 'is_special', 'email', 'image', 'username', 'about_me', 'following_number', 'follower_number', 'is_owner','is_admin']
-        read_only_fields = ('email', 'following_number', 'follower_number', 'is_owner','is_admin', 'image')
+        fields = ['id', 'full_name', 'is_special', 'email', 'image', 'username', 'about_me', 'following_number', 'follower_number', 'is_owner','is_admin', 'following']
+        read_only_fields = ('email', 'following_number', 'follower_number', 'is_owner','is_admin', 'image', 'following')
         
         extra_kwargs = {
         'image': {'read_only': False}
@@ -31,8 +32,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
         else:
             return False
 
+    def get_following(self, user):
+        status = None
+        request_user = self.context['user']
+        if request_user.is_authenticated:
+            status =  request_user.follows(user)
+        return status
+
 class UserFeedSerializer(serializers.ModelSerializer):
-    following = serializers.SerializerMethodField()
+    following = serializers.SerializerMethodField('get_following')
 
     def get_following(self, user):
         status = None
