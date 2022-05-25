@@ -12,7 +12,7 @@ class Tour(models.Model):
     end_date = models.DateTimeField()
     owner = models.ForeignKey("accounts.SpecialUser",related_name="tours",on_delete=models.CASCADE)
     bookers = models.ManyToManyField(User, blank=True, related_name='tours')
-    total_revenue = models.DecimalField(max_digits=9, decimal_places=2)
+    total_revenue = models.DecimalField(max_digits=9, decimal_places=2, default=0)
 
     def __str__(self):
         return self.title
