@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'accounts',
     'places',
     'experience',
+    'tours',
     'corsheaders',
     'cloudinary',
     'cloudinary_storage',
@@ -107,10 +108,10 @@ WSGI_APPLICATION = 'Irangard.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env.str('HEROKU_DB_NAME'), 
-        'USER': env.str('HEROKU_DB_USER'), 
-        'PASSWORD': env.str('HEROKU_DB_PASSWORD'),
-        'HOST': env.str('HEROKU_DB_HOST'), 
+        'NAME': env.str('DB_NAME'), 
+        'USER': env.str('DB_USER'), 
+        'PASSWORD': env.str('DB_PASSWORD'),
+        'HOST': env.str('DB_HOST'), 
         'PORT': '5432',
     },
     'TEST': {
@@ -162,7 +163,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = STATIC_HOST + "/media/"
+# MEDIA_URL = STATIC_HOST + "/media/"
+MEDIA_URL = "/media/"
 
 # ActivateDjango-Heroku
 django_heroku.settings(locals())

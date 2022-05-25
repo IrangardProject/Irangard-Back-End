@@ -5,12 +5,14 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import permissions
 from rest_framework.response import Response
+from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.decorators import action, api_view, permission_classes
 from .models import StagedPayments, SpecialUser, User
 from django.contrib.auth import authenticate, login
 from accounts.serializers.payment_serializers import VerifiedPaymentSerializer
+from django.template.loader import render_to_string
 
 
 class PayViewSet(GenericViewSet):
@@ -32,12 +34,12 @@ class PayViewSet(GenericViewSet):
             "amount": 10000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": "http://188.121.123.141:8000/accounts/pay/verify/"
+            "callback": "http://127.0.0.1:8000/accounts/pay/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
                       'X-API-KEY': '3394842f-7407-4598-8c48-499a15c8d0b7',
-                      'X-SANDBOX': '0'}
+                      'X-SANDBOX': '1'}
 
         
         response = requests.post(url="https://api.idpay.ir/v1.1/payment", data=json.dumps(my_data),
@@ -57,7 +59,7 @@ class PayViewSet(GenericViewSet):
         except:
             return Response(f"bad request", status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(f"{json.loads(response.content)}", status=status.HTTP_200_OK)
+        return Response(json.loads(response.content), status=status.HTTP_200_OK)
 
     @action(detail=False, url_path='verify', methods=['POST', 'GET'], permission_classes=[permissions.AllowAny])
     def verify(self, request):
@@ -71,7 +73,7 @@ class PayViewSet(GenericViewSet):
 
             my_headers = {"Content-Type": "application/json",
                           'X-API-KEY': '3394842f-7407-4598-8c48-499a15c8d0b7',
-                          'X-SANDBOX': '0'
+                          'X-SANDBOX': '1'
                           }
 
             response = requests.post(url="https://api.idpay.ir/v1.1/payment/verify", data=json.dumps(my_data),
@@ -93,11 +95,18 @@ class PayViewSet(GenericViewSet):
                     st_payment.delete()
                     verified_payment_serializer = VerifiedPaymentSerializer(data = json.loads(response.content)) 
                     verified_payment_serializer.is_valid(raise_exception=True)
-                    return Response(verified_payment_serializer.data, status=status.HTTP_200_OK)
+                    template = render_to_string('success_payment.html',
+                            {
+                                'username': user.username,
+                                'code': '123',
+                                'WEBSITE_URL': 'kooleposhti.tk',
+                            })
+                    return HttpResponse(template)
+                    #return Response(verified_payment_serializer.data, status=status.HTTP_200_OK)
                 except StagedPayments.DoesNotExist:
                     return Response(f"there is no corresponding payment to be verified", status=status.HTTP_400_BAD_REQUEST)
                 except Exception as error:
-                    print(error)
+                    print(erro.messages)
                     return Response(f"user {user.username} is already a special user", status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(f"transaction is not verified", status=status.HTTP_405_METHOD_NOT_ALLOWED)
