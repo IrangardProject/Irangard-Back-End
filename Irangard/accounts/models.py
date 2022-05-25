@@ -22,7 +22,7 @@ class User(AbstractUser):
 
 class SpecialUser(models.Model):
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, primary_key=True, related_name='special_users')
+        User, on_delete=models.CASCADE, primary_key=True, related_name='special_user')
     total_revenue = models.IntegerField(default=0)
 
     def follows(self, user):
@@ -30,6 +30,14 @@ class SpecialUser(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def withdraw(self, amount):
+        self.total_revenue -= amount
+        self.save()
+
+    def deposit(self, amount):
+        self.total_revenue += amount
+        self.save()
 
 
 class Verification(models.Model):

@@ -11,9 +11,17 @@ class Tour(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     owner = models.ForeignKey("accounts.SpecialUser",related_name="tours",on_delete=models.CASCADE)
+    bookers = models.ManyToManyField(User, blank=True, related_name='tours')
 
     def __str__(self):
         return self.title
+
+    def booked(self, user):
+        return self.bookers.filter(id=user.id).exists()
+
+    def update_remaining(self):
+        self.remaining = self.capacity - self.bookers.count()
+        self.save()
 
 class Transaction(models.Model):
     sender = models.ForeignKey(
