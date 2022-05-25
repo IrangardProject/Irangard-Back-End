@@ -32,9 +32,9 @@ class TourViewSet(ModelViewSet):
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-    
+
     def update(self, request, *args, **kwargs):
-    
+
         tour = self.get_object()
         serializer = self.get_serializer(tour, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -42,3 +42,31 @@ class TourViewSet(ModelViewSet):
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    # @action(detail=True, methods=['POST'], permission_classes=[IsOwnerOrReadOnly])
+    # def add_discount_code(self, request, pk, *args, **kwargs):
+    #     data = request.data
+    #     tour = self.get_object()
+
+    #     discount_code = DiscountCode.objects.create(
+    #         off_percentage=data['off_percentage'], expire_date=data['expire_date'], code=data['code'], tour=tour)
+        
+    #     discount_code.save()
+    #     serializer = DiscountCodeSerializer(discount_code)
+        
+        
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    # @action(detail=True, methods=['POST'], permission_classes=[IsOwnerOrReadOnly])
+    # def remove_discount_code(self, request, pk, *args, **kwargs):
+    #     data = request.data
+    #     tour = self.get_object()
+
+    #     discount_code = DiscountCode.objects.create(
+    #         off_percentage=data['off_percentage'], expire_date=data['expire_date'], code=data['code'], tour=tour)
+        
+    #     discount_code.save()
+    #     serializer = DiscountCodeSerializer(discount_code)
+        
+        
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED)

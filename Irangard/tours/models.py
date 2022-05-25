@@ -27,11 +27,14 @@ class Transaction(models.Model):
 
 class DiscountCode(models.Model):
     off_percentage = models.IntegerField(default=0)
-    expire_data = models.DateTimeField()
+    expire_date = models.DateTimeField()
     code = models.CharField(max_length=255)
     tour = models.ForeignKey(
         'Tour', related_name='discount_codes', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.tour.title +": " + self.code
+    
+    def is_owner(self, user):
+        return self.tour.owner.user == user
 
