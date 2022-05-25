@@ -99,8 +99,8 @@ class TourViewSet(ModelViewSet):
 		if request.user != tour.owner.user:
 			return Response('you are not the tour owner', 
 									status=status.HTTP_403_FORBIDDEN)
-		amount = request.data.get('amount', tour.tototal_revenue)
-		if amount > tour.tototal_revenue or tour.tototal_revenue == 0:
+		amount = request.data.get('amount', tour.total_revenue)
+		if amount > tour.total_revenue or tour.total_revenue == 0:
 			return Response('Insufficient funds', status=status.HTTP_400_BAD_REQUEST)
 		tour.owner.withraw(amount)
 		tour.withraw(amount)
