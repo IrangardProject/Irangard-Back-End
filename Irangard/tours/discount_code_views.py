@@ -24,7 +24,7 @@ class DicountCodeViewSet(ModelViewSet):
 
     def get_queryset(self):
         return DiscountCode.objects.filter(
-            tour__id=self.kwargs.get('tour_pk'))\
+            tour_id=self.kwargs.get('tour_pk'))\
             .order_by('expire_date')
 
     def get_serializer_context(self):
@@ -33,14 +33,13 @@ class DicountCodeViewSet(ModelViewSet):
         return context
 
     # def create(self, request, *args, **kwargs):
-    #     tour=get_object_or_404(Tour.objects, pk=self.kwargs.get('tour_pk'))
+    #     get_object_or_404(Tour.objects, pk=self.kwargs.get('tour_pk'))
     #     return super().create(request, *args, **kwargs)
     def create(self, request, *args, **kwargs):
         try:
             tour = get_object_or_404(Tour.objects, pk=self.kwargs.get('tour_pk'))
-            data = request.data.copy()
-            data.update({'tour':tour.id})
             serializer = DiscountCodeSerializer(data=data)
+            serializer.initial_data['tour'] = tour.id
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -64,10 +63,11 @@ class DicountCodeViewSet(ModelViewSet):
             return Response('you do not have permission to change this discount-code.',
                             status=status.HTTP_403_FORBIDDEN)
         if action == 'update':
-            serializer = self.get_serializer(discount_code, data=request.data, partial=True)
+            serializer = self.get_serializer(
+                discount_code, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
         super().destroy(request, *args, **kwargs)
         return Response('disount-code destroyed', status=status.HTTP_204_NO_CONTENT)
