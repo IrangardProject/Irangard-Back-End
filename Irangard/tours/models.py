@@ -12,6 +12,7 @@ class Tour(models.Model):
     end_date = models.DateTimeField()
     owner = models.ForeignKey("accounts.SpecialUser",related_name="tours",on_delete=models.CASCADE)
     bookers = models.ManyToManyField(User, blank=True, related_name='tours')
+    total_revenue = models.DecimalField(max_digits=9, decimal_places=2)
 
     def __str__(self):
         return self.title
@@ -21,6 +22,14 @@ class Tour(models.Model):
 
     def update_remaining(self):
         self.remaining = self.capacity - self.bookers.count()
+        self.save()
+
+    def update_revenue(self, amount):
+        self.total_revenue += amount
+        self.save()
+    
+    def withdraw(self, amount):
+        self.total_revenue -= amount
         self.save()
 
 class Transaction(models.Model):
