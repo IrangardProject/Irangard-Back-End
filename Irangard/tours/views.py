@@ -102,6 +102,6 @@ class TourViewSet(ModelViewSet):
 		amount = request.data.get('amount', tour.total_revenue)
 		if amount > tour.total_revenue or tour.total_revenue == 0:
 			return Response('Insufficient funds', status=status.HTTP_400_BAD_REQUEST)
-		tour.owner.withraw(amount)
-		tour.withraw(amount)
+		tour.owner.withdraw(amount)
+		tour.withdraw(amount)
 		return Response({'amount': amount}, status=status.HTTP_200_OK)
