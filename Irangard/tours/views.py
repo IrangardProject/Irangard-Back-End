@@ -79,18 +79,29 @@ class TourViewSet(ModelViewSet):
 		tour = self.get_object()
 		user = request.user
 		cost = tour.cost
-		# revenue = user.special_user.total_revenue
 		if tour.booked(user):
 			return Response('Already booked', status=status.HTTP_400_BAD_REQUEST)
 		if tour.capacity < 1:
 			return Response("there's no reservation available", status=status.HTTP_400_BAD_REQUEST)
-		# if cost > revenue:
-		# 	return Response('Insufficient funds.', status=status.HTTP_400_BAD_REQUEST)
-
-		# user.special_user.withdraw(cost)
 		tour.owner.deposit(cost)
 		Transaction.objects.create(tour=tour, sender=user, cost=cost, date=datetime.now())
+		tour.update_revenue(cost)
 		tour.bookers.add(user)
 		tour.update_remaining()
 
 		return Response({'booked': True}, status=status.HTTP_200_OK)
+
+
+	@action(detail=True, methods=['post'],
+			permission_classes=[IsAuthenticated])
+	def withraw(self, request, *args, **kwargs):
+		tour = self.get_object()
+		if request.user != tour.owner.user:
+			return Response('you are not the tour owner', 
+									status=status.HTTP_400_BAD_REQUEST)
+		amount = request.data.get('amount', tour.tototal_revenue)
+		if amount > tour.tototal_revenue or tour.tototal_revenue == 0:
+			return Response('Insufficient funds', status=status.HTTP_400_BAD_REQUEST)
+		tour.owner.withraw(amount)
+		tour.withraw(amount)
+		return Response({'amount': amount}, status=status.HTTP_200_OK)
