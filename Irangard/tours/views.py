@@ -1,3 +1,7 @@
+from datetime import datetime
+import uuid
+import requests
+import json
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpRequest, HttpResponse
 from rest_framework.decorators import permission_classes
@@ -12,96 +16,164 @@ from .pagination import DefaultPagination
 from tours.models import *
 from .serializers import *
 from .permissions import *
-from datetime import datetime
+from accounts.models import StagedPayments
+from accounts.serializers.payment_serializers import VerifiedPaymentSerializer
+from django.template.loader import render_to_string
 
 
 class TourViewSet(ModelViewSet):
-	queryset = Tour.objects.all()
-	serializer_class = TourSerializer
-	filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    queryset = Tour.objects.all()
+    serializer_class = TourSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
 
-	pagination_class = DefaultPagination
-	permission_classes = [IsOwnerOrReadOnly]
+    pagination_class = DefaultPagination
+    permission_classes = [IsOwnerOrReadOnly]
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['owner'] = self.request.user.id
+        return context
 
-	def create(self, request, *args, **kwargs):
-		data = request.data.copy()
-		data['owner'] = request.user
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        serializer = self.get_serializer(data=data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        tour = serializer.save()
 
-		serializer = self.get_serializer(data=data)
-		serializer.is_valid(raise_exception=True)
-		tour = serializer.save()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-		headers = self.get_success_headers(serializer.data)
-		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    def update(self, request, *args, **kwargs):
 
-	def update(self, request, *args, **kwargs):
+        tour = self.get_object()
+        serializer = self.get_serializer(tour, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-		tour = self.get_object()
-		serializer = self.get_serializer(tour, data=request.data, partial=True)
-		serializer.is_valid(raise_exception=True)
-		serializer.save()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-		headers = self.get_success_headers(serializer.data)
-		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    def destroy(self, request, *args, **kwargs):
+        try:
+            super().destroy(request, request)
+            return Response('tour deleted', status=status.HTTP_204_NO_CONTENT)
+        except Exception as error:
+            return Response(f"{error}", status=status.HTTP_400_BAD_REQUEST)
 
-	# @action(detail=True, methods=['POST'], permission_classes=[IsOwnerOrReadOnly])
-	# def add_discount_code(self, request, pk, *args, **kwargs):
-	#     data = request.data
-	#     tour = self.get_object()
+    @action(detail=True, methods=['post'],
+            permission_classes=[IsAuthenticated])
+    def book(self, request, *args, **kwargs):
+        tour = self.get_object()
+        user = request.user
+        cost = tour.cost
+        if tour.booked(user):
+            return Response('Already booked', status=status.HTTP_400_BAD_REQUEST)
+        if tour.capacity < 1:
+            return Response("there's no reservation available", status=status.HTTP_400_BAD_REQUEST)
 
-	#     discount_code = DiscountCode.objects.create(
-	#         off_percentage=data['off_percentage'], expire_date=data['expire_date'], code=data['code'], tour=tour)
-		
-	#     discount_code.save()
-	#     serializer = DiscountCodeSerializer(discount_code)
-		
-		
-	#     return Response(serializer.data, status=status.HTTP_201_CREATED)
-	
-	# @action(detail=True, methods=['POST'], permission_classes=[IsOwnerOrReadOnly])
-	# def remove_discount_code(self, request, pk, *args, **kwargs):
-	#     data = request.data
-	#     tour = self.get_object()
+        order_id = str(uuid.uuid4())
+        my_data = {
+            "order_id": order_id,
+            "amount": 10000,
+            "name": f"{request.user.username}",
+            "mail": f"{request.user.email}",
+            "callback": f"http://127.0.0.1:8000/tours/{self.kwargs.get('pk')}/verify/"
+        }
 
-	#     discount_code = DiscountCode.objects.create(
-	#         off_percentage=data['off_percentage'], expire_date=data['expire_date'], code=data['code'], tour=tour)
-		
-	#     discount_code.save()
-	#     serializer = DiscountCodeSerializer(discount_code)
-		
-		
-	#     return Response(serializer.data, status=status.HTTP_201_CREATED)
+        my_headers = {"Content-Type": "application/json",
+                      'X-API-KEY': '3394842f-7407-4598-8c48-499a15c8d0b7',
+                      'X-SANDBOX': '1'}
 
+        response = requests.post(url="https://api.idpay.ir/v1.1/payment", data=json.dumps(my_data),
+                                 headers=my_headers)
+        response.raise_for_status()
+        print(response.status_code)
+        try:
+            obj = StagedPayments.objects.get(user=request.user)
+            obj.transaction_id = json.loads(response.content)['id']
+            obj.order_id = order_id
+            obj.save()
 
-	@action(detail=True, methods=['post'],
-			permission_classes=[IsAuthenticated])
-	def book(self, request, *args, **kwargs):
-		tour = self.get_object()
-		user = request.user
-		cost = tour.cost
-		if tour.booked(user):
-			return Response('Already booked', status=status.HTTP_400_BAD_REQUEST)
-		if tour.capacity < 1:
-			return Response("there's no reservation available", status=status.HTTP_400_BAD_REQUEST)
-		tour.owner.deposit(cost)
-		Transaction.objects.create(tour=tour, sender=user, cost=cost, date=datetime.now())
-		tour.update_revenue(cost)
-		tour.bookers.add(user)
-		tour.update_remaining()
+        except StagedPayments.DoesNotExist:
+            obj = StagedPayments.objects.create(transaction_id=json.loads(response.content)[
+                'id'], order_id=order_id, user=request.user)
+            obj.save()
+        except:
+            return Response(f"bad request", status=status.HTTP_400_BAD_REQUEST)
 
-		return Response({'booked': True}, status=status.HTTP_200_OK)
+        return Response(json.loads(response.content), status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['POST', 'GET'], permission_classes=[permissions.AllowAny])
+    def verify(self, request, *args, **kwargs):
 
-	@action(detail=True, methods=['post'],
-			permission_classes=[IsAuthenticated])
-	def withraw(self, request, *args, **kwargs):
-		tour = self.get_object()
-		if request.user != tour.owner.user:
-			return Response('you are not the tour owner', 
-									status=status.HTTP_403_FORBIDDEN)
-		amount = request.data.get('amount', tour.total_revenue)
-		if amount > tour.total_revenue or tour.total_revenue == 0:
-			return Response('Insufficient funds', status=status.HTTP_400_BAD_REQUEST)
-		tour.owner.withdraw(amount)
-		tour.withdraw(amount)
-		return Response({'amount': amount}, status=status.HTTP_200_OK)
+        try:
+            my_data = {
+                "order_id": request.data['order_id'],
+                "id": request.data['id'],
+
+            }
+
+            my_headers = {"Content-Type": "application/json",
+                          'X-API-KEY': '3394842f-7407-4598-8c48-499a15c8d0b7',
+                          'X-SANDBOX': '1'
+                          }
+
+            response = requests.post(url="https://api.idpay.ir/v1.1/payment/verify", data=json.dumps(my_data),
+                                     headers=my_headers)
+            response.raise_for_status()
+# print(response.content, ' ', response.status_code)
+
+            if(response.status_code == 200):
+
+                try:
+                    staged_payments_user = StagedPayments.objects.get(
+                        transaction_id=request.data['id']).user
+                    user = User.objects.get(
+                        username=staged_payments_user.username)
+                    tour = self.get_object()
+                    cost = tour.cost
+                    tour.owner.deposit(cost)
+                    Transaction.objects.create(
+                        tour=tour, sender=user, cost=cost, date=datetime.now())
+                    tour.update_revenue(cost)
+                    tour.bookers.add(user)
+                    tour.update_remaining()
+                    tour.save()
+                    st_payment = StagedPayments.objects.get(user=user)
+                    st_payment.delete()
+                    verified_payment_serializer = VerifiedPaymentSerializer(
+                        data=json.loads(response.content))
+                    verified_payment_serializer.is_valid(raise_exception=True)
+                    template = render_to_string('success_registration.html',
+                                                {
+                                                    'username': user.username,
+                                                    'code': '123',
+                                                    'WEBSITE_URL': 'kooleposhti.tk',
+                                                    'tour' : tour.title
+                                                })
+                    return HttpResponse(template)
+# return Response(verified_payment_serializer.data, status=status.HTTP_200_OK)
+                except StagedPayments.DoesNotExist:
+                    return Response(f"there is no corresponding payment to be verified", status=status.HTTP_400_BAD_REQUEST)
+                except Exception as error:
+                    print(error)
+                    return Response(f"{error}", status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(f"transaction is not verified", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        except:
+            return Response(f"order id is required", status=status.HTTP_400_BAD_REQUEST)
+        
+
+    @action(detail=True, methods=['post'],
+            permission_classes=[IsAuthenticated])
+    def withraw(self, request, *args, **kwargs):
+        tour = self.get_object()
+        if request.user != tour.owner.user:
+            return Response('you are not the tour owner',
+                            status=status.HTTP_403_FORBIDDEN)
+        amount = request.data.get('amount', tour.total_revenue)
+        if amount > tour.total_revenue or tour.total_revenue == 0:
+            return Response('Insufficient funds', status=status.HTTP_400_BAD_REQUEST)
+        tour.owner.withdraw(amount)
+        tour.withdraw(amount)
+        return Response({'amount': amount}, status=status.HTTP_200_OK)
