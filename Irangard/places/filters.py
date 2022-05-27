@@ -12,4 +12,10 @@ class PlaceFilter(FilterSet):
 
     class Meta:
         model = Place
-        fields = ['province', 'city', 'place_type']
+        fields = ['province', 'city', 'place_type', 'is_free', 
+                'tags__name', 'features__title', 'rooms__capacity']
+        fields = {
+            'rooms__price': ['lte', 'gte'],
+            'optionals__price': ['lte', 'gte'],
+            'rate': ['gte'],
+        }
