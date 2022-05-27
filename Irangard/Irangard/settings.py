@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'accounts',
     'places',
     'experience',
+    'tours',
     'corsheaders',
     'cloudinary',
     'cloudinary_storage',
@@ -162,7 +163,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = STATIC_HOST + "/media/"
+# MEDIA_URL = STATIC_HOST + "/media/"
+MEDIA_URL = "/media/"
 
 # ActivateDjango-Heroku
 django_heroku.settings(locals())
