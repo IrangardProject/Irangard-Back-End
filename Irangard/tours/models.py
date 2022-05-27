@@ -5,6 +5,8 @@ from accounts.models import User, SpecialUser
 
 class Tour(models.Model):
     title = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    image = models.ImageField(upload_to=f'images/tours', blank=True, null=True)
     cost = models.IntegerField(default=0)
     capacity = models.IntegerField(default=0)
     remaining = models.IntegerField(default=0)

@@ -20,9 +20,12 @@ class DiscountCodeSerializer(serializers.ModelSerializer):
 
 class TourSerializer(serializers.ModelSerializer):
     owner = SpecialUserSerializer(read_only=True)
-
     class Meta:
         model = Tour
         fields = ['title', 'cost', 'capacity',
-                  'start_date', 'end_date', 'id', 'owner']
-        read_only_fields = ['id', 'owner']
+                  'start_date', 'end_date', 'id', 'owner','bookers','image']
+        read_only_fields = ['id','owner','bookers']
+
+    def create(self, validated_data):
+        validated_data['owner_id'] = self.context.get("owner")
+        return super().create(validated_data)

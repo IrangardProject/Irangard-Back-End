@@ -34,7 +34,7 @@ class PayViewSet(GenericViewSet):
             "amount": 10000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": "http://127.0.0.1:8000/accounts/pay/verify/"
+            "callback": "https://api.parizaan.ir/accounts/pay/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
@@ -106,7 +106,7 @@ class PayViewSet(GenericViewSet):
                 except StagedPayments.DoesNotExist:
                     return Response(f"there is no corresponding payment to be verified", status=status.HTTP_400_BAD_REQUEST)
                 except Exception as error:
-                    print(erro.messages)
+                    print(error)
                     return Response(f"user {user.username} is already a special user", status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(f"transaction is not verified", status=status.HTTP_405_METHOD_NOT_ALLOWED)
