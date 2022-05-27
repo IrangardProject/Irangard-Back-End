@@ -78,7 +78,7 @@ class TourViewSet(ModelViewSet):
             "amount": 10000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": f"http://127.0.0.1:8000/tours/{self.kwargs.get('pk')}/verify/"
+            "callback": f"https://api.parizaan.ir/tours/{self.kwargs.get('pk')}/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
