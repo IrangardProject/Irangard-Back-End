@@ -34,14 +34,15 @@ class TourViewSet(ModelViewSet):
         context['owner'] = self.request.user.id
         return context
 
-    def create(self, request, *args, **kwargs):
-        data = request.data
-        serializer = self.get_serializer(data=data, context=self.get_serializer_context())
-        serializer.is_valid(raise_exception=True)
-        tour = serializer.save()
+    # def create(self, request, *args, **kwargs):
+    #     # data = request.data
+    #     # serializer = self.get_serializer(data=data, context=self.get_serializer_context())
+    #     # serializer.is_valid(raise_exception=True)
+    #     # tour = serializer.save()
 
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    #     # headers = self.get_success_headers(serializer.data)
+    #     # return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    #     return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
 

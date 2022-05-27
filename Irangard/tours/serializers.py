@@ -23,7 +23,7 @@ class TourSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tour
         fields = ['title', 'cost', 'capacity',
-                  'start_date', 'end_date', 'id', 'owner','bookers']
+                  'start_date', 'end_date', 'id', 'owner','bookers','image']
         read_only_fields = ['id','owner','bookers']
 
     def create(self, validated_data):
