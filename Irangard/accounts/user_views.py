@@ -64,20 +64,24 @@ class FeediewSet(ModelViewSet):
 			methods=['post'])
 	def follow(self, request, *args, **kwargs):
 		user = self.get_object()
-		if user.follows(request.user):
+		if request.user.follows(user):
 			return Response("you already follows this user.", 
 						status=status.HTTP_400_BAD_REQUEST)
-		user.followers.add(request.user)
+		request.user.following.add(user)
+		user.update_follower_no()
+		request.user.update_following_no()
 		return Response(status=status.HTTP_200_OK)
 
 	@action(detail=True, permission_classes=[IsAuthenticated],
 			methods=['post'])
 	def unfollow(self, request, *args, **kwargs):
 		user = self.get_object()
-		if not user.follows(request.user):
+		if not request.user.follows(user):
 			return Response("you are not following this user.", 
 						status=status.HTTP_400_BAD_REQUEST)
-		user.followers.remove(request.user)
+		request.user.following.remove(user)
+		user.update_follower_no()
+		request.user.update_following_no()
 		return Response(status=status.HTTP_200_OK)
 		
 		

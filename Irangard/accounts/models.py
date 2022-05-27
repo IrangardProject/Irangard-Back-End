@@ -24,6 +24,14 @@ class SpecialUser(models.Model):
     def follows(self, user):
         return user in self.following.all()
 
+    def update_follower_no(self):
+        self.follower_number = self.followers.count()
+        self.save()
+
+    def update_following_no(self):
+        self.following_number = self.following.count()
+        self.save()
+
 class Verification(models.Model):
     email = models.EmailField(primary_key=True)
     username =  models.CharField(max_length=255)
