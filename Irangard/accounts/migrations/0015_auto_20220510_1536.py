@@ -10,29 +10,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # migrations.AddField(
-        #     model_name='user',
-        #     name='first_name',
-        #     field=models.CharField(blank=True, max_length=150, verbose_name='first name'),
-        # ),
-        # migrations.AddField(
-        #     model_name='user',
-        #     name='follower_number',
-        #     field=models.IntegerField(default=0),
-        # ),
-        # migrations.AddField(
-        #     model_name='user',
-        #     name='following_number',
-        #     field=models.IntegerField(default=0),
-        # ),
-        # migrations.AddField(
-        #     model_name='user',
-        #     name='full_name',
-        #     field=models.CharField(blank=True, max_length=255, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='user',
-        #     name='last_name',
-        #     field=models.CharField(blank=True, max_length=150, verbose_name='last name'),
-        # ),
+
     ]
