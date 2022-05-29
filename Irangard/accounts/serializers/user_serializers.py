@@ -25,10 +25,11 @@ class UserBasicInfoSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for user profile"""
     is_owner = serializers.SerializerMethodField('get_is_owner')
+    following = serializers.SerializerMethodField('get_following')
     
     class Meta:
         model = User
-        fields = ['full_name', 'is_special', 'email', 'image', 'username', 'about_me', 'following_number', 'follower_number', 'is_owner','is_admin']
+        fields = ['id', 'full_name', 'is_special', 'email', 'image', 'username', 'about_me', 'following_number', 'follower_number', 'following', 'is_owner','is_admin']
         read_only_fields = ('email', 'following_number', 'follower_number', 'is_owner','is_admin', 'image')
         
         extra_kwargs = {
@@ -43,18 +44,25 @@ class UserProfileSerializer(serializers.ModelSerializer):
         else:
             return False
 
+    def get_following(self, user):
+        status = None
+        request_user = self.context['user']
+        if request_user.is_authenticated:
+            status =  request_user.follows(user) or request_user == user
+        return status
+
 class UserFeedSerializer(serializers.ModelSerializer):
-    following = serializers.SerializerMethodField()
+    following = serializers.SerializerMethodField('get_following')
 
     def get_following(self, user):
         status = None
         request_user = self.context['user']
         if request_user.is_authenticated:
-            status =  request_user.follows(user)
+            status =  request_user.follows(user) or request_user == user
         return status
     class Meta:
         model = User
-        fields = ['username', 'image', 'full_name', 'following']
+        fields = ['id', 'username', 'image', 'full_name', 'following']
         
         
 class UserInformationSerializer(serializers.ModelSerializer):
