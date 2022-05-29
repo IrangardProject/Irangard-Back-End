@@ -127,7 +127,7 @@ class Optional(models.Model):
 
 class Hours(models.Model):
     weekdays = [
-        ('0', "Saturday")
+        ('0', "Saturday"),
         ('1', "Sunday"),
         ('2', "Monday"),
         ('3', "Tuesday"),
