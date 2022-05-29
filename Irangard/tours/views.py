@@ -28,7 +28,7 @@ class TourViewSet(ModelViewSet):
 
     pagination_class = DefaultPagination
     permission_classes = [IsOwnerOrReadOnly]
-    
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['owner'] = self.request.user.id
@@ -150,7 +150,7 @@ class TourViewSet(ModelViewSet):
                                                     'username': user.username,
                                                     'code': '123',
                                                     'WEBSITE_URL': 'kooleposhti.tk',
-                                                    'tour' : tour.title
+                                                    'tour': tour.title
                                                 })
                     return HttpResponse(template)
 # return Response(verified_payment_serializer.data, status=status.HTTP_200_OK)
@@ -163,7 +163,6 @@ class TourViewSet(ModelViewSet):
                 return Response(f"transaction is not verified", status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except:
             return Response(f"order id is required", status=status.HTTP_400_BAD_REQUEST)
-        
 
     @action(detail=True, methods=['post'],
             permission_classes=[IsAuthenticated])
@@ -178,3 +177,16 @@ class TourViewSet(ModelViewSet):
         tour.owner.withdraw(amount)
         tour.withdraw(amount)
         return Response({'amount': amount}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['GET'],
+            permission_classes=[IsAuthenticated])
+    def is_booked(self, request, pk):
+        tour = self.get_object()
+        user = request.user
+
+        booked = user in tour.bookers.all()
+
+        if(booked):
+            return Response('user has booked', status=status.HTTP_200_OK)
+        else:
+            return Response('user has not booked', status=status.HTTP_400_BAD_REQUEST)
