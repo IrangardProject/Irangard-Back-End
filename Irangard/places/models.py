@@ -124,5 +124,25 @@ class Optional(models.Model):
 
     def __str__(self):
         return f"{self.place.title} {self.title}"
+
+class Hours(models.Model):
+    weekdays = [
+        ('0', "Saturday")
+        ('1', "Sunday"),
+        ('2', "Monday"),
+        ('3', "Tuesday"),
+        ('4', "Wednesday"),
+        ('5', "Thursday"),
+        ('6', "Friday")
+    ]
+    contact = models.ForeignKey(
+        Contact, on_delete=models.CASCADE, related_name='working_hours')
+    weekday = models.CharField(max_length=255, choices=weekdays)
+    start_time = models.TimeField(blank=True, null=True)
+    end_time = models.TimeField(blank=True, null=True)
+    all_day = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.place.title}: {self.day} {self.start_time}-{self.end_time}"
     
 

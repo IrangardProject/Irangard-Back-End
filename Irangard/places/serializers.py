@@ -20,8 +20,13 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['place', 'name']
         extra_kwargs = {'place': {'write_only': True}}
 
-class ContactSerializer(serializers.ModelSerializer):
+class HoursSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hours
+        fields = ['id', 'weekday', 'start_time', 'end_time', 'all_day']
 
+class ContactSerializer(serializers.ModelSerializer):
+    working_hours = HoursSerializer(many=True)
     class Meta:
         model = Contact
         fields = '__all__'
@@ -47,7 +52,6 @@ class OptionalSerializer(serializers.ModelSerializer):
         model = Optional
         fields = ['place', 'title', 'description', 'price']
         extra_kwargs = {'place': {'write_only': True}}
-
 
 class PlaceSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True, required=False)
