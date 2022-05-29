@@ -22,9 +22,7 @@ class TourSerializer(serializers.ModelSerializer):
     owner = SpecialUserSerializer(read_only=True)
     class Meta:
         model = Tour
-        fields = ['title', 'cost', 'capacity',
-                  'start_date', 'end_date', 'id', 'owner','bookers','image','description']
-        read_only_fields = ['id','owner','bookers']
+        fields = '__all__'
 
     def create(self, validated_data):
         validated_data['owner_id'] = self.context.get("owner")

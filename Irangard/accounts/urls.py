@@ -8,6 +8,7 @@ from rest_framework_nested import routers
 
 from .user_views import *
 from .accounts_auth_views import AccountAuthViewSet
+from .special_user_views import SpecialUserViewSet
 from accounts.serializers.serializersNew import myTokenObtainPairSerializer
 from .admin_views import AdminViewSet
 from .views import PayViewSet
@@ -20,6 +21,7 @@ router.register('auth', AccountAuthViewSet,
 router.register('pay',PayViewSet , basename='accounts-pay')
 router.register('admin', AdminViewSet, basename='accounts-admin')
 router.register('', FeediewSet)
+router.register('special-users', SpecialUserViewSet, basename='special-users')
 
 urlpatterns = [
     path('',include(router.urls)),
