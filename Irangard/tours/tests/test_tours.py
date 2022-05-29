@@ -25,6 +25,8 @@ class TourViewSetTestCase(TestCase):
             return "incorrect"
 
     def setUp(self):
+        
+        #create main super-user
         self.user = User.objects.create(
             email="emad12@gmail.com",
             username="emad12",
@@ -39,8 +41,25 @@ class TourViewSetTestCase(TestCase):
         self.special_user = SpecialUser.objects.create(
             user=self.user, total_revenue=0)
         self.special_user.save()
+        #end create main super-user
+        
+        #create second super-user
+        self.second_user = User.objects.create(
+            email="emad13@gmail.com",
+            username="emad13",
+            first_name="سید عماد",
+            last_name="موسوی",
+            phone_no="09364945328"
+        )
+        self.second_user.set_password('emad123456')
+        self.second_user.is_special = True
+        self.second_user.save()
 
-        self.url = 'http://127.0.0.1/tours/'
+        self.second_special_user = SpecialUser.objects.create(
+            user=self.second_user, total_revenue=0)
+        self.second_special_user.save()
+        #end create second super-user
+        self.url = 'http://127.0.0.1:8000/tours/'
         self.client = APIClient()
         token = self.login(self.special_user.user.username, 'emad1234')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
@@ -54,6 +73,9 @@ class TourViewSetTestCase(TestCase):
             "end_date": "2022-05-23T15:49:49.505Z"
         }
 
+        self.tour = Tour.objects.create(**self.data,owner = self.special_user)
+        self.tour.save()
+        
     def normal_user_client(self):
         user = User.objects.create(
             email="emad@gmail.com",
@@ -63,7 +85,6 @@ class TourViewSetTestCase(TestCase):
             phone_no="09364945328"
         )
         user.set_password('emad12345')
-        user.is_special = True
         user.save()
 
         client = APIClient()
@@ -84,7 +105,7 @@ class TourViewSetTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_tour_create_not_superuser(self):
-        
+
         client = self.normal_user_client()
         response = client.post(self.url, json.dumps(
             self.data, indent=4, sort_keys=True, default=str), content_type='application/json')
@@ -93,66 +114,52 @@ class TourViewSetTestCase(TestCase):
 
     def test_tour_create_not_given_title(self):
 
-        data = self.data
+        data = self.data.copy()
         data.pop('title')
         response = self.client.post(self.url, json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_tour_create_not_given_cost(self):
-        data = self.data
-        data.pop('cost')
-        client = self.normal_user_client()
-        response = client.post(self.url, json.dumps(
-            data, indent=4, sort_keys=True, default=str), content_type='application/json')
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_tour_create_not_given_capacity(self):
-        data = self.data
-        data.pop('capacity')
-        client = self.normal_user_client()
-        response = client.post(self.url, json.dumps(
-            data, indent=4, sort_keys=True, default=str), content_type='application/json')
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     def test_tour_create_not_given_start_date(self):
-        data = self.data
+        data = self.data.copy()
         data.pop('start_date')
-        client = self.normal_user_client()
-        response = client.post(self.url, json.dumps(
+        response = self.client.post(self.url, json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_tour_create_not_given_end_date(self):
-        data = self.data
+        data = self.data.copy()
         data.pop('end_date')
-        client = self.normal_user_client()
-        response = client.post(self.url, json.dumps(
-            data, indent=4, sort_keys=True, default=str), content_type='application/json')
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_tour_create_not_given_remaining(self):
-        data = self.data
-        data.pop('remaining')
-        client = self.normal_user_client()
-        response = client.post(self.url, json.dumps(
+        response = self.client.post(self.url, json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_tour_update(self):
-        pass
+        data = self.data.copy()
+        data['title'] = 'test_title'
+        data['cost'] = 100
+        response = self.client.put(self.url + f'{self.tour.id}/', json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_tour_partial_update(self):
-        pass
+        data = {"title":"test_title"}
+        response = self.client.put(self.url + f'{self.tour.id}/', json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_tour_update_not_owner(self):
-        pass
+        data = {"title":"test_title"}
+        client = APIClient()
+        client.login(username=self.second_special_user.user.username, password='emad123456')
+        response = client.put(self.url + f'{self.tour.id}/', json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_tour_delete(self):
         pass
