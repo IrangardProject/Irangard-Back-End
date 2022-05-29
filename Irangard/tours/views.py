@@ -44,6 +44,12 @@ class TourViewSet(ModelViewSet):
     #     # return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     #     return super().create(request, *args, **kwargs)
 
+    def retrieve(self, request, *args, **kwargs):
+        tour = self.get_object()
+        serializer = self.get_serializer(tour)
+        # serializer.data['is_booked'] = booked
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def update(self, request, *args, **kwargs):
 
         tour = self.get_object()
