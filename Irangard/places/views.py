@@ -70,9 +70,12 @@ class PlaceViewSet(ModelViewSet):
 		rooms = data.pop('rooms', None)
 		optional_costs = data.pop('optional_costs', None)
 		contact_data = data.pop('contact', None)
+		hours_data = data.pop('working_hours', None)
 
 		if contact_data:
 			ContactSerializer().update(place.contact, contact_data)
+		if hours_data:
+			HoursSerializer().update(place.contact.working_hours, hours_data)
 		if images:
 			place.images.all().delete()
 			for image in images:
