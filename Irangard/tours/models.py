@@ -15,6 +15,7 @@ class Tour(models.Model):
     owner = models.ForeignKey("accounts.SpecialUser",related_name="tours",on_delete=models.CASCADE)
     bookers = models.ManyToManyField(User, blank=True, related_name='tours')
     total_revenue = models.DecimalField(max_digits=9, decimal_places=2, default=0)
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.title
