@@ -38,8 +38,9 @@ class DicountCodeViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         try:
             tour = get_object_or_404(Tour.objects, pk=self.kwargs.get('tour_pk'))
+            data = request.data.copy()
+            data['tour'] = tour.id
             serializer = DiscountCodeSerializer(data=data)
-            serializer.initial_data['tour'] = tour.id
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
