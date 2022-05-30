@@ -23,9 +23,10 @@ import mock
 #             is_admin=True
 #         )
 #         self.admin.set_password('admin')
+#         self.admin.is_admin = True
 #         self.admin.save()
-#         self.client = APIClient
-#         self.client.force_authenticate(user=self.admin)
+#         self.client = APIClient()
+#         self.client.login(username=self.admin.username, password='admin')
 
 #     @classmethod
 #     def setUpTestData(cls):
@@ -33,20 +34,24 @@ import mock
 
 #     def test_addAdmin(self):
 
-#         url = reverse('accounts:accounts-admin-add-admin')
+#         url = 'http://127.0.0.1:8000/accounts/admin/add-admin/'
 #         response = self.client.post(path=url,content_type='application/json')
+#         print(response.json())
 #         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 #     def test_removeSpecialUser(self):
 
-#         url = reverse('accounts:accounts-admin-remove-special-user')
+#         url = 'http://127.0.0.1:8000/accounts/admin/remove-special-user/'
 #         response = self.client.post(path=url,content_type='application/json')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 #     def test_removeUser(self, mocked_ActivationEmail):
 
-#         url = reverse('accounts:accounts-admin-remove-user')
+#         url = 'http://127.0.0.1:8000/accounts/admin/remove-user/'
 #         response = self.client.post(path=url,content_type='application/json')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 #     def test_addUser(self):
-#         url = reverse('accounts:accounts-admin-add-user')
+#         url = 'http://127.0.0.1:8000/accounts/admin/add-user/'
 #         response = self.client.post(path=url,content_type='application/json')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)

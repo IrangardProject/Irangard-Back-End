@@ -19,6 +19,7 @@ from .permissions import *
 from accounts.models import StagedPayments
 from accounts.serializers.payment_serializers import VerifiedPaymentSerializer
 from django.template.loader import render_to_string
+from django.utils import timezone
 
 
 class TourViewSet(ModelViewSet):
@@ -78,10 +79,18 @@ class TourViewSet(ModelViewSet):
         if tour.capacity < 1:
             return Response("there's no reservation available", status=status.HTTP_400_BAD_REQUEST)
 
+        if('discount_code_code' in request.data):
+            try:
+                discount_code = DiscountCode.objects.get(code=request.data['discount_code_code'])
+                if(discount_code.expire_date < timezone.now()):
+                    return Response('discount code has expired',status=status.HTTP_400_BAD_REQUEST)
+                cost = cost * (discount_code.off_percentage/100)
+            except DiscountCode.DoesNotExist:
+                return Response('discount_code does not exist',status=status.HTTP_400_BAD_REQUEST)
         order_id = str(uuid.uuid4())
         my_data = {
             "order_id": order_id,
-            "amount": 10000,
+            "amount": cost,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
             "callback": f"https://api.parizaan.ir/tours/{self.kwargs.get('pk')}/verify/"

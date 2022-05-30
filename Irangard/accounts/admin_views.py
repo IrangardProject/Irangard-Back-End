@@ -4,6 +4,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import Avg, Count, Min, Sum
+
+from tours.models import Tour
 from .models import User, SpecialUser
 from .serializers.user_serializers import UserProfileSerializer, UserBasicInfoSerializer, UserSerializer
 from rest_framework import status, permissions
@@ -103,7 +106,7 @@ class AdminViewSet(GenericViewSet):
         serializer.is_valid()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=False, url_path='basic-statistics', methods=['POST'], permission_classes=[IsAdmin])
+    @action(detail=False, url_path='basic-statistics', methods=['GET'], permission_classes=[IsAdmin])
     def basicStatistics(self, request):
         statistics = defaultdict(int)
 
@@ -111,10 +114,12 @@ class AdminViewSet(GenericViewSet):
         statistics['special-users_no'] = len(SpecialUser.objects.all())
         statistics['places_no'] = len(Place.objects.all())
         statistics['experiences_no'] = len(Experience.objects.all())
-        statistics['tour_no'] = len(Tour.objects.all())
         statistics['top_10_liked_experiences'] = ExperienceSerializer(
             Experience.objects.all().order_by('-like_number')[:10], many=True).data
-
+        statistics['tour_no'] = len(Tour.objects.all())
+        statistics['users_revenue'] = SpecialUser.objects.aggregate(Sum('total_revenue'))
+        statistics['top_10_person_with_most_follower'] = UserSerializer(
+            User.objects.all().order_by('follower_number')[:10], many=True).data
         return Response(statistics, status=status.HTTP_200_OK)
 
     @action(detail=False, url_path='daily-statistics', methods=['POST'], permission_classes=[IsAdmin])
@@ -309,15 +314,17 @@ class AdminViewSet(GenericViewSet):
             statistics = defaultdict(int)
 
             user = User.objects.get(username=request.data['username'])
-            statistics['date-joined'] = user.date_joined.strftime('%Y-%m-%d')
             statistics['experiences-no'] = len(user.experiences.all())
             statistics['created-tours'] = 0
+            statistics['date-joined'] = user.date_joined
+            print(user.tours.all())
+            statistics['registered-tours'] = len(user.tours.all())
             if(user.is_special):
                 special_user = SpecialUser.objects.get(user = user)
+                statistics['total_revenue'] = special_user.total_revenue
                 statistics['created-tours'] = len(special_user.tours.all())
             statistics['top_10_liked_experiences'] = ExperienceSerializer(
                 user.experiences.all().order_by('-like_number')[:10], many=True).data
-
             return Response(statistics, status=status.HTTP_200_OK)
         except Exception as error:
             print(error)
