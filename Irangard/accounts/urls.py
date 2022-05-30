@@ -10,14 +10,14 @@ from .user_views import UserProfile
 from .accounts_auth_views import AccountAuthViewSet
 from accounts.serializers.serializersNew import myTokenObtainPairSerializer
 from .views import *
-from accounts.user_views import FeediewSet
+from accounts.user_views import FollowViewSet
 
 app_name = 'accounts'
 
 router =  routers.DefaultRouter()
 router.register('auth', AccountAuthViewSet,
                 basename='accounts-auth')
-router.register('', FeediewSet)
+router.register('', FollowViewSet)
 
 urlpatterns = [
     path('',include(router.urls)),

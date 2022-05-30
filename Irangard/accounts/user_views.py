@@ -38,7 +38,7 @@ class UserProfile(APIView):
 
 
 
-class FeediewSet(ModelViewSet):
+class FollowViewSet(ModelViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserFeedSerializer
 	permission_classes = [IsAdminUser]
