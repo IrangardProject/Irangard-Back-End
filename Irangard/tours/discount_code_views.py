@@ -37,9 +37,12 @@ class DicountCodeViewSet(ModelViewSet):
     #     return super().create(request, *args, **kwargs)
     def create(self, request, *args, **kwargs):
         try:
+            if(len(DiscountCode.objects.filter(code=request.data['code'])) > 0):
+                return Response('the discount_code exists',status=status.HTTP_400_BAD_REQUEST) 
             tour = get_object_or_404(Tour.objects, pk=self.kwargs.get('tour_pk'))
+            data = request.data.copy()
+            data['tour'] = tour.id
             serializer = DiscountCodeSerializer(data=data)
-            serializer.initial_data['tour'] = tour.id
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
