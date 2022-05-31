@@ -74,6 +74,14 @@ class ExperienceViewSet(ModelViewSet):
 		else:
 			return super().destroy(request, *args, **kwargs)
 
+
+	@action(detail=False, permission_classes=[IsAuthenticated])
+	def feed(self, request, *args, **kwargs):
+		user = request.user
+		serializer = ExperienceSerializer(
+			user.followers.experiences, many=True)
+		return Response(status=status.HTTP_200_OK, data=serializer.data)
+
  
 class LikeViewSet(GenericAPIView):
     queryset = Like.objects.all()
