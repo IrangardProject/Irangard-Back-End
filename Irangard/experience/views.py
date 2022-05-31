@@ -80,7 +80,7 @@ class ExperienceViewSet(ModelViewSet):
 	def feed(self, request, *args, **kwargs):
 		user = request.user
 		serializer = ExperienceSerializer(
-			user.followers.experiences, many=True)
+			[follower.experiences for follower in user.followers], many=True)
 		return Response(status=status.HTTP_200_OK, data=serializer.data)
 
  
