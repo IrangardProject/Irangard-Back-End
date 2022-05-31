@@ -15,6 +15,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework import status
 from django.db.models import Q
 # from accounts.permissions import IsAdmin
+from rest_framework.decorators import action
 
 
 class ExperienceViewSet(ModelViewSet):
@@ -74,6 +75,20 @@ class ExperienceViewSet(ModelViewSet):
 		else:
 			return super().destroy(request, *args, **kwargs)
 
+
+	@action(detail=False, permission_classes=[IsAuthenticated])
+	def feed(self, request, *args, **kwargs):
+		expriences = Experience.objects\
+			.filter(user__following=request.user).order_by('-date_created')
+		serializer = ExperienceSerializer(expriences, many=True)
+		return Response(status=status.HTTP_200_OK, data=serializer.data)
+		# user = request.user
+		# expriences = QuerySet()
+		# fllowers = list(user.followers.all())
+		# for fllower in fllowers:
+		# 	fllower_experiences = list(fllower.experiences.all())
+		# 	expriences.extend(fllower_experiences)
+
  
 class LikeViewSet(GenericAPIView):
     queryset = Like.objects.all()
@@ -125,12 +140,15 @@ class CommentViewSet(ModelViewSet):
 	def perform_change(self, request, action, *args, **kwargs):
 		user = request.user
 		comment = self.get_object()
+		experience = comment.experience
 		if not comment.is_owner(user):
 			return Response('you do not have permission to change this comment.',
 							 status=status.HTTP_403_FORBIDDEN)
 		if action == 'update':
 			return super().update(request, *args, **kwargs)
-		return super().destroy(request, *args, **kwargs)
+		response = super().destroy(request, *args, **kwargs)
+		experience.update_comment_no()
+		return response
 
 
 
