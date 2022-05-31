@@ -161,17 +161,17 @@ class TourViewSetTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-#     def test_tour_delete(self):
-#         pass
+    def test_tour_delete(self):
+        pass
 
-#     def test_tour_delete_not_owner(self):
-#         pass
+    def test_tour_delete_not_owner(self):
+        pass
 
-#     def test_tour_book(self):
-#         pass
+    def test_tour_book(self):
+        pass
 
-#     def test_tour_book_not_authenticated(self):
-#         pass
+    def test_tour_book_not_authenticated(self):
+        pass
 
-#     def test_tour_verify(self):
-#         pass
+    def test_tour_verify(self):
+        pass
