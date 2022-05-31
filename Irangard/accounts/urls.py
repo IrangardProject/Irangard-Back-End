@@ -22,7 +22,6 @@ router.register('auth', AccountAuthViewSet,
                 basename='accounts-auth')
 router.register('pay',PayViewSet , basename='accounts-pay')
 router.register('admin', AdminViewSet, basename='accounts-admin')
-router.register('', FeediewSet)
 router.register('special-users', SpecialUserViewSet, basename='special-users')
 router.register('', FollowViewSet)
 
