@@ -29,6 +29,7 @@ class UserProfile(GenericAPIView):
 	def put(self, request, username, *args, **kwargs):
 		parser_classes = [MultiPartParser, FormParser]
 		user = User.objects.get(username=username)
+		print(request.data)
 		serializer = UserProfileSerializer(user, data=request.data, context = {'user': request.user})
 		if serializer.is_valid():
 			serializer.save()

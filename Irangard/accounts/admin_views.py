@@ -221,8 +221,8 @@ class AdminViewSet(GenericViewSet):
             while start <= end_date:
                 try:
                     queryset = Tour.objects.filter(date_created__day=start.day)
-                    queryset = Tour.objects.filter(date_created__month=start.month)
-                    queryset = Tour.objects.filter(date_created__year=start.year)
+                    queryset = queryset.objects.filter(date_created__month=start.month)
+                    queryset = queryset.objects.filter(date_created__year=start.year)
                     if(len(queryset) > 0):
                         added_daily_tours[f'{start}'] = len(queryset)
                 except Exception as error:
