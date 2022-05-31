@@ -12,6 +12,8 @@ from .special_user_views import SpecialUserViewSet
 from accounts.serializers.serializersNew import myTokenObtainPairSerializer
 from .admin_views import AdminViewSet
 from .views import PayViewSet
+from .views import *
+from accounts.user_views import FollowViewSet
 
 app_name = 'accounts'
 
@@ -22,6 +24,7 @@ router.register('pay',PayViewSet , basename='accounts-pay')
 router.register('admin', AdminViewSet, basename='accounts-admin')
 router.register('', FeediewSet)
 router.register('special-users', SpecialUserViewSet, basename='special-users')
+router.register('', FollowViewSet)
 
 urlpatterns = [
     path('',include(router.urls)),
