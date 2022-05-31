@@ -77,10 +77,16 @@ class ExperienceViewSet(ModelViewSet):
 
 	@action(detail=False, permission_classes=[IsAuthenticated])
 	def feed(self, request, *args, **kwargs):
-		user = request.user
-		serializer = ExperienceSerializer(
-			[follower.experiences for follower in user.followers.all()], many=True)
+		expriences = Experience.objects\
+			.filter(user__following=request.user).order_by('-date_created')
+		serializer = ExperienceSerializer(expriences, many=True)
 		return Response(status=status.HTTP_200_OK, data=serializer.data)
+		# user = request.user
+		# expriences = QuerySet()
+		# fllowers = list(user.followers.all())
+		# for fllower in fllowers:
+		# 	fllower_experiences = list(fllower.experiences.all())
+		# 	expriences.extend(fllower_experiences)
 
  
 class LikeViewSet(GenericAPIView):
