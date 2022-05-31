@@ -184,8 +184,8 @@ class AdminViewSet(GenericViewSet):
             while start <= end_date:
                 try:
                     queryset = Experience.objects.filter(date_created__day=start.day)
-                    queryset = queryset.objects.filter(date_created__month=start.month)
-                    queryset = queryset.objects.filter(date_created__year=start.year)
+                    queryset = queryset.filter(date_created__month=start.month)
+                    queryset = queryset.filter(date_created__year=start.year)
                     if(len(queryset) > 0):
                         added_daily_experience[f'{start}'] = len(queryset)
                 except Exception as error:
@@ -203,8 +203,8 @@ class AdminViewSet(GenericViewSet):
             while start <= end_date:
                 try:
                     queryset = Place.objects.filter(date_created__day=start.day)
-                    queryset = queryset.objects.filter(date_created__month=start.month)
-                    queryset = queryset.objects.filter(date_created__year=start.year)
+                    queryset = queryset.filter(date_created__month=start.month)
+                    queryset = queryset.filter(date_created__year=start.year)
                     if(len(queryset) > 0):
                         added_daily_places[f'{start}'] = len(queryset)
                 except Exception as error:
@@ -221,8 +221,8 @@ class AdminViewSet(GenericViewSet):
             while start <= end_date:
                 try:
                     queryset = Tour.objects.filter(date_created__day=start.day)
-                    queryset = queryset.objects.filter(date_created__month=start.month)
-                    queryset = queryset.objects.filter(date_created__year=start.year)
+                    queryset = queryset.filter(date_created__month=start.month)
+                    queryset = queryset.filter(date_created__year=start.year)
                     if(len(queryset) > 0):
                         added_daily_tours[f'{start}'] = len(queryset)
                 except Exception as error:
@@ -247,7 +247,7 @@ class AdminViewSet(GenericViewSet):
             request.data['start_date'], "%Y-%m-%d").date()
         end_date = datetime.strptime(
             request.data['end_date'], "%Y-%m-%d").date()
-        delta = timedelta(weeks=1)
+        delta = timedelta(days=6)
 
         try:
             # start find count of added user per day in range of strart_date and end-date
@@ -257,7 +257,9 @@ class AdminViewSet(GenericViewSet):
                 print(start)
                 try:
                     queryset = User.objects.filter(
-                        date_joined__day__gte=start.day).filter(date_joined__day__lte=(start+delta).day)
+                        date_joined__day__gte=start.day)
+                    if(not ((start.day >= 24 and start.month in [7,8,9,10,11,12]) or (start.day >=25 and start.month in [1,2,3,4,5,6]))):
+                        queryset = queryset.filter(date_joined__day__lte=(start+delta).day)
                     queryset = queryset.filter(
                         date_joined__month=start.month)
                     queryset = queryset.filter(
@@ -281,7 +283,9 @@ class AdminViewSet(GenericViewSet):
                 print(start)
                 try:
                     queryset = SpecialUser.objects.filter(
-                        user__date_joined__day__gte=start.day).filter(user__date_joined__day__lte=(start+delta).day)
+                        user__date_joined__day__gte=start.day)
+                    if(not ((start.day >= 24 and start.month in [7,8,9,10,11,12]) or (start.day >=25 and start.month in [1,2,3,4,5,6]))):
+                        queryset = queryset.filter(user__date_joined__day__lte=(start+delta).day)
                     queryset = queryset.filter(
                         user__date_joined__month=start.month)
                     queryset = queryset.filter(
@@ -306,7 +310,9 @@ class AdminViewSet(GenericViewSet):
                 print(start)
                 try:
                     queryset = Experience.objects.filter(
-                        date_created__day__gte=start.day).filter(date_created__day__lte=(start+delta).day)
+                        date_created__day__gte=start.day)
+                    if(not ((start.day >= 24 and start.month in [7,8,9,10,11,12]) or (start.day >=25 and start.month in [1,2,3,4,5,6]))):
+                        queryset = queryset.filter(date_created__day__lte=(start+delta).day)
                     queryset = queryset.filter(
                         date_created__month=start.month)
                     queryset = queryset.filter(
@@ -329,7 +335,9 @@ class AdminViewSet(GenericViewSet):
                 print(start)
                 try:
                     queryset = Tour.objects.filter(
-                        date_created__day__gte=start.day).filter(date_created__day__lte=(start+delta).day)
+                        date_created__day__gte=start.day)
+                    if(not ((start.day >= 24 and start.month in [7,8,9,10,11,12]) or (start.day >=25 and start.month in [1,2,3,4,5,6]))):
+                        queryset = queryset.filter(date_created__day__lte=(start+delta).day)
                     queryset = queryset.filter(
                         date_created__month=start.month)
                     queryset = queryset.filter(
@@ -352,7 +360,9 @@ class AdminViewSet(GenericViewSet):
                 print(start)
                 try:
                     queryset = Place.objects.filter(
-                        date_created__day__gte=start.day).filter(date_created__day__lte=(start+delta).day)
+                        date_created__day__gte=start.day)
+                    if(not ((start.day >= 24 and start.month in [7,8,9,10,11,12]) or (start.day >=25 and start.month in [1,2,3,4,5,6]))):
+                        queryset = queryset.filter(date_created__day__lte=(start+delta).day)
                     queryset = queryset.filter(
                         date_created__month=start.month)
                     queryset = queryset.filter(
