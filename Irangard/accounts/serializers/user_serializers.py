@@ -26,16 +26,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for user profile"""
     is_owner = serializers.SerializerMethodField('get_is_owner')
     following = serializers.SerializerMethodField('get_following')
+    print("hello")
+    
     
     class Meta:
         model = User
         fields = ['id', 'full_name', 'is_special', 'email', 'image', 'username', 'about_me', 'following_number', 'follower_number', 'following', 'is_owner','is_admin']
-        read_only_fields = ('email', 'following_number', 'follower_number', 'is_owner','is_admin', 'image')
-        
-        extra_kwargs = {
-        'image': {'read_only': False}
-        }
-        
+        read_only_fields = ('email', 'following_number', 'follower_number', 'is_owner','is_admin')
         
     def get_is_owner(self, user):
         request_user = self.context['user']
