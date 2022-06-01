@@ -15,7 +15,7 @@ class User(AbstractUser):
     following_number = models.IntegerField(default=0)
     follower_number = models.IntegerField(default=0)
     is_admin = models.BooleanField(default=False, blank=True)
-
+    
     def follows(self, user):
         return user in self.following.all()
 
@@ -55,6 +55,13 @@ class SpecialUser(models.Model):
         self.total_revenue += amount
         self.save()
 
+    def update_follower_no(self):
+        self.follower_number = self.followers.count()
+        self.save()
+
+    def update_following_no(self):
+        self.following_number = self.following.count()
+        self.save()
 
 class Verification(models.Model):
     email = models.EmailField(primary_key=True)

@@ -12,4 +12,4 @@ class IsAdmin(IsAuthenticated):
 class IsSpecialUser(IsAuthenticated):
     def has_permission(self, request, view):
         return super().has_permission(request, view) and \
-            hasattr(request.user, 'special_users')
+            request.user.is_special

@@ -6,6 +6,9 @@
       href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,900&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
   </head>
   <style>
     @font-face {
@@ -53,6 +56,18 @@
       display: inline-block;
       margin: 0 auto;
     }
+
+    .green{
+        background-color: green;
+        color: white;
+        font-size: 17px;
+        margin-top: 30px;
+        border-radius: 10px;
+    }
+
+    .green:hover{
+        background-color: rgb(20, 77, 20);
+    }
   </style>
   <body>
     <div class="card">
@@ -73,5 +88,10 @@
         <p style="margin-top:10px;"><span>ثبت نام کردید  </span>{{tour}}<span>شما با موفقیت در تور </span></p>
       </p>
     </div>
+    <div><a href="http://localhost:3000"><button id="myButton" class="mdl-button mdl-js-button mdl-button--raised green">برگشت به صفحه تور</button></a></div>
+
+
+
+
   </body>
 </html>

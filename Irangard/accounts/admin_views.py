@@ -4,6 +4,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import Avg, Count, Min, Sum
+
+from tours.models import Tour
 from .models import User, SpecialUser
 from .serializers.user_serializers import UserProfileSerializer, UserBasicInfoSerializer, UserSerializer
 from rest_framework import status, permissions
@@ -103,7 +106,7 @@ class AdminViewSet(GenericViewSet):
         serializer.is_valid()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=False, url_path='basic-statistics', methods=['POST'], permission_classes=[IsAdmin])
+    @action(detail=False, url_path='basic-statistics', methods=['GET'], permission_classes=[IsAdmin])
     def basicStatistics(self, request):
         statistics = defaultdict(int)
 
@@ -111,10 +114,12 @@ class AdminViewSet(GenericViewSet):
         statistics['special-users_no'] = len(SpecialUser.objects.all())
         statistics['places_no'] = len(Place.objects.all())
         statistics['experiences_no'] = len(Experience.objects.all())
-        statistics['tour_no'] = len(Tour.objects.all())
         statistics['top_10_liked_experiences'] = ExperienceSerializer(
             Experience.objects.all().order_by('-like_number')[:10], many=True).data
-
+        statistics['tour_no'] = len(Tour.objects.all())
+        statistics['users_revenue'] = SpecialUser.objects.aggregate(Sum('total_revenue'))
+        statistics['top_10_person_with_most_follower'] = UserSerializer(
+            User.objects.all().order_by('follower_number')[:10], many=True).data
         return Response(statistics, status=status.HTTP_200_OK)
 
     @action(detail=False, url_path='daily-statistics', methods=['POST'], permission_classes=[IsAdmin])
@@ -172,6 +177,61 @@ class AdminViewSet(GenericViewSet):
 
             statistics['added_daily_special_user'] = added_daily_special_user
             
+            # find count of added experience per day in range of strart_date and end-date
+            
+            added_daily_experience = dict()
+            start = start_date
+            while start <= end_date:
+                try:
+                    queryset = Experience.objects.filter(date_created__day=start.day)
+                    queryset = queryset.filter(date_created__month=start.month)
+                    queryset = queryset.filter(date_created__year=start.year)
+                    if(len(queryset) > 0):
+                        added_daily_experience[f'{start}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+                    
+                start += delta
+                
+            statistics['added_daily_experience'] = added_daily_experience
+            
+            
+            # find count of added places per day in range of strart_date and end-date
+            
+            added_daily_places = dict()
+            start = start_date
+            while start <= end_date:
+                try:
+                    queryset = Place.objects.filter(date_created__day=start.day)
+                    queryset = queryset.filter(date_created__month=start.month)
+                    queryset = queryset.filter(date_created__year=start.year)
+                    if(len(queryset) > 0):
+                        added_daily_places[f'{start}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+                    
+                start += delta
+                
+            statistics['added_daily_place'] = added_daily_places
+            
+            # find count of added tours per day in range of strart_date and end-date
+            
+            added_daily_tours = dict()
+            start = start_date
+            while start <= end_date:
+                try:
+                    queryset = Tour.objects.filter(date_created__day=start.day)
+                    queryset = queryset.filter(date_created__month=start.month)
+                    queryset = queryset.filter(date_created__year=start.year)
+                    if(len(queryset) > 0):
+                        added_daily_tours[f'{start}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+                    
+                start += delta
+                
+            statistics['added_daily_tour'] = added_daily_tours
+            
             #filter find count of added special users per day in range of strart_date and end-date
             
 
@@ -187,7 +247,7 @@ class AdminViewSet(GenericViewSet):
             request.data['start_date'], "%Y-%m-%d").date()
         end_date = datetime.strptime(
             request.data['end_date'], "%Y-%m-%d").date()
-        delta = timedelta(weeks=1)
+        delta = timedelta(days=6)
 
         try:
             # start find count of added user per day in range of strart_date and end-date
@@ -197,7 +257,9 @@ class AdminViewSet(GenericViewSet):
                 print(start)
                 try:
                     queryset = User.objects.filter(
-                        date_joined__day__gte=start.day).filter(date_joined__day__lte=(start+delta).day)
+                        date_joined__day__gte=start.day)
+                    if(not ((start.day >= 24 and start.month in [7,8,9,10,11,12]) or (start.day >=25 and start.month in [1,2,3,4,5,6]))):
+                        queryset = queryset.filter(date_joined__day__lte=(start+delta).day)
                     queryset = queryset.filter(
                         date_joined__month=start.month)
                     queryset = queryset.filter(
@@ -221,7 +283,9 @@ class AdminViewSet(GenericViewSet):
                 print(start)
                 try:
                     queryset = SpecialUser.objects.filter(
-                        user__date_joined__day__gte=start.day).filter(user__date_joined__day__lte=(start+delta).day)
+                        user__date_joined__day__gte=start.day)
+                    if(not ((start.day >= 24 and start.month in [7,8,9,10,11,12]) or (start.day >=25 and start.month in [1,2,3,4,5,6]))):
+                        queryset = queryset.filter(user__date_joined__day__lte=(start+delta).day)
                     queryset = queryset.filter(
                         user__date_joined__month=start.month)
                     queryset = queryset.filter(
@@ -236,6 +300,81 @@ class AdminViewSet(GenericViewSet):
             statistics['added_weekly_special_user'] = added_weekly_special_user
             
             #filter find count of added special users per day in range of strart_date and end-date
+            
+            
+            #start find count of added experience per week in range of strart_date and end-date
+            
+            added_weekly_experience = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = Experience.objects.filter(
+                        date_created__day__gte=start.day)
+                    if(not ((start.day >= 24 and start.month in [7,8,9,10,11,12]) or (start.day >=25 and start.month in [1,2,3,4,5,6]))):
+                        queryset = queryset.filter(date_created__day__lte=(start+delta).day)
+                    queryset = queryset.filter(
+                        date_created__month=start.month)
+                    queryset = queryset.filter(
+                        date_created__year=start.year)
+                    if(len(queryset) > 0):
+                        added_weekly_experience[f'{start} - {start+delta}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_weekly_experience'] = added_weekly_experience
+            
+            
+            #start find count of added tours per week in range of strart_date and end-date
+            
+            added_weekly_tours = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = Tour.objects.filter(
+                        date_created__day__gte=start.day)
+                    if(not ((start.day >= 24 and start.month in [7,8,9,10,11,12]) or (start.day >=25 and start.month in [1,2,3,4,5,6]))):
+                        queryset = queryset.filter(date_created__day__lte=(start+delta).day)
+                    queryset = queryset.filter(
+                        date_created__month=start.month)
+                    queryset = queryset.filter(
+                        date_created__year=start.year)
+                    if(len(queryset) > 0):
+                        added_weekly_tours[f'{start} - {start+delta}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_weekly_tour'] = added_weekly_tours
+            
+            
+            #start find count of added places per week in range of strart_date and end-date
+            
+            added_weekly_places = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = Place.objects.filter(
+                        date_created__day__gte=start.day)
+                    if(not ((start.day >= 24 and start.month in [7,8,9,10,11,12]) or (start.day >=25 and start.month in [1,2,3,4,5,6]))):
+                        queryset = queryset.filter(date_created__day__lte=(start+delta).day)
+                    queryset = queryset.filter(
+                        date_created__month=start.month)
+                    queryset = queryset.filter(
+                        date_created__year=start.year)
+                    if(len(queryset) > 0):
+                        added_weekly_places[f'{start} - {start+delta}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_weekly_place'] = added_weekly_places
             
 
         except Exception as error:
@@ -296,6 +435,71 @@ class AdminViewSet(GenericViewSet):
             
             #filter find count of added special users per day in range of strart_date and end-date
             
+            # start find count of added experience per month in range of strart_date and end-date
+            added_monthly_experience = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = Experience.objects.filter(
+                        date_created__month=start.month)
+                    queryset = queryset.filter(
+                        date_created__year=start.year)
+                    if(len(queryset) > 0):
+                        added_monthly_experience[f'{start.strftime("%B")}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_monthly_experience'] = added_monthly_experience
+
+            # finish find count of added experience per month in range of strart_date and end-date
+            
+            
+            # start find count of added place per month in range of strart_date and end-date
+            added_monthly_place = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = Place.objects.filter(
+                        date_created__month=start.month)
+                    queryset = queryset.filter(
+                        date_created__year=start.year)
+                    if(len(queryset) > 0):
+                        added_monthly_place[f'{start.strftime("%B")}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_monthly_place'] = added_monthly_place
+
+            # finish find count of added place per month in range of strart_date and end-date
+            
+            
+            # start find count of added tour per month in range of strart_date and end-date
+            added_monthly_tour = dict()
+            start = start_date
+            while start <= end_date:
+                print(start)
+                try:
+                    queryset = Tour.objects.filter(
+                        date_created__month=start.month)
+                    queryset = queryset.filter(
+                        date_created__year=start.year)
+                    if(len(queryset) > 0):
+                        added_monthly_tour[f'{start.strftime("%B")}'] = len(queryset)
+                except Exception as error:
+                    print(error)
+
+                start += delta
+
+            statistics['added_monthly_tour'] = added_monthly_tour
+
+            # finish find count of added tour per month in range of strart_date and end-date
+            
 
         except Exception as error:
             return Response(f'bad request', status=status.HTTP_400_BAD_REQUEST)
@@ -309,15 +513,17 @@ class AdminViewSet(GenericViewSet):
             statistics = defaultdict(int)
 
             user = User.objects.get(username=request.data['username'])
-            statistics['date-joined'] = user.date_joined.strftime('%Y-%m-%d')
             statistics['experiences-no'] = len(user.experiences.all())
             statistics['created-tours'] = 0
+            statistics['date-joined'] = user.date_joined
+            print(user.tours.all())
+            statistics['registered-tours'] = len(user.tours.all())
             if(user.is_special):
                 special_user = SpecialUser.objects.get(user = user)
+                statistics['total_revenue'] = special_user.total_revenue
                 statistics['created-tours'] = len(special_user.tours.all())
             statistics['top_10_liked_experiences'] = ExperienceSerializer(
                 user.experiences.all().order_by('-like_number')[:10], many=True).data
-
             return Response(statistics, status=status.HTTP_200_OK)
         except Exception as error:
             print(error)

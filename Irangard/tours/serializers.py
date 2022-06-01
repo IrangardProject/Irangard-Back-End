@@ -18,14 +18,32 @@ class DiscountCodeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TourRegisteredUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'full_name', 'image']
+
+
 class TourSerializer(serializers.ModelSerializer):
     owner = SpecialUserSerializer(read_only=True)
+    is_booked = serializers.SerializerMethodField('booked')
+    bookers = TourRegisteredUserSerializer(many=True,read_only=True)
+
     class Meta:
         model = Tour
+<<<<<<< HEAD
         fields = ['title', 'cost', 'capacity',
                   'start_date', 'end_date', 'id', 'owner','bookers','image','description']
         read_only_fields = ['id','owner','bookers']
+=======
+        fields = '__all__'
+        extra_fields = ('is_booked')
+>>>>>>> feature/dashboard
 
     def create(self, validated_data):
         validated_data['owner_id'] = self.context.get("owner")
         return super().create(validated_data)
+
+    def booked(self, tour):
+        request = self.context.get("request")
+        return tour.booked(request.user)

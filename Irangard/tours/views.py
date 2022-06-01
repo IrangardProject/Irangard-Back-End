@@ -19,6 +19,7 @@ from .permissions import *
 from accounts.models import StagedPayments
 from accounts.serializers.payment_serializers import VerifiedPaymentSerializer
 from django.template.loader import render_to_string
+from django.utils import timezone
 
 
 class TourViewSet(ModelViewSet):
@@ -28,7 +29,7 @@ class TourViewSet(ModelViewSet):
 
     pagination_class = DefaultPagination
     permission_classes = [IsOwnerOrReadOnly]
-    
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['owner'] = self.request.user.id
@@ -43,6 +44,12 @@ class TourViewSet(ModelViewSet):
     #     # headers = self.get_success_headers(serializer.data)
     #     # return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     #     return super().create(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        tour = self.get_object()
+        serializer = self.get_serializer(tour)
+        # serializer.data['is_booked'] = booked
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
 
@@ -72,10 +79,18 @@ class TourViewSet(ModelViewSet):
         if tour.capacity < 1:
             return Response("there's no reservation available", status=status.HTTP_400_BAD_REQUEST)
 
+        if('discount_code_code' in request.data):
+            try:
+                discount_code = DiscountCode.objects.get(code=request.data['discount_code_code'])
+                if(discount_code.expire_date < timezone.now()):
+                    return Response('discount code has expired',status=status.HTTP_400_BAD_REQUEST)
+                cost = cost * (discount_code.off_percentage/100)
+            except DiscountCode.DoesNotExist:
+                return Response('discount_code does not exist',status=status.HTTP_400_BAD_REQUEST)
         order_id = str(uuid.uuid4())
         my_data = {
             "order_id": order_id,
-            "amount": 10000,
+            "amount": cost,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
             "callback": f"https://api.parizaan.ir/tours/{self.kwargs.get('pk')}/verify/"
@@ -150,7 +165,7 @@ class TourViewSet(ModelViewSet):
                                                     'username': user.username,
                                                     'code': '123',
                                                     'WEBSITE_URL': 'kooleposhti.tk',
-                                                    'tour' : tour.title
+                                                    'tour': tour.title
                                                 })
                     return HttpResponse(template)
 # return Response(verified_payment_serializer.data, status=status.HTTP_200_OK)
@@ -163,7 +178,6 @@ class TourViewSet(ModelViewSet):
                 return Response(f"transaction is not verified", status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except:
             return Response(f"order id is required", status=status.HTTP_400_BAD_REQUEST)
-        
 
     @action(detail=True, methods=['post'],
             permission_classes=[IsAuthenticated])
@@ -178,3 +192,16 @@ class TourViewSet(ModelViewSet):
         tour.owner.withdraw(amount)
         tour.withdraw(amount)
         return Response({'amount': amount}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['GET'],
+            permission_classes=[IsAuthenticated])
+    def is_booked(self, request, pk):
+        tour = self.get_object()
+        user = request.user
+
+        booked = user in tour.bookers.all()
+
+        if(booked):
+            return Response('user has booked', status=status.HTTP_200_OK)
+        else:
+            return Response('user has not booked', status=status.HTTP_400_BAD_REQUEST)
