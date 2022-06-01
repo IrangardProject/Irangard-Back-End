@@ -29,14 +29,17 @@ class UserProfile(GenericAPIView):
 	def put(self, request, username, *args, **kwargs):
 		parser_classes = [MultiPartParser, FormParser]
 		user = User.objects.get(username=username)
-		print(request.data)
+		# if(request.user != username):
+		# 	return Response("token is not for given username", status=status.HTTP_400_BAD_REQUEST)
+		# else:
 		serializer = UserProfileSerializer(user, data=request.data, context = {'user': request.user})
 		if serializer.is_valid():
 			serializer.save()
-				
 			return Response(serializer.data, status=status.HTTP_200_OK)
 		else:
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+		
+		
 
 
 
