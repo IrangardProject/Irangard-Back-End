@@ -35,12 +35,14 @@ class PlaceViewSet(ModelViewSet):
 		rooms = data.pop('rooms', [])
 		optional_costs = data.pop('optional_costs', [])
 		contact_data = data.pop('contact', None)
+		hours_data = data.pop('working_hours', None)
 
 		serializer = self.get_serializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		place = serializer.save()
 		
-		Contact.objects.create(place=place, **contact_data)
+		contact = Contact.objects.create(place=place, **contact_data)
+		Hours.objects.create(contact=contact, **hours_data)
 		for image in images:
 			Image.objects.create(place=place, **image)
 		for tag in tags:
@@ -68,9 +70,12 @@ class PlaceViewSet(ModelViewSet):
 		rooms = data.pop('rooms', None)
 		optional_costs = data.pop('optional_costs', None)
 		contact_data = data.pop('contact', None)
+		hours_data = data.pop('working_hours', None)
 
 		if contact_data:
 			ContactSerializer().update(place.contact, contact_data)
+		if hours_data:
+			HoursSerializer().update(place.contact.working_hours, hours_data)
 		if images:
 			place.images.all().delete()
 			for image in images:
