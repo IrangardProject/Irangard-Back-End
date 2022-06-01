@@ -31,14 +31,9 @@ class TourSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tour
-<<<<<<< HEAD
         fields = ['title', 'cost', 'capacity',
                   'start_date', 'end_date', 'id', 'owner','bookers','image','description']
         read_only_fields = ['id','owner','bookers']
-=======
-        fields = '__all__'
-        extra_fields = ('is_booked')
->>>>>>> feature/dashboard
 
     def create(self, validated_data):
         validated_data['owner_id'] = self.context.get("owner")
