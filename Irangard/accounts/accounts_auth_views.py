@@ -254,7 +254,7 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
         #                                 status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(request_body=reset_password_confirm_seriliazer)
-    @action(detail=False, url_path='reset-password/confirm/',  methods=['POST'], permission_classes=[permissions.AllowAny])
+    @action(detail=False, url_path='reset-password/confirm',  methods=['POST'], permission_classes=[permissions.AllowAny])
     def reset_pass_confirm(self, request, *args, **kwargs):
         uid = request.data.get('uid')
         token = request.data.get('token')
@@ -282,4 +282,4 @@ class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.Retriev
                 return Response(status=status.HTTP_400_BAD_REQUEST, data='incorrect token.')
 
         except Token.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND, data="token doesn't exist.")
+            return Response(status=status.HTTP_400_BAD_REQUEST, data="token doesn't exist.")
