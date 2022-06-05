@@ -68,6 +68,12 @@
     .green:hover{
         background-color: rgb(20, 77, 20);
     }
+    .tour{
+        font-weight: bold;
+        font-size:25px;
+        margin: 10px;
+    }
+
   </style>
   <body>
     <div class="card">
@@ -85,12 +91,15 @@
       <h1>عزیز {{username}}</h1>
       <p style="font-family:Yekan;">
         پرداخت شما با موفقیت انجام شد<br />
-        <p style="margin-top:10px;"><span>ثبت نام کردید  </span>{{tour}}<span>شما با موفقیت در تور </span></p>
+        <p style="margin-top:10px;"><span> ثبت نام کردید <span class="tour">{{tour_title}}</span>شما با موفقیت در تور</span></p>
       </p>
     </div>
-    <div><a href="http://localhost:3000"><button id="myButton" class="mdl-button mdl-js-button mdl-button--raised green">برگشت به صفحه تور</button></a></div>
+    <div><a id='link' ><button id="myButton" class="mdl-button mdl-js-button mdl-button--raised green">برگشت به صفحه تور</button></a></div>
 
-
+    <script>
+      var scrt_var = "https://parizaan.ir/tours/"+{{tour_id}};
+      document.getElementById("link").setAttribute("href",scrt_var);
+   </script>
 
 
   </body>

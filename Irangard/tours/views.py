@@ -93,7 +93,7 @@ class TourViewSet(ModelViewSet):
             "amount": cost,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": f"https://api.parizaan.ir/tours/{self.kwargs.get('pk')}/verify/"
+            "callback": f"http://127.0.0.1:8000/tours/{self.kwargs.get('pk')}/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
@@ -165,7 +165,8 @@ class TourViewSet(ModelViewSet):
                                                     'username': user.username,
                                                     'code': '123',
                                                     'WEBSITE_URL': 'kooleposhti.tk',
-                                                    'tour': tour.title
+                                                    'tour_title': tour.title,
+                                                    'tour_id' : tour.id
                                                 })
                     return HttpResponse(template)
 # return Response(verified_payment_serializer.data, status=status.HTTP_200_OK)
