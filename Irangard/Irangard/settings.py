@@ -214,6 +214,8 @@ CLOUDINARY_STORAGE = {
     'API_SECRET':'I6ytAk4a-0sw1KyI4-tONQusnjc',
 }
 
+REDIS_HOST = os.environ.get('REDIS_HOST', '127.0.0.1')
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
