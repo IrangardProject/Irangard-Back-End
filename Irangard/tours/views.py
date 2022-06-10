@@ -20,7 +20,7 @@ from accounts.models import StagedPayments
 from accounts.serializers.payment_serializers import VerifiedPaymentSerializer
 from django.template.loader import render_to_string
 from django.utils import timezone
-
+from django.core.cache import cache
 
 class TourViewSet(ModelViewSet):
     queryset = Tour.objects.all()
@@ -45,8 +45,18 @@ class TourViewSet(ModelViewSet):
     #     # return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     #     return super().create(request, *args, **kwargs)
 
+        
     def retrieve(self, request, *args, **kwargs):
-        tour = self.get_object()
+        
+        tour = None
+        tour_id = kwargs.get('tour_pk')
+        if(cache.get(tour_id)):
+            tour = cache.get(tour_id)
+            print('hit the cache')
+        else:
+            tour = self.get_object()
+            cache.set(tour_id,tour)
+            print("hot the db")
         serializer = self.get_serializer(tour)
         # serializer.data['is_booked'] = booked
         return Response(serializer.data, status=status.HTTP_200_OK)
