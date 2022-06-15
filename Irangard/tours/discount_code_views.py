@@ -15,6 +15,13 @@ from .serializers import *
 from .permissions import *
 
 
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+from django.utils.decorators import method_decorator
+from Irangard.settings import CACHE_TTL
+
+
 class DicountCodeViewSet(ModelViewSet):
 
     serializer_class = DiscountCodeSerializer
@@ -32,9 +39,6 @@ class DicountCodeViewSet(ModelViewSet):
         context['tour'] = self.kwargs.get('tour_pk')
         return context
 
-    # def create(self, request, *args, **kwargs):
-    #     get_object_or_404(Tour.objects, pk=self.kwargs.get('tour_pk'))
-    #     return super().create(request, *args, **kwargs)
     def create(self, request, *args, **kwargs):
         try:
             tour = get_object_or_404(Tour.objects, pk=self.kwargs.get('tour_pk'))
@@ -51,6 +55,30 @@ class DicountCodeViewSet(ModelViewSet):
         except Exception as error:
             print(error)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @method_decorator(cache_page(CACHE_TTL))
+    def list(self, request, *args, **kwargs):
+      return super().list(self, request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        
+        discount_code = None
+        tour_id = kwargs.get('tour_pk')
+        discount_code_id = "DiscountCode"+str(kwargs.get('pk'))
+
+        if(cache.get(discount_code_id)):
+            discount_code = cache.get(discount_code_id)
+            print('hit the cache')
+        else:
+            discount_code = self.get_object()
+            cache.set(discount_code_id,discount_code)
+            print("hit the db")
+
+        serializer = self.get_serializer(discount_code)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     def update(self, request, *args, **kwargs):
         discount_code = self.get_object()
@@ -70,7 +98,10 @@ class DicountCodeViewSet(ModelViewSet):
                 discount_code, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            cache.set("DiscountCode"+str(discount_code.id),discount_code)
+            print('update the cache')
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         super().destroy(request, *args, **kwargs)
+        cache.delete("DiscountCode"+str(discount_code.id))
         return Response('disount-code destroyed', status=status.HTTP_204_NO_CONTENT)

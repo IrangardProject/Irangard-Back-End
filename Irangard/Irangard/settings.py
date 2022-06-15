@@ -16,7 +16,7 @@ from pathlib import Path
 from environs import Env
 import dj_database_url
 from datetime import timedelta
-import django_heroku
+#import django_heroku
 import cloudinary
 
 
@@ -69,6 +69,7 @@ ALLOWED_HOSTS=['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE = [
+    # 'django.middleware.cache.UpdateCacheMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -79,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'Irangard.urls'
@@ -167,7 +169,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
 # ActivateDjango-Heroku
-django_heroku.settings(locals())
+#django_heroku.settings(locals())
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -215,6 +217,12 @@ CLOUDINARY_STORAGE = {
 }
 
 REDIS_HOST = os.environ.get('REDIS_HOST', '127.0.0.1')
+
+# cache requested url for each user for 2 minutes
+CACHE_TTL = 2*60
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 CACHES = {
     "default": {
