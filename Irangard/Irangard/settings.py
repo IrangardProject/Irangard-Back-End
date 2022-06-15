@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_yasg',
+    'chat',
     'accounts',
     'places',
     'experience',
@@ -63,6 +64,7 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     'django_filters',
+    'channels',
 ]
 
 ALLOWED_HOSTS=['*']
@@ -100,7 +102,19 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Irangard.wsgi.application'
+ASGI_APPLICATION = 'Irangard.asgi.application'
 
+#socket_chat
+CHANNEL_LAYERS = {
+    
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts' : [('127.0.0.1', 6379)],
+        }
+    }
+    
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
