@@ -29,13 +29,13 @@ class PlaceViewSet(ModelViewSet):
 	
 	def create(self, request, *args, **kwargs):
 		data = request.data
-		images = data.pop('images', [])
-		tags = data.pop('tags', [])
-		features = data.pop('features', [])
-		rooms = data.pop('rooms', [])
-		optional_costs = data.pop('optional_costs', [])
-		contact_data = data.pop('contact', None)
-		hours_data = data.pop('working_hours', None)
+		images = data.get('images', [])
+		tags = data.get('tags', [])
+		features = data.get('features', [])
+		rooms = data.get('rooms', [])
+		optional_costs = data.get('optional_costs', [])
+		contact_data = data.get('contact', None)
+		hours_data = data.get('working_hours', None)
 
 		serializer = self.get_serializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
@@ -64,13 +64,13 @@ class PlaceViewSet(ModelViewSet):
 			return Response('you do not have permission to edit this place.',
 							 status=status.HTTP_403_FORBIDDEN)
 		data = request.data
-		images = data.pop('images', None)
-		tags = data.pop('tags', None)
-		features = data.pop('features', None)
-		rooms = data.pop('rooms', None)
-		optional_costs = data.pop('optional_costs', None)
-		contact_data = data.pop('contact', None)
-		hours_data = data.pop('working_hours', None)
+		images = data.get('images', None)
+		tags = data.get('tags', None)
+		features = data.get('features', None)
+		rooms = data.get('rooms', None)
+		optional_costs = data.get('optional_costs', None)
+		contact_data = data.get('contact', None)
+		hours_data = data.get('working_hours', None)
 
 		if contact_data:
 			ContactSerializer().update(place.contact, contact_data)
