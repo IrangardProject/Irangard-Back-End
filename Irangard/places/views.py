@@ -14,6 +14,12 @@ from .serializers import *
 from .permissions import *
 from .filters import PlaceFilter
 
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+from django.utils.decorators import method_decorator
+from Irangard.settings import CACHE_TTL
+
 
 class PlaceViewSet(ModelViewSet):
 	queryset = Place.objects.all()
@@ -59,6 +65,28 @@ class PlaceViewSet(ModelViewSet):
 		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
+	@method_decorator(cache_page(CACHE_TTL))
+	def list(self, request, *args, **kwargs):
+		return super().list(self, request, *args, **kwargs)
+
+
+	def retrieve(self, request, *args, **kwargs):
+		place = None
+		place_id = "Place"+str(self.kwargs.get("pk"))
+
+		if(cache.get(place_id)):
+			place = cache.get(place_id)
+			print("hit the cache")
+		else:
+			place = self.get_object()
+			cache.set(place_id,place)
+			print("hit the db")
+		
+		serializer = self.get_serializer(place)
+
+		return Response(serializer.data , status=status.HTTP_200_OK)
+
+
 	def update(self, request, *args, **kwargs):
 		place = self.get_object()
 		if not place.is_owner(request.user):
@@ -99,7 +127,9 @@ class PlaceViewSet(ModelViewSet):
 			place.optional_costs.all().delete()
 			for optional_cost in optional_costs:
 				Optional.objects.create(place=place, **optional_cost)
-				
+		
+		cache.set("Place"+str(place.id),place)
+		print("update the cache")
 		return super().update(request, *args, **kwargs)
 
 

@@ -20,7 +20,12 @@ from accounts.models import StagedPayments
 from accounts.serializers.payment_serializers import VerifiedPaymentSerializer
 from django.template.loader import render_to_string
 from django.utils import timezone
+
 from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+from django.utils.decorators import method_decorator
+from Irangard.settings import CACHE_TTL
 
 class TourViewSet(ModelViewSet):
     queryset = Tour.objects.all()
@@ -35,30 +40,28 @@ class TourViewSet(ModelViewSet):
         context['owner'] = self.request.user.id
         return context
 
-    # def create(self, request, *args, **kwargs):
-    #     # data = request.data
-    #     # serializer = self.get_serializer(data=data, context=self.get_serializer_context())
-    #     # serializer.is_valid(raise_exception=True)
-    #     # tour = serializer.save()
 
-    #     # headers = self.get_success_headers(serializer.data)
-    #     # return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-    #     return super().create(request, *args, **kwargs)
+    @method_decorator(cache_page(CACHE_TTL))
+    def list(self, request, *args, **kwargs):
+      return super().list(self, request, *args, **kwargs)
 
-        
+    # @method_decorator(cache_page(CACHE_TTL))
+    # @method_decorator(vary_on_cookie)
     def retrieve(self, request, *args, **kwargs):
         
         tour = None
-        tour_id = kwargs.get('tour_pk')
+        tour_id = "Tour" + str(kwargs.get('pk'))
+
         if(cache.get(tour_id)):
             tour = cache.get(tour_id)
             print('hit the cache')
         else:
             tour = self.get_object()
             cache.set(tour_id,tour)
-            print("hot the db")
+            print("hit the db")
+
         serializer = self.get_serializer(tour)
-        # serializer.data['is_booked'] = booked
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
@@ -67,6 +70,9 @@ class TourViewSet(ModelViewSet):
         serializer = self.get_serializer(tour, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        cache.set("Tour"+str(tour.id),tour)
+        print('update the cache')
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
