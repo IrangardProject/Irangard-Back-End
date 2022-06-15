@@ -78,8 +78,6 @@ class Contact(models.Model):
     email = models.EmailField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     instagram = models.CharField(max_length=255, blank=True, null=True)
-    start_time = models.TimeField(blank=True, null=True)
-    end_time = models.TimeField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.place.title} {self.province} {self.city}"
