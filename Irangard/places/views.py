@@ -28,21 +28,22 @@ class PlaceViewSet(ModelViewSet):
 
 	
 	def create(self, request, *args, **kwargs):
-		data = request.data
+		data = request.data.copy()
 		images = data.pop('images', [])
 		tags = data.pop('tags', [])
 		features = data.pop('features', [])
 		rooms = data.pop('rooms', [])
 		optional_costs = data.pop('optional_costs', [])
 		contact_data = data.pop('contact', None)
-		hours_data = data.pop('working_hours', None)
+		hours_data = contact_data.pop('working_hours', None)
 
-		serializer = self.get_serializer(data=request.data)
+		serializer = self.get_serializer(data=data)
 		serializer.is_valid(raise_exception=True)
 		place = serializer.save()
 		
 		contact = Contact.objects.create(place=place, **contact_data)
-		Hours.objects.create(contact=contact, **hours_data)
+		for hours in hours_data:
+			Hours.objects.create(contact=contact, **hours)
 		for image in images:
 			Image.objects.create(place=place, **image)
 		for tag in tags:
@@ -63,7 +64,7 @@ class PlaceViewSet(ModelViewSet):
 		if not place.is_owner(request.user):
 			return Response('you do not have permission to edit this place.',
 							 status=status.HTTP_403_FORBIDDEN)
-		data = request.data
+		data = request.data.copy()
 		images = data.pop('images', None)
 		tags = data.pop('tags', None)
 		features = data.pop('features', None)
