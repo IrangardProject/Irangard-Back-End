@@ -16,6 +16,6 @@ class PlaceFilter(FilterSet):
                 'tags__name', 'features__title', 'rooms__capacity']
         fields = {
             'rooms__price': ['lte', 'gte'],
-            'optionals__price': ['lte', 'gte'],
+            'optional_costs__price': ['lte', 'gte'],
             'rate': ['gte'],
         }
