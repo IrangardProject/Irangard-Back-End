@@ -128,9 +128,15 @@ class PlaceViewSet(ModelViewSet):
 			for optional_cost in optional_costs:
 				Optional.objects.create(place=place, **optional_cost)
 		
+		serializer = self.get_serializer(place, data=request.data, partial=True)
+		serializer.is_valid(raise_exception=True)
+		serializer.save()
+
 		cache.set("Place"+str(place.id),place)
-		print("update the cache")
-		return super().update(request, *args, **kwargs)
+		print('update the cache')
+
+		headers = self.get_success_headers(serializer.data)
+		return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 	# def destroy(self, request, *args, **kwargs):
