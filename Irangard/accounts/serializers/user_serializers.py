@@ -26,8 +26,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for user profile"""
     is_owner = serializers.SerializerMethodField('get_is_owner')
     following = serializers.SerializerMethodField('get_following')
-    print("hello")
-    
     
     class Meta:
         model = User
