@@ -108,6 +108,26 @@ class LikeViewSet(GenericAPIView):
                 experience.save()
                 serializer.save(user=user, experience=experience)
                 return Response(serializer.data, status=status.HTTP_200_OK)
+            
+        
+class UnLikeViewSet(GenericAPIView):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permission_classes = [IsAuthenticated]   
+    
+    def post(self, request, id, *args, **kwargs):
+        user = request.user
+        experience = Experience.objects.get(pk=id)
+        serializer = LikeSerializer(data=request.data, context = {'experience': experience, 'user': request.user})
+        if serializer.is_valid():
+            user_likes = Like.objects.filter(user=user, experience=experience)
+            if user_likes.exists():
+                experience.like_number -= 1
+                experience.save()
+                user_likes.delete()
+                return Response("Like deleted", status=status.HTTP_200_OK)
+            else:
+                return Response("You haven't liked this experience before", status=status.HTTP_400_BAD_REQUEST)
                 
     
 
