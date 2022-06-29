@@ -28,21 +28,23 @@ class PlaceViewSet(ModelViewSet):
 
 	
 	def create(self, request, *args, **kwargs):
-		data = request.data
-		images = data.get('images', [])
-		tags = data.get('tags', [])
-		features = data.get('features', [])
-		rooms = data.get('rooms', [])
-		optional_costs = data.get('optional_costs', [])
-		contact_data = data.get('contact', None)
-		hours_data = data.get('working_hours', None)
+		data = request.data.copy()
+		images = data.pop('images', [])
+		tags = data.pop('tags', [])
+		features = data.pop('features', [])
+		rooms = data.pop('rooms', [])
+		optional_costs = data.pop('optional_costs', [])
+		contact_data = data.pop('contact', None)
+		hours_data = contact_data.pop('working_hours', []) if contact_data else []
 
-		serializer = self.get_serializer(data=request.data)
+		serializer = self.get_serializer(data=data)
 		serializer.is_valid(raise_exception=True)
 		place = serializer.save()
 		
-		contact = Contact.objects.create(place=place, **contact_data)
-		Hours.objects.create(contact=contact, **hours_data)
+		if contact_data:
+			contact = Contact.objects.create(place=place, **contact_data)
+		for hours in hours_data:
+			Hours.objects.create(contact=contact, **hours)
 		for image in images:
 			Image.objects.create(place=place, **image)
 		for tag in tags:
@@ -63,19 +65,21 @@ class PlaceViewSet(ModelViewSet):
 		if not place.is_owner(request.user):
 			return Response('you do not have permission to edit this place.',
 							 status=status.HTTP_403_FORBIDDEN)
-		data = request.data
-		images = data.get('images', None)
-		tags = data.get('tags', None)
-		features = data.get('features', None)
-		rooms = data.get('rooms', None)
-		optional_costs = data.get('optional_costs', None)
-		contact_data = data.get('contact', None)
-		hours_data = data.get('working_hours', None)
+		data = request.data.copy()
+		images = data.pop('images', None)
+		tags = data.pop('tags', None)
+		features = data.pop('features', None)
+		rooms = data.pop('rooms', None)
+		optional_costs = data.pop('optional_costs', None)
+		contact_data = data.pop('contact', None)
+		hours_data = contact_data.pop('working_hours', None) if contact_data else None
 
 		if contact_data:
 			ContactSerializer().update(place.contact, contact_data)
 		if hours_data:
-			HoursSerializer().update(place.contact.working_hours, hours_data)
+			place.contact.working_hours.all().delete()
+			for hours in hours_data:
+				Hours.objects.create(contact=place.contact, **hours)
 		if images:
 			place.images.all().delete()
 			for image in images:

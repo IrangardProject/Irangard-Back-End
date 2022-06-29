@@ -37,6 +37,8 @@ class PlaceViewsTestCase(TestCase):
         self.user = self.make_user("ghazal", "gh1234", "ghazal@gmail.com")
         self.place = Place.objects.create(
             place_type=1, title="test place", description="test_description", added_by=self.user)
+        contact = Contact.objects.create(
+            place=self.place, x_location=0, y_location=0, province="test province", city="test city")
     
     def post_place(self, data, user):     
         token = self.login(self.user.username, 'gh1234')
@@ -56,33 +58,139 @@ class PlaceViewsTestCase(TestCase):
     def test_incorrect_retrieve_place(self):
         retrieve_url = self.url + str(2000) + '/'
         response = self.client.get(retrieve_url)
-        self.assertEqual(response.status_code, status.HTTP_404_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         
     def test_correct_post_place(self):
         
         token = self.login(self.user.username, 'gh1234')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         
+        working_hours = [
+            {
+                "weekday": "0",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "1",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "2",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "3",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "4",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "5",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "6",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            }
+        ]
+
+        contact_data = {
+            "working_hours": working_hours,
+            "x_location": 0,
+            "y_location": 0,
+            "province": "a province"
+        }
+        
         data = {
             "title": "new place",
+            "contact": contact_data,
             "description": "new place description",
             "place_type": 0,
             "is_free": True,
         }
 
-        response = self.client.post(self.url, data=data)
+        response = self.client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
     def test_incorrect_post_place_without_token(self):
         
+        working_hours = [
+            {
+                "weekday": "0",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "1",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "2",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "3",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "4",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "5",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "6",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            }
+        ]
+
+        contact_data = {
+            "working_hours": working_hours,
+            "x_location": 0,
+            "y_location": 0,
+            "province": "a province"
+        }
+
         data = {
             "title": "new place",
+            "contact": contact_data,
             "description": "new place description",
             "place_type": 0,
             "is_free": True,
         }
 
-        response = self.client.post(self.url, data=data)
+        response = self.client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         
         
@@ -91,14 +199,67 @@ class PlaceViewsTestCase(TestCase):
         token = self.login(self.user.username, 'gh1234')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token + 'aa')
         
+        working_hours = [
+            {
+                "weekday": "0",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "1",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "2",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "3",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "4",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "5",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "6",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            }
+        ]
+
+        contact_data = {
+            "working_hours": working_hours,
+            "x_location": 0,
+            "y_location": 0,
+            "province": "a province"
+        }
+
         data = {
             "title": "new place",
+            "contact": contact_data,
             "description": "new place description",
             "place_type": 0,
             "is_free": True,
         }
 
-        response = self.client.post(self.url, data=data)
+        response = self.client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -107,13 +268,66 @@ class PlaceViewsTestCase(TestCase):
         token = self.login(self.user.username, 'gh1234')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         
+        working_hours = [
+            {
+                "weekday": "0",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "1",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "2",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "3",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "4",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "5",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "6",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            }
+        ]
+
+        contact_data = {
+            "working_hours": working_hours,
+            "x_location": 0,
+            "y_location": 0,
+            "province": "a province"
+        }
+
         data = {
+            "contact": contact_data,
             "description": "new place description",
             "place_type": 0,
             "is_free": True,
         }
 
-        response = self.client.post(self.url, data=data)
+        response = self.client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
 
@@ -122,13 +336,66 @@ class PlaceViewsTestCase(TestCase):
         token = self.login(self.user.username, 'gh1234')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
    
+        working_hours = [
+            {
+                "weekday": "0",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "1",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "2",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "3",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "4",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "5",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "6",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            }
+        ]
+
+        contact_data = {
+            "working_hours": working_hours,
+            "x_location": 0,
+            "y_location": 0,
+            "province": "a province"
+        }
+
         data = {
             "title": "new place",
+            "contact": contact_data,
             "place_type": 0,
             "is_free": True,
         }
 
-        response = self.client.post(self.url, data=data)
+        response = self.client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
@@ -137,13 +404,66 @@ class PlaceViewsTestCase(TestCase):
         token = self.login(self.user.username, 'gh1234')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
    
-        data = {
-            "title": "new place",
-            "description": "new place description",
-            "place_type": 0,
+        working_hours = [
+            {
+                "weekday": "0",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "1",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "2",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "3",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "4",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "5",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "6",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            }
+        ]
+
+        contact_data = {
+            "working_hours": working_hours,
+            "x_location": 0,
+            "y_location": 0,
+            "province": "a province"
         }
 
-        response = self.client.post(self.url, data=data)
+        data = {
+            "title": "new place",
+            "contact": contact_data,
+            "description": "new place description",
+            "place_type": 0
+        }
+
+        response = self.client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
    
         
@@ -152,15 +472,299 @@ class PlaceViewsTestCase(TestCase):
         token = self.login(self.user.username, 'gh1234')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         
+        working_hours = [
+            {
+                "weekday": "0",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "1",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "2",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "3",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "4",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "5",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "6",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            }
+        ]
+
+        contact_data = {
+            "working_hours": working_hours,
+            "x_location": 0,
+            "y_location": 0,
+            "province": "a province"
+        }
+
+        data = {
+            "title": "new place",
+            "contact": contact_data,
+            "description": "new place description",
+            "is_free": True
+        }
+
+        response = self.client.post(self.url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_incorrect_post_place_without_contact(self):
+        
+        token = self.login(self.user.username, 'gh1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+
         data = {
             "title": "new place",
             "description": "new place description",
-            "is_free": True,
+            "is_free": True
         }
 
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_incorrect_post_place_without_working_hours(self):
         
+        token = self.login(self.user.username, 'gh1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+
+        contact_data = {
+            "x_location": 0,
+            "y_location": 0,
+            "province": "a province"
+        }
+
+        data = {
+            "title": "new place",
+            "contact": contact_data,
+            "description": "new place description",
+            "is_free": True
+        }
+
+        response = self.client.post(self.url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_incorrect_post_place_without_contact_province(self):
+        
+        token = self.login(self.user.username, 'gh1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        
+        working_hours = [
+            {
+                "weekday": "0",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "1",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "2",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "3",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "4",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "5",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "6",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            }
+        ]
+
+        contact_data = {
+            "working_hours": working_hours,
+            "x_location": 0,
+            "y_location": 0
+        }
+
+        data = {
+            "title": "new place",
+            "contact": contact_data,
+            "description": "new place description",
+            "is_free": True
+        }
+
+        response = self.client.post(self.url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_incorrect_post_place_without_contact_location(self):
+        
+        token = self.login(self.user.username, 'gh1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        
+        working_hours = [
+            {
+                "weekday": "0",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "1",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "2",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "3",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "4",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "5",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "6",
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            }
+        ]
+
+        contact_data = {
+            "working_hours": working_hours,
+            "province": "a province"
+        }
+
+        data = {
+            "title": "new place",
+            "contact": contact_data,
+            "description": "new place description",
+            "is_free": True
+        }
+
+        response = self.client.post(self.url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_incorrect_post_place_without_working_hours_weekday(self):
+        
+        token = self.login(self.user.username, 'gh1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        
+        working_hours = [
+            {
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "start_time": "08:30",
+                "end_time": "21:30",
+                "all_day": False
+            }
+        ]
+
+        contact_data = {
+            "working_hours": working_hours,
+            "x_location": 0,
+            "y_location": 0,
+            "province": "a province"
+        }
+
+        data = {
+            "title": "new place",
+            "contact": contact_data,
+            "description": "new place description",
+            "is_free": True
+        }
+
+        response = self.client.post(self.url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
         
     def test_correct_put_place(self):
         
@@ -244,6 +848,100 @@ class PlaceViewsTestCase(TestCase):
         put_url = self.url + str(self.place.id) + '/'
         response = self.client.put(put_url, data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    
+    def test_correct_put_place_update_contact(self):
+        
+        token = self.login(self.user.username, 'gh1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+
+        new_working_hours = [
+            {
+                "weekday": "0",
+                "start_time": "09:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "1",
+                "start_time": "09:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "2",
+                "start_time": "09:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "3",
+                "start_time": "09:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "4",
+                "start_time": "09:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "5",
+                "start_time": "09:30",
+                "end_time": "21:30",
+                "all_day": False
+            },
+            {
+                "weekday": "6",
+                "start_time": "09:30",
+                "end_time": "21:30",
+                "all_day": False
+            }
+        ]
+
+        contact_data = {
+            "working_hours": new_working_hours,
+            "x_location": 1,
+            "y_location": 1,
+            "province": "a new province"
+        }
+        
+        data = {
+            "title": "new updated place",
+            "contact": contact_data,
+            "description": "new place description",
+            "place_type": 1,
+            "is_free": False,
+        }
+
+        put_url = self.url + str(self.place.id) + '/'
+        response = self.client.put(put_url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    def test_correct_put_place_update_contact_without_working_hours(self):
+        
+        token = self.login(self.user.username, 'gh1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+
+        contact_data = {
+            "x_location": 1,
+            "y_location": 1,
+            "province": "a new province"
+        }
+
+        data = {
+            "title": "new updated place",
+            "contact": contact_data,
+            "description": "new place update description",
+            "place_type": 1,
+            "is_free": False,
+        }
+
+        put_url = self.url + str(self.place.id) + '/'
+        response = self.client.put(put_url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         
     def test_correct_put_place_without_description(self):
@@ -251,7 +949,6 @@ class PlaceViewsTestCase(TestCase):
         token = self.login(self.user.username, 'gh1234')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
 
-        
         data = {
             "title": "new updated place",
             "place_type": 1,
@@ -259,7 +956,33 @@ class PlaceViewsTestCase(TestCase):
         }
 
         put_url = self.url + str(self.place.id) + '/'
-        response = self.client.put(put_url, data=data)
+        response = self.client.put(put_url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    def test_correct_put_place_update_tags(self):
+        
+        token = self.login(self.user.username, 'gh1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+
+        tags = [
+            {
+            "name": "tag1"
+            },
+            {
+            "name": "tag2"
+            }
+        ]
+
+        data = {
+            "title": "new updated place",
+            "place_type": 1,
+            "is_free": False,
+            "tags": tags
+        }
+
+        put_url = self.url + str(self.place.id) + '/'
+        response = self.client.put(put_url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 

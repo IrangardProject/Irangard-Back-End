@@ -26,7 +26,7 @@ class HoursSerializer(serializers.ModelSerializer):
         fields = ['id', 'weekday', 'start_time', 'end_time', 'all_day']
 
 class ContactSerializer(serializers.ModelSerializer):
-    working_hours = HoursSerializer(many=True)
+    working_hours = HoursSerializer(many=True, read_only=True)
     class Meta:
         model = Contact
         fields = '__all__'
@@ -54,13 +54,13 @@ class OptionalSerializer(serializers.ModelSerializer):
         extra_kwargs = {'place': {'write_only': True}}
 
 class PlaceSerializer(serializers.ModelSerializer):
-    images = ImageSerializer(many=True, required=False)
-    tags = TagSerializer(many=True, required=False)
-    contact = ContactSerializer(required=False) #read_only=True
+    images = ImageSerializer(many=True, read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
+    contact = ContactSerializer(read_only=True) #read_only=True
 
-    features = FeatureSerializer(many=True, required=False)
-    rooms = RoomSerializer(many=True, required=False)
-    optional_costs = OptionalSerializer(many=True, required=False) #required=False
+    features = FeatureSerializer(many=True, read_only=True)
+    rooms = RoomSerializer(many=True, read_only=True)
+    optional_costs = OptionalSerializer(many=True, read_only=True) #required=False
 
     class Meta:
         model = Place
