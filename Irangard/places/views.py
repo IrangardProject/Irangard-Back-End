@@ -35,13 +35,14 @@ class PlaceViewSet(ModelViewSet):
 		rooms = data.pop('rooms', [])
 		optional_costs = data.pop('optional_costs', [])
 		contact_data = data.pop('contact', None)
-		hours_data = contact_data.pop('working_hours', None) if contact_data else []
+		hours_data = contact_data.pop('working_hours', []) if contact_data else []
 
 		serializer = self.get_serializer(data=data)
 		serializer.is_valid(raise_exception=True)
 		place = serializer.save()
 		
-		contact = Contact.objects.create(place=place, **contact_data)
+		if contact_data:
+			contact = Contact.objects.create(place=place, **contact_data)
 		for hours in hours_data:
 			Hours.objects.create(contact=contact, **hours)
 		for image in images:
