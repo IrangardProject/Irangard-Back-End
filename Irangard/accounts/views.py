@@ -39,7 +39,7 @@ class PayViewSet(GenericViewSet):
 
         my_headers = {"Content-Type": "application/json",
                       'X-API-KEY': '3394842f-7407-4598-8c48-499a15c8d0b7',
-                      'X-SANDBOX': '0'}
+                      'X-SANDBOX': '1'}
 
         
         response = requests.post(url="https://api.idpay.ir/v1.1/payment", data=json.dumps(my_data),
