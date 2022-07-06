@@ -6,6 +6,9 @@
       href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,900&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
   </head>
   <style>
     @font-face {
@@ -53,6 +56,24 @@
       display: inline-block;
       margin: 0 auto;
     }
+
+    .green{
+        background-color: green;
+        color: white;
+        font-size: 17px;
+        margin-top: 30px;
+        border-radius: 10px;
+    }
+
+    .green:hover{
+        background-color: rgb(20, 77, 20);
+    }
+    .tour{
+        font-weight: bold;
+        font-size:25px;
+        margin: 10px;
+    }
+
   </style>
   <body>
     <div class="card">
@@ -73,5 +94,14 @@
         <p style="margin-top:10px;">حساب کاربری شما به کاربر ویژه ارتقا یافت</p>
       </p>
     </div>
+    <div><a id='link'><button id="myButton" class="mdl-button mdl-js-button mdl-button--raised green">برگشت به پروفایل</button></a></div>
+
+    <script type="text/javascript">
+      var username = "{{username}}"
+      var scrt_var = "https://parizaan.ir/profile/"+username;
+      document.getElementById("link").setAttribute("href",scrt_var);
+   </script>
+
+
   </body>
 </html>
