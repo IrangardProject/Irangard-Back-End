@@ -96,8 +96,9 @@
     </div>
     <div><a id='link' ><button id="myButton" class="mdl-button mdl-js-button mdl-button--raised green">برگشت به صفحه تور</button></a></div>
 
-    <script>
-      var scrt_var = "https://parizaan.ir/tours/"+{{tour_id}};
+    <script type="text/javascript">
+      var tour_id = "{{tour_id}}"
+      var scrt_var = "https://parizaan.ir/tours/"+tour_id;
       document.getElementById("link").setAttribute("href",scrt_var);
    </script>
 
