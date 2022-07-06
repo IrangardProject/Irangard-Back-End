@@ -66,6 +66,7 @@ class reset_password_confirm_seriliazer(serializers.Serializer):
 class AccountAuthViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
 
     queryset = User.objects.all()
+    serializer_class = UserSerializer
 
     @swagger_auto_schema(request_body=check_email_seriliazer)
     @action(detail=False, url_path='check-email',  methods=['POST'], permission_classes=[permissions.AllowAny])
