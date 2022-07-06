@@ -36,7 +36,7 @@ class ChatViewSet(ModelViewSet):
     )
     def room(self, request, room_name, username):
 
-        # messages = Message.objects.filter(room=room_name)[0:25]
+        messages = Chat.objects.filter(room=room_name)
 
         return render(request, 'chat/room.html', {'room_name': room_name, 'username': username, 'messages': messages})
 
