@@ -17,6 +17,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.test import APIClient
 from . permissions import IsAdmin
 from accounts.serializers.serializers import *
+from accounts.serializers.admin_serilizers import *
 from experience.serializers import *
 from places.serializers import *
 from places.models import *
@@ -25,16 +26,24 @@ from accounts.models import *
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import serializers
+
+
 
 class AdminViewSet(GenericViewSet):
     queryset = User.objects.filter(is_admin=True)
 
+    def get_serializer_class(self):
+        return None
     # @action(detail=False, url_path='upgrade-user',  methods=['POST'], permission_classes=[IsAdmin])
     # def UpgradeUser(self, request):
     #     user = User.objects.get(username = request.user.username)
     #     special_user = SpecialUser.objects.create(user = user)
     #     special_user.save()
     #     return Response(f"user with username {request.user.username} upgraded to special user successfully",status = HTTP_200_OK)
+
 
     @action(detail=False, url_path='add-admin', methods=['POST'], permission_classes=[permissions.AllowAny])
     def addAdmin(self, request):
@@ -46,6 +55,7 @@ class AdminViewSet(GenericViewSet):
         except:
             return Response(f'unAuthenticated user', status=status.HTTP_401_UNAUTHORIZED)
 
+    @swagger_auto_schema(request_body=RemoveUserSerilizer, responses={200:"special user deleted"})
     @action(detail=False, url_path='remove-specialuser', methods=['POST'], permission_classes=[IsAdmin])
     def removeSpecialUser(self, request):
         try:
@@ -58,6 +68,7 @@ class AdminViewSet(GenericViewSet):
         except SpecialUser.DoesNotExist:
             return Response(f'special user with username {user.username} doesn not exist', status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(request_body=RemoveUserSerilizer, responses={200:"user deleted"})
     @action(detail=False, url_path='remove-user', methods=['POST'], permission_classes=[IsAdmin])
     def removeUser(self, request):
         try:
@@ -73,6 +84,12 @@ class AdminViewSet(GenericViewSet):
         except User.DoesNotExist:
             return Response(f'user with username {user.username} doesn not exist', status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(request_body=AddUserSerilizer, responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="response description",
+                schema=UserBasicInfoSerializer,
+            )
+        })
     @action(detail=False, url_path='add-user', methods=['POST'], permission_classes=[IsAdmin])
     def addUser(self, request):
 
@@ -122,6 +139,12 @@ class AdminViewSet(GenericViewSet):
             User.objects.all().order_by('follower_number')[:10], many=True).data
         return Response(statistics, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=StatisticSerializer, responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="response description",
+                schema=DailyStatisticResponseSerializer,
+            )
+        })
     @action(detail=False, url_path='daily-statistics', methods=['POST'], permission_classes=[IsAdmin])
     def dailyStatistics(self, request):
         statistics = defaultdict(int)
@@ -240,6 +263,12 @@ class AdminViewSet(GenericViewSet):
 
         return Response(statistics, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=StatisticSerializer, responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="response description",
+                schema=WeeklyStatisticResponseSerializer,
+            )
+        })
     @action(detail=False, url_path='weekly-statistics', methods=['POST'], permission_classes=[IsAdmin])
     def weeklyStatistics(self, request):
         statistics = defaultdict(int)
@@ -382,6 +411,12 @@ class AdminViewSet(GenericViewSet):
 
         return Response(statistics, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=StatisticSerializer, responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="response description",
+                schema=MonthlyStatisticResponseSerializer,
+            )
+        })
     @action(detail=False, url_path='monthly-statistics', methods=['POST'], permission_classes=[IsAdmin])
     def monthlyStatistics(self, request):
         statistics = defaultdict(int)
@@ -528,3 +563,45 @@ class AdminViewSet(GenericViewSet):
         except Exception as error:
             print(error)
             return Response(f'bad request', status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(request_body=check_place_ownership_claim_seriliazer, responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="response description",
+                schema=PlaceStatusSerializer,
+            )
+        })
+    @action(detail=False, url_path='check-place-ownership-claim', methods=['POST'], permission_classes=[IsAdmin])
+    def check_place_ownership_claim(self, request, *args, **kwargs):
+        try:
+            record_status = request.data.get('status')
+            
+            if(record_status not in ("AC","DN","PN")):
+                raise Exception("status mode is invalid")
+            
+            place_status_record_id = request.data.get('id')
+            place_status_record = PlaceStatus.objects.get(id=place_status_record_id)
+            place_status_record.status = record_status
+            place_status_record.save()
+            serializer = PlaceStatusSerializer(place_status_record)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        except Exception as error:
+            return Response(f'{error}', status=status.HTTP_400_BAD_REQUEST)
+
+
+    @swagger_auto_schema(request_body=None, responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="response description",
+                schema=PlaceStatusSerializer(many=True),
+            )
+        })
+    @action(detail=False, url_path='pending-place-ownership-claim', methods=['POST'], permission_classes=[IsAdmin])
+    def pending_place_ownership_claim(self, request, *args, **kwargs):
+        try:
+
+            pending_records = PlaceStatus.objects.filter(status="PN")
+            serializer = PlaceStatusSerializer(pending_records, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        except Exception as error:
+            return Response(f'{error}', status=status.HTTP_400_BAD_REQUEST)

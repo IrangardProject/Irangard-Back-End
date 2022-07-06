@@ -145,3 +145,15 @@ class Hours(models.Model):
         return f"{self.place.title}: {self.day} {self.start_time}-{self.end_time}"
     
 
+class PlaceStatus(models.Model):
+    
+    class StatusMode(models.TextChoices):
+        ACCEPTED = 'AC'
+        DENIED = 'DN'
+        PENDING = 'PN'
+        
+        
+    place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name="status_info")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="claimed_places")
+    status = models.CharField(max_length=2, choices=StatusMode.choices, default=StatusMode.PENDING)
+    reason = models.TextField(blank=True, null=True)
