@@ -86,7 +86,7 @@ class TourViewSet(ModelViewSet):
 
     @action(detail=True, methods=['post'],
             permission_classes=[IsAuthenticated])
-    def book(self, request, *args, **kwargs):
+    def apply_discount_code(self, request, *args, **kwargs):
         tour = self.get_object()
         user = request.user
         cost = tour.cost
@@ -97,12 +97,29 @@ class TourViewSet(ModelViewSet):
 
         if('discount_code_code' in request.data):
             try:
-                discount_code = DiscountCode.objects.get(code=request.data['discount_code_code'])
+                discount_code = tour.discount_codes.get(code=request.data['discount_code_code'])
                 if(discount_code.expire_date < timezone.now()):
                     return Response('discount code has expired',status=status.HTTP_400_BAD_REQUEST)
                 cost = cost * (discount_code.off_percentage/100)
+                return Response({"new_cost":cost},status=status.HTTP_200_OK)
             except DiscountCode.DoesNotExist:
                 return Response('discount_code does not exist',status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response("no discount_code is provieded", status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'],
+            permission_classes=[IsAuthenticated])
+    def book(self, request, *args, **kwargs):
+        tour = self.get_object()
+        user = request.user
+        cost = tour.cost
+        if("new_cost" in request.data):
+            cost = request.data.get("new_cost")
+        if tour.booked(user):
+            return Response('Already booked', status=status.HTTP_400_BAD_REQUEST)
+        if tour.capacity < 1:
+            return Response("there's no reservation available", status=status.HTTP_400_BAD_REQUEST)
+
         order_id = str(uuid.uuid4())
         my_data = {
             "order_id": order_id,
