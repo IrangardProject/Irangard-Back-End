@@ -46,7 +46,7 @@ class PlaceViewSet(ModelViewSet):
 		for hours in hours_data:
 			Hours.objects.create(contact=contact, **hours)
 		for image in images:
-			Image.objects.create(place=place, **image)
+			Image.objects.create(place=place, image=image)
 		for tag in tags:
 			Tag.objects.create(place=place, **tag)
 		for feature in features:
