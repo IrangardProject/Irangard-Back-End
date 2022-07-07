@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.viewsets import ModelViewSet
 from .models import *
 from accounts.models import User
+from accounts.serializers.user_serializers import UserSerializer
 from datetime import date, datetime, time, timedelta
 
 
@@ -74,6 +75,14 @@ class PlaceSerializer(serializers.ModelSerializer):
         validated_data['added_by'] = request.user
         return super().create(validated_data)
 
+
+class PlaceStatusSerializer(serializers.ModelSerializer):
+    
+    place =  PlaceSerializer(read_only=True)
+    user = UserSerializer(read_only=True)
+    class Meta:
+        model = PlaceStatus
+        fields= "__all__"
 
 # class ResidenceSerializer(PlaceSerializer):
 #     features = FeatureSerializer(many=True, read_only=True)

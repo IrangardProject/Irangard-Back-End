@@ -9,4 +9,5 @@ admin.site.register(Feature)
 admin.site.register(Room)
 admin.site.register(Optional)
 admin.site.register(Rate)
+admin.site.register(PlaceStatus)
 

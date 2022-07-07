@@ -17,6 +17,12 @@ from django.db.models import Q
 # from accounts.permissions import IsAdmin
 from rest_framework.decorators import action
 
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+from django.utils.decorators import method_decorator
+from Irangard.settings import CACHE_TTL
+
 
 class ExperienceViewSet(ModelViewSet):
 	queryset = Experience.objects.all()
@@ -30,6 +36,12 @@ class ExperienceViewSet(ModelViewSet):
 	search_fields = ['title', 'body']
 	filterset_class = ExperienceFilterSet
 	
+
+
+	@method_decorator(cache_page(CACHE_TTL))
+	def list(self, request, *args, **kwargs):
+		return super().list(self, request, *args, **kwargs)
+
 	def retrieve(self, request, pk=None):
 		# Add field is_owner for retrieve method
   
