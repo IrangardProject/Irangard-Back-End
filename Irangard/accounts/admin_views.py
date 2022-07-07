@@ -582,6 +582,10 @@ class AdminViewSet(GenericViewSet):
             place_status_record = PlaceStatus.objects.get(id=place_status_record_id)
             place_status_record.status = record_status
             place_status_record.save()
+            if(record_status == "AC"):
+                place = place_status_record.place
+                place.owner = place_status_record.user
+                place.save()
             serializer = PlaceStatusSerializer(place_status_record)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
