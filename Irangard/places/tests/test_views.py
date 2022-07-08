@@ -766,33 +766,6 @@ class PlaceViewsTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-    # def test_incorrect_put_place_not_owner(self):
-        
-    #     token = self.login(self.user.username, 'gh1234')
-    #     self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
-
-        
-    #     data = {
-    #         "title": "new updated place",
-    #         "description": "new updated place description",
-    #         "place_type": 1,
-    #         "is_free": False,
-    #     }
-
-    #     put_url = self.url + str(self.place.id) + '/'
-    #     response = self.client.put(put_url, data=data)
-    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-
-    # def test_incorrect_delete_place_not_owner(self):
-        
-    #     token = self.login(self.user.username, 'gh1234')
-    #     self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
-    #     delete_url = self.url + str(self.place.id) + '/'
-    #     response = self.client.delete(delete_url)
-    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-
     def test_correct_put_place(self):
         
         token = self.login(self.user.username, 'gh1234')
@@ -848,6 +821,26 @@ class PlaceViewsTestCase(TestCase):
         
         token = self.login("ghazal-new", "gh1234-new")
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        
+        data = {
+            "title": "new updated place",
+            "description": "new updated place description",
+            "place_type": 1,
+            "is_free": False,
+        }
+
+        put_url = self.url + str(self.place.id) + '/'
+        response = self.client.put(put_url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+    def test_incorrect_put_place_not_owner(self):
+        
+        self.place.owner = None
+        self.place.save()
+        token = self.login(self.user.username, 'gh1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+
         
         data = {
             "title": "new updated place",
@@ -1078,6 +1071,17 @@ class PlaceViewsTestCase(TestCase):
         token = self.login("ghazal-new", "gh1234-new")
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
 
+        delete_url = self.url + str(self.place.id) + '/'
+        response = self.client.delete(delete_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+    def test_incorrect_delete_place_not_owner(self):
+        
+        self.place.owner = None
+        self.place.save()
+        token = self.login(self.user.username, 'gh1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         delete_url = self.url + str(self.place.id) + '/'
         response = self.client.delete(delete_url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
