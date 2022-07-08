@@ -19,6 +19,7 @@ class Place(models.Model):
     is_free = models.BooleanField(default=False, blank=True)
     added_by = models.ForeignKey(
         User, related_name='added_places', on_delete=models.DO_NOTHING)
+    owner = models.ForeignKey(User, related_name='owned_places', on_delete=models.DO_NOTHING, null=True)
 
     def __str__(self):
         return f'{self.title} => {self.place_type}'

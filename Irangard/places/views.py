@@ -102,14 +102,13 @@ class PlaceViewSet(ModelViewSet):
 				Optional.objects.create(place=place, **optional_cost)
 				
 		return super().update(request, *args, **kwargs)
-
-
+		
 	def destroy(self, request, *args, **kwargs):
 		place = self.get_object()
 		if not place.is_adimn_or_owner(request.user):
 			return Response('you do not have permission to delete this place.',
-							 status=status.HTTP_403_FORBIDDEN)
-	 	return super().destroy(request, *args, **kwargs)
+							status=status.HTTP_403_FORBIDDEN)
+		return super().destroy(request, *args, **kwargs)
 
 	# def get_serializer_class(self):
 	# 	place = self.get_object()
