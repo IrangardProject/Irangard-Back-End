@@ -23,8 +23,8 @@ class Place(models.Model):
     def __str__(self):
         return f'{self.title} => {self.place_type}'
 
-    def is_owner(self, user):
-        return self.added_by == user
+    def is_adimn_or_owner(self, user):
+        return self.owner == user or user.is_admin
     
     def update_rate(self):
         rates = self.rates.all()
