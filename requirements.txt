@@ -8,6 +8,8 @@ celery==5.2.1
 certifi==2021.10.8
 cffi==1.15.0
 charset-normalizer==2.0.9
+channels==3.0.5
+channels_redis==3.4.0
 click==8.0.3
 click-didyoumean==0.3.0
 click-plugins==1.1.1
