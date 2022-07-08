@@ -20,12 +20,13 @@ class Place(models.Model):
     added_by = models.ForeignKey(
         User, related_name='added_places', on_delete=models.DO_NOTHING)
     date_created = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey(User, related_name='owned_places', on_delete=models.DO_NOTHING, null=True)
 
     def __str__(self):
         return f'{self.title} => {self.place_type}'
 
-    def is_owner(self, user):
-        return self.added_by == user
+    def is_adimn_or_owner(self, user):
+        return self.owner == user or user.is_admin
     
     def update_rate(self):
         rates = self.rates.all()
