@@ -17,11 +17,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['full_name', 'is_special', 'email', 'image', 'username', 'about_me', 'following_number', 'follower_number', 'is_owner','is_admin']
-        read_only_fields = ('email', 'following_number', 'follower_number', 'is_owner','is_admin', 'image')
-        
-        extra_kwargs = {
-        'image': {'read_only': False}
-        }
+        read_only_fields = ('email', 'following_number', 'follower_number', 'is_owner','is_admin')
         
         
     def get_is_owner(self, user):
