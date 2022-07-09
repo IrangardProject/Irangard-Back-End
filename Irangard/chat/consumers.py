@@ -7,7 +7,8 @@ from .models import Chat
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        # self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.room_name = 'emad12'
         self.room_group_name = 'chat_%s' % self.room_name
 
         # Join room
