@@ -36,7 +36,11 @@ class ExperienceSerializer(serializers.ModelSerializer):
     def get_is_liked(self, experience):
         request = self.context.get("request")
         # print(request)
-        user = request.user
+        if request.user.is_anonymous == False:
+            user = request.user
+        else:
+            return False
+        
         likes = Like.objects.filter(user=user, experience=experience)
         if len(likes) > 0:
             return True
