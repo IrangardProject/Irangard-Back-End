@@ -38,7 +38,7 @@ class ExperienceViewSet(ModelViewSet):
 			experience = Experience.objects.get(pk=pk)
 		except Experience.DoesNotExist:
 			return Response({'error': "Experience with given ID does not exist"}, status= status.HTTP_400_BAD_REQUEST)
-
+		
 		serializer = ExperienceSerializer(experience)
 		# Check if user is anonymous or not
 		if request.user.is_anonymous == False:
@@ -48,17 +48,25 @@ class ExperienceViewSet(ModelViewSet):
 			# Get xp writer usernamme
 			xp_user = serializer.data["user_username"]
 			xp_user = xp_user.replace(' ', '')
-			print(serializer.data["user_username"])
+   
+			likes = Like.objects.filter(user=request.user, experience=experience)
 			# Check if xp writer and request user are the same or not
-			if request_user == xp_user:
-				new_response = {"is_owner":True}    
-			else:
-				new_response = {"is_owner":False}
+			if request_user == xp_user and len(likes) > 0:
+				new_response = {"is_owner":True, "is_liked": True}    
+			elif request_user == xp_user and len(likes) == 0:
+				new_response = {"is_owner":True, "is_liked": False}
+			elif request_user != xp_user and len(likes) > 0:
+				new_response = {"is_owner":False, "is_liked": True}
+			elif request_user != xp_user and len(likes) == 0:
+				new_response = {"is_owner":False, "is_liked": False}
 		else:
-			new_response = {"is_owner":False}
+			if len(likes) > 0:
+				new_response = {"is_owner":False, "is_liked":True}
+			else:
+				new_response = {"is_owner":False, "is_liked":False}
+   
 		new_response.update(serializer.data)
 		return Response(new_response)
-
 
 	def update(self, request, *args, **kwargs):
 		experience = self.get_object()
