@@ -14,8 +14,8 @@ from rest_framework import filters
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
 from django.db.models import Q
-# from accounts.permissions import IsAdmin
 from rest_framework.decorators import action
+# from accounts.permissions import IsAdmin
 
 
 class ExperienceViewSet(ModelViewSet):
@@ -38,14 +38,16 @@ class ExperienceViewSet(ModelViewSet):
 			experience = Experience.objects.get(pk=pk)
 		except Experience.DoesNotExist:
 			return Response({'error': "Experience with given ID does not exist"}, status= status.HTTP_400_BAD_REQUEST)
-
-		serializer = ExperienceSerializer(experience)
+		
+		# serializer = ExperienceSerializer(experience)
+		serializer = ExperienceSerializer(experience, context={'request':request})
 		# Check if user is anonymous or not
 		if request.user.is_anonymous == False:
 			# Get request user, username
 			request_user = request.user.username
 			request_user.replace(' ', '')
 			# Get xp writer usernamme
+			print(serializer.data)
 			xp_user = serializer.data["user_username"]
 			xp_user = xp_user.replace(' ', '')
 			print(serializer.data["user_username"])
@@ -56,9 +58,9 @@ class ExperienceViewSet(ModelViewSet):
 				new_response = {"is_owner":False}
 		else:
 			new_response = {"is_owner":False}
+   
 		new_response.update(serializer.data)
-		return Response(new_response)
-
+		return Response(new_response)		
 
 	def update(self, request, *args, **kwargs):
 		experience = self.get_object()
@@ -108,6 +110,26 @@ class LikeViewSet(GenericAPIView):
                 experience.save()
                 serializer.save(user=user, experience=experience)
                 return Response(serializer.data, status=status.HTTP_200_OK)
+            
+        
+class UnLikeViewSet(GenericAPIView):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permission_classes = [IsAuthenticated]   
+    
+    def post(self, request, id, *args, **kwargs):
+        user = request.user
+        experience = Experience.objects.get(pk=id)
+        serializer = LikeSerializer(data=request.data, context = {'experience': experience, 'user': request.user})
+        if serializer.is_valid():
+            user_likes = Like.objects.filter(user=user, experience=experience)
+            if user_likes.exists():
+                experience.like_number -= 1
+                experience.save()
+                user_likes.delete()
+                return Response("Like deleted", status=status.HTTP_200_OK)
+            else:
+                return Response("You haven't liked this experience before", status=status.HTTP_400_BAD_REQUEST)
                 
     
 

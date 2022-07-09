@@ -10,11 +10,12 @@ class ExperienceSerializer(serializers.ModelSerializer):
     place_title = serializers.SerializerMethodField('get_place_title')
     user_username = serializers.SerializerMethodField('get_user_username')
     user_image = serializers.SerializerMethodField('get_user_image')
+    is_liked_new = serializers.SerializerMethodField('get_is_liked')
     
     class Meta:
         model = Experience     
         fields = "__all__"  
-        read_only_fields = ['like_number', 'comment_number', 'views', 'rate', 'rate_no', 'place_title', 'user_username', 'user_image', 'user']
+        read_only_fields = ['like_number', 'comment_number', 'views', 'rate', 'rate_no', 'place_title', 'user_username', 'user_image', 'user', 'is_liked']
         
     def get_place_title(self, experience):
         place = experience.place
@@ -31,6 +32,20 @@ class ExperienceSerializer(serializers.ModelSerializer):
             return user.image.url
         else:
             return ""
+        
+    def get_is_liked(self, experience):
+        request = self.context.get("request")
+        # print(request)
+        if request.user.is_anonymous == False:
+            user = request.user
+        else:
+            return False
+        
+        likes = Like.objects.filter(user=user, experience=experience)
+        if len(likes) > 0:
+            return True
+        else:
+            return False
     
     def create(self, validated_data):
         request = self.context.get("request")
