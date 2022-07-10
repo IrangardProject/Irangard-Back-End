@@ -94,7 +94,8 @@
                 chatSocket.send(JSON.stringify({
                     'message': message,
                     'username': userName,
-                    'room_name': roomName
+                    'room_name': roomName,
+                    'sender_type':"SERVER"
                 }));
 
                 messageInputDom.value = '';

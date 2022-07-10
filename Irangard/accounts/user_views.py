@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from .models import User
 from .serializers.user_serializers import *
 from places.serializers import PlaceStatusSerializer
@@ -11,6 +12,10 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.generics import GenericAPIView
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
+
+
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 
 class UserProfile(GenericAPIView):
@@ -122,6 +127,30 @@ class ClaimedPlaceOwnership(GenericAPIView):
             serializer = PlaceStatusSerializer(claimed_places, many=True)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as error:
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class WhoIs(GenericAPIView):
+
+    queryset = PlaceStatus.objects.all()
+    serializer_class = None
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(request_body=None, responses={
+    status.HTTP_200_OK: openapi.Response(
+        description="response description",
+        schema=WhoIsSeriliazer,
+    )
+})
+    def get(self, request, *args, **kwargs):
+
+        try:
+            request_user = request.user
+
+            return Response({"username":request_user.username}, status=status.HTTP_200_OK)
 
         except Exception as error:
             return Response(error, status=status.HTTP_400_BAD_REQUEST)

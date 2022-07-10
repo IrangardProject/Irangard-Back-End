@@ -68,7 +68,9 @@ class UserInformationSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
     
-   
+
+class WhoIsSeriliazer(serializers.Serializer):
+    username = serializers.CharField(max_length=50, help_text="user username")
         
     
     
