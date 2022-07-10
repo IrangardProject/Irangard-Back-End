@@ -57,8 +57,9 @@
             document.querySelector('#room-name-submit').onclick = function(e) {
                 var roomName = document.querySelector('#room-name-input').value;
                 var userName = document.querySelector('#username-input').value;
+                const address = 'http://' + window.location.host + "/chat/room/" + roomName + "/username/" + userName;
 
-                location.replace("http://127.0.0.1:8000/chat/" + "room/" + roomName + '/username/' + userName);
+                location.replace(address);
             };
         </script>
     </body>
