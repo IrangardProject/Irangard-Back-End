@@ -104,7 +104,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Irangard.wsgi.application'
-ASGI_APPLICATION = 'Irangard.asgi.application'
+ASGI_APPLICATION = 'Irangard.routing.application'
 
 
 # Database
@@ -244,7 +244,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts' : [(f'${REDIS_HOST}', 6379)],
+            'hosts' : [(REDIS_HOST, 6379)],
         }
     }
     
