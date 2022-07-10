@@ -6,6 +6,7 @@ from .pagination import ExperiencePagination
 from .serializers import *
 from .models import *
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from accounts.permissions import IsAdmin
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.contrib.auth.models import User, AnonymousUser
@@ -35,8 +36,6 @@ class ExperienceViewSet(ModelViewSet):
 				'place__contact__province', 'user__username', 'user__id']
 	search_fields = ['title', 'body']
 	filterset_class = ExperienceFilterSet
-	
-
 
 	@method_decorator(cache_page(CACHE_TTL))
 	def list(self, request, *args, **kwargs):
@@ -76,7 +75,7 @@ class ExperienceViewSet(ModelViewSet):
 
 	def update(self, request, *args, **kwargs):
 		experience = self.get_object()
-		if experience.user.username != request.user.username:
+		if experience.user.username != request.user.username and request.user.is_admin == False:
 			return Response({'error': "you do not have permission to Edit this experience. Because you're not owner of this experience"}, status=status.HTTP_403_FORBIDDEN)
 		else:
 			return super().update(request, *args, **kwargs)
@@ -84,7 +83,7 @@ class ExperienceViewSet(ModelViewSet):
 
 	def destroy(self, request, *args, **kwargs):
 		experience = self.get_object()
-		if experience.user.username != request.user.username:
+		if experience.user.username != request.user.username and request.user.is_admin == False:
 			return Response({'error': "you do not have permission to Delete this experience. Because you're not owner of this experience"}, status=status.HTTP_403_FORBIDDEN)
 		else:
 			return super().destroy(request, *args, **kwargs)
