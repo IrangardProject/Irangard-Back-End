@@ -54,11 +54,11 @@ class ExperienceSerializer(serializers.ModelSerializer):
 
 
 class ExperienceFeedSerializer(ExperienceSerializer):
-    class Meta:
-        model = Experience     
+    class Meta(ExperienceSerializer.Meta):    
         fields = ['id', 'image', 'title', 'place_title', 
         'rate', 'summary', 'comment_number', 'like_number', 
         'date_created', 'user_username', 'user_image'] 
+        read_only_fields = fields
         
         
 class LikeSerializer(serializers.ModelSerializer):
