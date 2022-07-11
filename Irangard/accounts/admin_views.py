@@ -59,7 +59,7 @@ class AdminViewSet(GenericViewSet):
     @action(detail=False, url_path='remove-specialuser', methods=['POST'], permission_classes=[IsAdmin])
     def removeSpecialUser(self, request):
         try:
-            user = User.objects.get(username=request.data['username'])
+            user = SpecialUser.objects.get(username=request.data['username'])
             sp_user = SpecialUser.objects.get(user=user)
             sp_user.delete()
             user.is_special = False
