@@ -56,8 +56,8 @@ class ExperienceSerializer(serializers.ModelSerializer):
 class ExperienceFeedSerializer(ExperienceSerializer):
     class Meta:
         model = Experience     
-        fields = ['id', 'image', 'title', 'place_title', 'rate', 
-        'rate_no', 'summary', 'comment_number', 'like_number', 
+        fields = ['id', 'image', 'title', 'place_title', 
+        'rate', 'summary', 'comment_number', 'like_number', 
         'date_created', 'user_username', 'user_image'] 
         
         
