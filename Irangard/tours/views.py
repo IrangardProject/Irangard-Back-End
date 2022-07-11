@@ -100,7 +100,7 @@ class TourViewSet(ModelViewSet):
                 discount_code = tour.discount_codes.get(code=request.data['discount_code_code'])
                 if(discount_code.expire_date < timezone.now()):
                     return Response('discount code has expired',status=status.HTTP_400_BAD_REQUEST)
-                cost = cost * (discount_code.off_percentage/100)
+                cost = cost - cost * (discount_code.off_percentage/100)
                 return Response({"new_cost":cost},status=status.HTTP_200_OK)
             except DiscountCode.DoesNotExist:
                 return Response('discount_code does not exist',status=status.HTTP_400_BAD_REQUEST)
@@ -123,7 +123,7 @@ class TourViewSet(ModelViewSet):
                 discount_code = tour.discount_codes.get(code=request.data['discount_code_code'])
                 if(discount_code.expire_date < timezone.now()):
                     return Response('discount code has expired',status=status.HTTP_400_BAD_REQUEST)
-                cost = cost * (discount_code.off_percentage/100)
+                cost = cost - cost * (discount_code.off_percentage/100)
             except DiscountCode.DoesNotExist:
                 return Response('discount_code does not exist',status=status.HTTP_400_BAD_REQUEST)
 
