@@ -39,6 +39,23 @@ class ChatViewSet(ModelViewSet):
         messages = Chat.objects.filter(room=room_name)
 
         return render(request, 'chat/room.html', {'room_name': room_name, 'username': username, 'messages': messages})
+    
+    @action(
+        detail=False,
+        methods=['get', 'post'],
+        url_path=r'room/messages/(?P<room_name>\w+)',
+        url_name='chat_room',
+        permission_classes=[AllowAny]
+    )
+    def get_room_messages(self, request, room_name, *args, **kwargs):
+        
+        try:
+            messages = Chat.objects.filter(room_name=room_name)
+            serializer = ChatSerializer(data=messages, many=True)
+            print(serializer.data)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except Exception as error:
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
 
 def room(request, room_name, username):
