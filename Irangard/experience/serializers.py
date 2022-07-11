@@ -51,6 +51,14 @@ class ExperienceSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         validated_data['user'] = request.user
         return super().create(validated_data)
+
+
+class ExperienceFeedSerializer(ExperienceSerializer):
+    class Meta:
+        model = Experience     
+        fields = ['id', 'image', 'title', 'place_title', 'rate', 
+        'rate_no', 'summary', 'comment_number', 'like_number', 
+        'date_created', 'user_username', 'user_image'] 
         
         
 class LikeSerializer(serializers.ModelSerializer):
