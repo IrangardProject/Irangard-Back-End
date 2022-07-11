@@ -21,6 +21,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('<int:id>/like', LikeViewSet.as_view(), name='like-experience'),
     path('<int:id>/unlike', UnLikeViewSet.as_view(), name='unlike-experience'),
+    path('place/<int:placeId>', GetXpByPlace.as_view(), name='get_xp_by_place'),
     path('', include(experiences_router.urls)),
     path('', include(comments_router.urls)),
 ]

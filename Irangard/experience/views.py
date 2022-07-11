@@ -1,3 +1,4 @@
+from re import M
 from django.shortcuts import get_object_or_404, render
 from rest_framework.viewsets import ModelViewSet
 
@@ -210,7 +211,18 @@ class ReplytViewSet(CommentViewSet):
 		return super().create(request, *args, **kwargs)
 
 
-
+class GetXpByPlace(GenericAPIView):
+    queryset = Experience.objects.all()
+    serializer_class = ExperienceSerializer
+    
+    def get(self, request, placeId, *args, **kwargs):
+        place = Place.objects.get(pk=placeId)
+        experiences = Experience.objects.filter(place=placeId)
+        serializer = ExperienceSerializer(experiences, many=True, context={'request':request})
+        # if serializer.is_valid():
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        # else:
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 				
 	
