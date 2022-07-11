@@ -31,6 +31,7 @@ urlpatterns = [
     path('information', UserInformation.as_view(), name='user-information'),
     path('claimed-places', ClaimedPlaceOwnership.as_view(), name='user-claimed_places'),
     path('who-is', WhoIs.as_view(), name='user-who-is'),
+    path('users', GetAllUsers.as_view(), name='user-all'),
     path("auth/jwt/create", views.TokenObtainPairView.as_view(serializer_class=myTokenObtainPairSerializer),
             name="accounts-jwt-create"),
     path("auth/jwt/refresh", views.TokenRefreshView.as_view(),

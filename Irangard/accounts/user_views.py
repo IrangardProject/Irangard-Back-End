@@ -154,3 +154,27 @@ class WhoIs(GenericAPIView):
 
         except Exception as error:
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetAllUsers(GenericAPIView):
+
+    queryset = User.objects.all()
+    serializer_class = None
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(request_body=None, responses={
+    status.HTTP_200_OK: openapi.Response(
+        description="response description",
+        schema=UserSerializer,
+    )
+})
+    def get(self, request, *args, **kwargs):
+
+        try:
+            users = self.get_queryset()
+            serializer = UserSerializer(users,many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as error:
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
