@@ -85,7 +85,7 @@ class ExperienceViewSet(ModelViewSet):
 			.order_by('-date_created')[:10] | Experience.objects\
 			.filter(~Q(user__following=request.user))\
 			.order_by('-likes_experience')[:10]
-		serializer = ExperienceSerializer(expriences, many=True, context={'request':request})
+		serializer = ExperienceFeedSerializer(expriences, many=True)
 		return Response(status=status.HTTP_200_OK, data=serializer.data)
 		
 		# user = request.user
