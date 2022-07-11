@@ -12,6 +12,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.generics import GenericAPIView
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
+from chat.models import Chat
 
 
 from drf_yasg import openapi
@@ -178,3 +179,29 @@ class GetAllUsers(GenericAPIView):
 
         except Exception as error:
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
+        
+class ChatUsers(GenericAPIView):
+    
+    queryset = User.objects.all()
+    serializer_class = UserProfileSerializer
+
+    def get(self, request, *args, **kwargs):
+        chats = Chat.objects.all()
+        usernames = []
+        users = []
+        for chat in chats:
+            if chat.room_name not in usernames:
+                usernames.append(chat.room_name)
+                user = User.objects.get(username=chat.room_name)
+                # user_information.append(user.username)
+                users.append(user)
+                # if user.image != None and user.image != "":
+                #     user_information.append(user.image)
+                # else:
+                #     user_information.append("")
+            #     response[user.pk] = user_information
+            #     i += 1
+            # print(chat.room_name)
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
