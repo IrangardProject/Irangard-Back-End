@@ -92,9 +92,9 @@ class ExperienceViewSet(ModelViewSet):
 	@action(detail=False, permission_classes=[IsAuthenticated])
 	def feed(self, request, *args, **kwargs):
 		expriences = Experience.objects\
-			.filter(Q(user__followers=request.user)&~Q(user=request.user))\
+			.filter(Q(user__followers=request.user)&~Q(user__id=request.user.id))\
 			.order_by('-date_created')[:10] | Experience.objects\
-			.filter(~Q(user__followers=request.user)&~Q(user=request.user))\
+			.filter(~Q(user__followers=request.user)&~Q(user__id=request.user.id))\
 			.order_by('-likes_experience')[:10]
 		serializer = ExperienceFeedSerializer(expriences, many=True)
 		return Response(status=status.HTTP_200_OK, data=serializer.data)
