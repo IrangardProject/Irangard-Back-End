@@ -35,7 +35,7 @@ class ExperienceSerializer(serializers.ModelSerializer):
         
     def get_is_liked(self, experience):
         request = self.context.get("request")
-        # print(request)
+        print(request)
         if request.user.is_anonymous == False:
             user = request.user
         else:
@@ -51,6 +51,14 @@ class ExperienceSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         validated_data['user'] = request.user
         return super().create(validated_data)
+
+
+class ExperienceFeedSerializer(ExperienceSerializer):
+    class Meta(ExperienceSerializer.Meta):    
+        fields = ['id', 'image', 'title', 'place_title', 
+        'rate', 'summary', 'comment_number', 'like_number', 
+        'date_created', 'user_username', 'user_image'] 
+        read_only_fields = fields
         
         
 class LikeSerializer(serializers.ModelSerializer):

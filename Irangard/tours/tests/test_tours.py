@@ -103,6 +103,13 @@ class TourViewSetTestCase(TestCase):
             self.data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+    def test_tour_create_incorrect(self):
+
+        response = self.client.post(self.url + "HelloTest", json.dumps(
+            self.data, indent=4, sort_keys=True, default=str), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_301_MOVED_PERMANENTLY)
 
     def test_tour_create_not_superuser(self):
 
@@ -110,16 +117,16 @@ class TourViewSetTestCase(TestCase):
         response = client.post(self.url, json.dumps(
             self.data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
-#         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-#     def test_tour_create_not_given_title(self):
+    def test_tour_create_not_given_title(self):
 
         data = self.data.copy()
         data.pop('title')
         response = self.client.post(self.url, json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
-#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_tour_create_not_given_start_date(self):
         data = self.data.copy()
@@ -127,7 +134,7 @@ class TourViewSetTestCase(TestCase):
         response = self.client.post(self.url, json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
-#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_tour_create_not_given_end_date(self):
         data = self.data.copy()
@@ -135,7 +142,7 @@ class TourViewSetTestCase(TestCase):
         response = self.client.post(self.url, json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
-#         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_tour_update(self):
         data = self.data.copy()
@@ -144,6 +151,14 @@ class TourViewSetTestCase(TestCase):
         response = self.client.put(self.url + f'{self.tour.id}/', json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+    def test_tour_update_incorrect_url(self):
+        data = self.data.copy()
+        data['title'] = 'test_title'
+        data['cost'] = 100
+        response = self.client.put(self.url + "bug" + f'{self.tour.id}/', json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_tour_partial_update(self):
         data = {"title":"test_title"}
@@ -160,12 +175,48 @@ class TourViewSetTestCase(TestCase):
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+    def test_tour_update_incorrect_credentials(self):
+        data = {"title":"test_title"}
+        client = APIClient()
+        client.login(username=self.second_special_user.user.username, password='emad12345678')
+        response = client.put(self.url + f'{self.tour.id}/', json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_tour_delete(self):
-        pass
+        response = self.client.delete(self.url + f'{self.tour.id}/', json.dumps(
+            self.data, indent=4, sort_keys=True, default=str), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_tour_delete_not_owner(self):
-        pass
+        data = {"title":"test_title"}
+        client = APIClient()
+        client.login(username=self.second_special_user.user.username, password='emad123456')
+        response = client.delete(self.url + f'{self.tour.id}/', json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    
+    def test_tour_delete_incorrect_credentials(self):
+        data = {"title":"test_title"}
+        client = APIClient()
+        client.login(username=self.second_special_user.user.username, password='emad12345678')
+        response = client.delete(self.url + f'{self.tour.id}/', json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+    def test_tour_delete_incorrect_url(self):
+        data = {"title":"test_title"}
+        client = APIClient()
+        client.login(username=self.second_special_user.user.username, password='emad123456')
+        response = client.delete(self.url + '2050/', json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_tour_book(self):
         pass
