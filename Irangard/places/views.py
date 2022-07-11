@@ -83,7 +83,7 @@ class PlaceViewSet(ModelViewSet):
 		if images:
 			place.images.all().delete()
 			for image in images:
-				Image.objects.create(place=place, **image)
+				Image.objects.create(place=place, image=image)
 		if tags:
 			place.tags.all().delete()
 			for tag in tags:
