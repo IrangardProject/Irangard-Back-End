@@ -6,8 +6,6 @@
       href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
   </head>
   <style>
@@ -24,6 +22,9 @@
       text-rendering: optimizeLegibility;
       font-display: auto;
     }
+    *{
+      font-family: Yekan !important;
+    }
     body {
       text-align: center;
       padding: 40px 0;
@@ -31,14 +32,12 @@
     }
     h1 {
       color: #88b04b;
-      font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
       font-weight: 900;
       font-size: 40px;
       margin-bottom: 10px;
     }
     p {
       color: #404f5e;
-      font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
       font-size: 20px;
       margin: 0;
     }
@@ -58,7 +57,9 @@
     }
 
     .green{
-        background-color: green;
+        background-color: #9abc66;
+        padding:10px;
+        border:None;
         color: white;
         font-size: 17px;
         margin-top: 30px;
@@ -89,7 +90,7 @@
         <i class="checkmark">✓</i>
       </div >
       <h1>عزیز {{username}}</h1>
-      <p style="font-family:Yekan;">
+      <p >
         پرداخت شما با موفقیت انجام شد<br />
         <p style="margin-top:10px;"><span> ثبت نام کردید <span class="tour">{{tour_title}}</span>شما با موفقیت در تور</span></p>
       </p>
