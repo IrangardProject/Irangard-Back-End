@@ -92,7 +92,7 @@ class ExperienceViewSet(ModelViewSet):
 	@action(detail=False, permission_classes=[IsAuthenticated])
 	def feed(self, request, *args, **kwargs):
 		expriences = Experience.objects\
-			.filter(user__followers=request.user)\
+			.filter(Q(user__followers=request.user)&~Q(user=request.user))\
 			.order_by('-date_created')[:10] | Experience.objects\
 			.filter(~Q(user__followers=request.user)&~Q(user=request.user))\
 			.order_by('-likes_experience')[:10]
