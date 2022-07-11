@@ -50,9 +50,8 @@ class ChatViewSet(ModelViewSet):
     def get_room_messages(self, request, room_name, *args, **kwargs):
         
         try:
-            messages = Chat.objects.filter(room_name=room_name)
-            serializer = ChatSerializer(data=messages, many=True)
-            print(serializer.data)
+            chats = Chat.objects.filter(room_name=room_name)
+            serializer = ChatSerializer(chats, many=True)
             return Response(serializer.data,status=status.HTTP_200_OK)
         except Exception as error:
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
