@@ -238,7 +238,7 @@ CACHES = {
 }
 
 
-#socket_chat
+#socket_chat_layer
 CHANNEL_LAYERS = {
     
     'default': {
