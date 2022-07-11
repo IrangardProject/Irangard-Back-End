@@ -93,7 +93,7 @@ class PlaceViewSet(ModelViewSet):
 
 	def update(self, request, *args, **kwargs):
 		place = self.get_object()
-		if not place.is_adimn_or_owner(request.user):
+		if not (place.is_adimn_or_owner(request.user) or place.is_added_by(request.user)):
 			return Response('you do not have permission to edit this place.',
 							status=status.HTTP_403_FORBIDDEN)
 		data = request.data.copy()
@@ -114,7 +114,7 @@ class PlaceViewSet(ModelViewSet):
 		if images:
 			place.images.all().delete()
 			for image in images:
-				Image.objects.create(place=place, **image)
+				Image.objects.create(place=place, image=image)
 		if tags:
 			place.tags.all().delete()
 			for tag in tags:

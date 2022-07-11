@@ -834,24 +834,24 @@ class PlaceViewsTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
-    def test_incorrect_put_place_not_owner(self):
+    # def test_incorrect_put_place_not_owner(self):
         
-        self.place.owner = None
-        self.place.save()
-        token = self.login(self.user.username, 'gh1234')
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+    #     self.place.owner = None
+    #     self.place.save()
+    #     token = self.login(self.user.username, 'gh1234')
+    #     self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
 
         
-        data = {
-            "title": "new updated place",
-            "description": "new updated place description",
-            "place_type": 1,
-            "is_free": False,
-        }
+    #     data = {
+    #         "title": "new updated place",
+    #         "description": "new updated place description",
+    #         "place_type": 1,
+    #         "is_free": False,
+    #     }
 
-        put_url = self.url + str(self.place.id) + '/'
-        response = self.client.put(put_url, data=data)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+    #     put_url = self.url + str(self.place.id) + '/'
+    #     response = self.client.put(put_url, data=data)
+    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
          
         
     def test_incorrect_put_place_without_title(self):
