@@ -10,9 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from pathlib import Path
+import sys
 import os
+from pathlib import Path
 from environs import Env
+import dj_database_url
+from datetime import timedelta
+# import django_heroku
+import cloudinary
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,7 +43,6 @@ DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,11 +54,27 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     'django.contrib.staticfiles',
     'rest_framework',
-    'accounts'
+    'drf_yasg',
+    'chat',
+    'accounts',
+    'places',
+    'experience',
+    'tours',
+    'corsheaders',
+    'cloudinary',
+    'cloudinary_storage',
+    'django_filters',
+    'channels',
 ]
 
+ALLOWED_HOSTS=['*']
+CORS_ORIGIN_ALLOW_ALL = True
+
 MIDDLEWARE = [
+    # 'django.middleware.cache.UpdateCacheMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -60,6 +82,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'Irangard.urls'
@@ -81,6 +104,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Irangard.wsgi.application'
+ASGI_APPLICATION = 'Irangard.routing.application'
 
 
 # Database
@@ -89,10 +113,10 @@ WSGI_APPLICATION = 'Irangard.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dbIrangard', 
-        'USER': 'postgres', 
+        'NAME': env.str('DB_NAME'), 
+        'USER': env.str('DB_USER'), 
         'PASSWORD': env.str('DB_PASSWORD'),
-        'HOST': '127.0.0.1', 
+        'HOST': env.str('DB_HOST'), 
         'PORT': '5432',
     },
     'TEST': {
@@ -144,9 +168,84 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = STATIC_HOST + "/media/"
+# MEDIA_URL = STATIC_HOST + "/media/"
+MEDIA_URL = "/media/"
+
+# ActivateDjango-Heroku
+# django_heroku.settings(locals())
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# EMAIL
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_ID')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PW')
+
+
+# Rest Framework Settings
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False,
+    # 'PAGE_SIZE': 10,
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.IsAuthenticated'
+    ],
+    
+}
+
+# request header prefix JWT
+# SIMPLE JWT
+SIMPLE_JWT = {
+    # JWT ACCESS_TOKEN
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dgwbbbisy',
+    'API_KEY':'681516956198644',
+    'API_SECRET':'I6ytAk4a-0sw1KyI4-tONQusnjc',
+}
+
+REDIS_HOST = os.environ.get('REDIS_HOST', '127.0.0.1')
+
+# cache requested url for each user for 2 minutes
+CACHE_TTL = 2*60
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+
+#socket_chat_layer
+CHANNEL_LAYERS = {
+    
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts' : [(REDIS_HOST, 6379)],
+        }
+    }
+    
+}

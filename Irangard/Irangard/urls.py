@@ -14,12 +14,46 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.conf import settings
+from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls.conf import include
 
+from rest_framework import permissions
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+
+
+
+schema_view = get_schema_view(  # swagger/redoc
+    openapi.Info(
+        title="Irangard",
+        default_version="v1",
+        description="irangard BackEnd",
+        terms_of_service="Use it for good :)",
+        contact=openapi.Contact(email=settings.EMAIL_HOST_USER),
+        license=openapi.License(name="Irangard License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls'), name='accounts')
+    path('accounts/', include('accounts.urls'), name='accounts'),
+    path('chat/', include('chat.urls'), name='chat'),
+    path('places/', include('places.urls'), name='places'),
+    path('experiences/', include('experience.urls'), name='experiences'),
+    path('tours/', include('tours.urls'), name='tours'),
+    path('swagger/', schema_view.with_ui('swagger',
+                                         cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc',
+                                       cache_timeout=0), name='schema-redoc'),
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
