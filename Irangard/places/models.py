@@ -59,7 +59,7 @@ class Rate(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(5)])
 
     def __str__(self):
-        return f"{user.username} rated {self.rate} to {self.place.title}"
+        return f"{self.user.username} rated {self.rate} to {self.place.title}"
 
 
 class Tag(models.Model):
