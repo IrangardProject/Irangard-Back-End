@@ -34,7 +34,7 @@ class PayViewSet(GenericViewSet):
             "amount": 10000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": "https://api.parizaan.ir/accounts/pay/verify/"
+            "callback": "http://188.121.102.52/accounts/pay/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
