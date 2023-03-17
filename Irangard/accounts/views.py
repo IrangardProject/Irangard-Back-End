@@ -39,7 +39,7 @@ class PayViewSet(GenericViewSet):
 
         my_headers = {"Content-Type": "application/json",
                       'X-API-KEY': 'e309f6e9-7462-46c4-acc7-e6ba2e39252e',
-                      'X-SANDBOX': '0'}
+                      'X-SANDBOX': '1'}
 
         
         response = requests.post(url="https://api.idpay.ir/v1.1/payment", data=json.dumps(my_data),
@@ -73,7 +73,7 @@ class PayViewSet(GenericViewSet):
 
             my_headers = {"Content-Type": "application/json",
                           'X-API-KEY': 'e309f6e9-7462-46c4-acc7-e6ba2e39252e',
-                          'X-SANDBOX': '0'
+                          'X-SANDBOX': '1'
                           }
 
             response = requests.post(url="https://api.idpay.ir/v1.1/payment/verify", data=json.dumps(my_data),
