@@ -14,8 +14,9 @@ class PlaceFilter(FilterSet):
         model = Place
         fields = ['province', 'city', 'place_type', 'is_free', 
                 'tags__name', 'features__title', 'rooms__capacity']
+        
         fields = {
             'rooms__price': ['lte', 'gte'],
             'optional_costs__price': ['lte', 'gte'],
-            'rate': ['gte'],
+            'rate': ['gte'], 'title': ['contains'], 'place_type': ['exact']
         }
