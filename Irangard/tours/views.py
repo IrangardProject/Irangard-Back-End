@@ -133,12 +133,12 @@ class TourViewSet(ModelViewSet):
             "amount": cost,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": f"http://188.121.102.52/tours/{self.kwargs.get('pk')}/verify/"
+            "callback": f"https://api.quilco.ir/tours/{self.kwargs.get('pk')}/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
-                      'X-API-KEY': 'e309f6e9-7462-46c4-acc7-e6ba2e39252e',
-                      'X-SANDBOX': '1'}
+                      'X-API-KEY': '6f304859-1d0c-461a-b5f3-1d7bd9d3fd5b',
+                      'X-SANDBOX': '0'}
 
         response = requests.post(url="https://api.idpay.ir/v1.1/payment", data=json.dumps(my_data),
                                  headers=my_headers)
@@ -170,7 +170,7 @@ class TourViewSet(ModelViewSet):
             }
 
             my_headers = {"Content-Type": "application/json",
-                          'X-API-KEY': 'e309f6e9-7462-46c4-acc7-e6ba2e39252e',
+                          'X-API-KEY': '6f304859-1d0c-461a-b5f3-1d7bd9d3fd5b',
                           'X-SANDBOX': '1'
                           }
 

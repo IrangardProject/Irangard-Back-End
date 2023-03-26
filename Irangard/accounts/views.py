@@ -34,12 +34,12 @@ class PayViewSet(GenericViewSet):
             "amount": 10000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": "http://188.121.102.52/accounts/pay/verify/"
+            "callback": "https://api.quilco.ir/accounts/pay/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",
-                      'X-API-KEY': 'e309f6e9-7462-46c4-acc7-e6ba2e39252e',
-                      'X-SANDBOX': '1'}
+                      'X-API-KEY': '6f304859-1d0c-461a-b5f3-1d7bd9d3fd5b',
+                      'X-SANDBOX': '0'}
 
         
         response = requests.post(url="https://api.idpay.ir/v1.1/payment", data=json.dumps(my_data),
@@ -72,7 +72,7 @@ class PayViewSet(GenericViewSet):
             }
 
             my_headers = {"Content-Type": "application/json",
-                          'X-API-KEY': 'e309f6e9-7462-46c4-acc7-e6ba2e39252e',
+                          'X-API-KEY': '6f304859-1d0c-461a-b5f3-1d7bd9d3fd5b',
                           'X-SANDBOX': '1'
                           }
 
