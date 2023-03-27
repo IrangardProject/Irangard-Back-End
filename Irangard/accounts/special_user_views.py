@@ -21,8 +21,8 @@ class SpecialUserViewSet(ModelViewSet):
     @action(detail=False, methods=['GET'], permission_classes=[IsSpecialUser])
     def tours(self, request):
         special_user = SpecialUser.objects.get(user=request.user)
-        tours = TourSerializer(special_user.tours, many=True)
-        
+        tours = TourSerializer(special_user.tours, many=True, context={"request": request})
+
         return Response(tours.data, status=status.HTTP_200_OK)
         
         
