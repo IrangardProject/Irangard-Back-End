@@ -1,11 +1,7 @@
-from email.mime import image
 from django.test import TestCase
 from ..models import Chat
 from accounts.models import User
 from rest_framework.test import APIClient
-import io
-from PIL import Image
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 import json
 from rest_framework import status
