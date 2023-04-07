@@ -5,10 +5,17 @@ from rest_framework import serializers
 from Irangard.settings import STATIC_HOST
 
 class UserSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField('get_image')
+
     class Meta:
         model = User
         fields = "__all__"
-        
+
+    def get_image(self, user):
+        if user.image != "":
+            return 'https://api.quilco.ir' + user.image.url
+        else:
+            return ""
 class SpecialUserSerializer(serializers.ModelSerializer):
     
     # user = UserSerializer(read_only=True)
