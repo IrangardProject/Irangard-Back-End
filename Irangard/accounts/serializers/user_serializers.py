@@ -2,7 +2,7 @@ from dataclasses import fields
 from pyexpat import model
 from accounts.models import User, SpecialUser
 from rest_framework import serializers
-
+from Irangard.settings import STATIC_HOST
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,7 +26,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """Serializer for user profile"""
     is_owner = serializers.SerializerMethodField('get_is_owner')
     following = serializers.SerializerMethodField('get_following')
-    
+    image = serializers.SerializerMethodField('get_image')
     
     
     class Meta:
@@ -47,6 +47,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if request_user.is_authenticated:
             status =  request_user.follows(user) or request_user == user
         return status
+    
+    def get_image(self, user):
+        if user.image != "":
+            return 'https://api.quilco.ir' + user.image.url
+        else:
+            return "" 
+
 
 class UserFeedSerializer(serializers.ModelSerializer):
     following = serializers.SerializerMethodField('get_following')

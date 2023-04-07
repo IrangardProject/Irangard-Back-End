@@ -27,7 +27,6 @@ class ExperienceSerializer(serializers.ModelSerializer):
     
     def get_user_image(self, experience):
         user = experience.user
-        print(user.image)
         if user.image != "":
             return user.image.url
         else:
