@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'django_filters',
     'channels',
+    'events'
 ]
 
 ALLOWED_HOSTS=['*']
