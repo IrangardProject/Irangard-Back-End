@@ -36,8 +36,8 @@ class Event(models.Model):
     title = models.CharField(max_length=255)
     organizer = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    x_location = models.DecimalField(decimal_places=10)
-    y_location = models.DecimalField(decimal_places=10)
+    x_location = models.DecimalField(max_digits=20, decimal_places=15)
+    y_location = models.DecimalField(max_digits=20, decimal_places=15)
     province = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     start_date = models.DateField()
@@ -78,3 +78,5 @@ class Image(models.Model):
 
     def __str__(self):
         return f'{self.pk} {self.event}'
+
+
