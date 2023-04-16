@@ -26,12 +26,14 @@ from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 from django.utils.decorators import method_decorator
 from Irangard.settings import CACHE_TTL
+from .filters import TourFilter
+
 
 class TourViewSet(ModelViewSet):
     queryset = Tour.objects.all()
     serializer_class = TourSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-
+    filterset_class = TourFilter
     pagination_class = DefaultPagination
     permission_classes = [IsOwnerOrReadOnly]
 
