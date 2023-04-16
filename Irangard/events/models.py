@@ -3,30 +3,41 @@ from accounts.models import User
 
 class Event(models.Model):
     EVENT_TYPES = [
-        ('0', "سایر"),
-        ('1', "جشنواره"),
-        ('2', "کنسرت موسیقی"),
-        ('3', "مسابقه"),
-        ('4', "مهمانی و دورهمی"),
+        ('0', 'همایش'),
+        ('1', 'نمایشگاه'),
+        ('2', 'نمایش'),
+        ('3', 'کنسرت یا اجرا'),
+        ('4', 'جشنواره'),
+        ('5', 'مسابقه'),
+        ('6', 'کنفرانس'),
+        ('7', 'سمینار'),
+        ('8', 'مجمع'),
+        ('9', 'جشن'),
+        ('10', 'مراسم'),
+        ('11', 'سایر')
     ]
     
     EVENT_CATEGORIES = [
-        ('0', "سایر"),
-        ('1', "خانوادگی"),
-        ('2', "هنری"),
-        ('3', "بیزنسی"),
-        ('4', "مذهبی"),
+        ('0', 'هنری'),
+        ('1', 'علمی'),
+        ('2', 'فرهنگی'),
+        ('3', 'ورزشی'),
+        ('4', 'سیاسی'),
+        ('5', 'اجتماعی'),
+        ('6', 'مذهبی'),
+        ('7', 'تجاری'),
+        ('8', 'سایر'),
     ]
     
     event_type = models.CharField(
-        max_length=20, choices=EVENT_TYPES, default='0')
+        max_length=20, choices=EVENT_TYPES, default='11')
     event_category = models.CharField(
-        max_length=20, choices=EVENT_CATEGORIES, default='0')
+        max_length=20, choices=EVENT_CATEGORIES, default='8')
     title = models.CharField(max_length=255)
     organizer = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    x_location = models.DecimalField(max_digits=15, decimal_places=10)
-    y_location = models.DecimalField(max_digits=15, decimal_places=10)
+    x_location = models.DecimalField(decimal_places=10)
+    y_location = models.DecimalField(decimal_places=10)
     province = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     start_date = models.DateField()
