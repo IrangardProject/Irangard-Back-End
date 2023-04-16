@@ -5,11 +5,21 @@ from accounts.models import User, SpecialUser
 
 class Tour(models.Model):
     TOUR_TYPES = [
-    
+        ('0', 'فرهنگی'),
+        ('1', 'ماجراجویی'),
+        ('2', 'تفریحی'),
+        ('3', 'حیات وحش'),
+        ('4', 'آشپزی'),
+        ('5', 'معنوی'),
+        ('6', 'عکاسی'),
+        ('7', 'تاریخی'),
+        ('8', 'طبیعت گردی'),
+        ('9', 'سفرهای آموزشی'),
+        ('10', 'سایر'),
     ]
     
     tour_type = models.CharField(max_length=20, choices=TOUR_TYPES,
-                                default='0')
+                                default='10')
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to=f'images/tours', blank=True, null=True)
