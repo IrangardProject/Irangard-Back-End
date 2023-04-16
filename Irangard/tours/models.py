@@ -4,6 +4,12 @@ from accounts.models import User, SpecialUser
 
 
 class Tour(models.Model):
+    TOUR_TYPES = [
+    
+    ]
+    
+    tour_type = models.CharField(max_length=20, choices=TOUR_TYPES,
+                                default='0')
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to=f'images/tours', blank=True, null=True)
