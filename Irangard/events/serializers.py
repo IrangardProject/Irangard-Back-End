@@ -1,8 +1,5 @@
 from rest_framework import serializers
-from rest_framework.viewsets import ModelViewSet
 from .models import Image, Event, Tag
-from accounts.models import User
-from accounts.serializers.user_serializers import UserSerializer
 
 
 class ImageSerializer(serializers.ModelSerializer):
