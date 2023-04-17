@@ -58,8 +58,6 @@ class Event(models.Model):
     def __str__(self):
         return self.title
 
-    
-    
 
 class Tag(models.Model):
     event = models.ForeignKey(
@@ -78,5 +76,3 @@ class Image(models.Model):
 
     def __str__(self):
         return f'{self.pk} {self.event}'
-
-
