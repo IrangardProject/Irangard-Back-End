@@ -8,15 +8,15 @@ class ImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = ['image', 'upload_date']
         read_only_fields = ['upload_date']
-        extra_kwargs = {'place': {'write_only': True}}
+        extra_kwargs = {'event': {'write_only': True}}
 
 
 class TagSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Tag
-        fields = ['place', 'name']
-        extra_kwargs = {'place': {'write_only': True}}
+        fields = ['event', 'name']
+        extra_kwargs = {'event': {'write_only': True}}
 
         
 class EventSerializer(serializers.ModelSerializer):
