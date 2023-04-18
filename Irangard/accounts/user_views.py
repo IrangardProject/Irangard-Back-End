@@ -2,6 +2,8 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
+
+from chat.serializers import MessageRoomSerializer
 from .models import User
 from .serializers.user_serializers import *
 from places.serializers import PlaceStatusSerializer
@@ -12,8 +14,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.generics import GenericAPIView
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
-from chat.models import Chat
-
+from chat.models import Chat, UserInRoom
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -204,4 +205,18 @@ class ChatUsers(GenericAPIView):
             # print(chat.room_name)
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
+class UserMessageRooms(APIView):
+    queryset = User.objects.all()
+    serializer_class = UserProfileSerializer
+
+    def get(self, request, pk, format=None):
+        user = User.objects.filter(id=pk)
+        room_objs = []
+        if user.exists():
+            user_in_message_objs = UserInRoom.objects.filter(user=user.first())
+            for obj in user_in_message_objs:
+                    room_objs.append(obj.room)
+            serializer = MessageRoomSerializer(room_objs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'user not found'}, status=status.HTTP_404_NOT_FOUND)
