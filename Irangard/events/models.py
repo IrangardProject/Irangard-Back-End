@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import User
 
+
 class Event(models.Model):
     EVENT_TYPES = [
         ('0', 'همایش'),
@@ -49,6 +50,8 @@ class Event(models.Model):
         on_delete=models.SET_NULL, null=True)
     address = models.CharField(max_length=255)
     is_free = models.BooleanField(default=False, blank=True)
+    website = models.CharField(max_length=255)
+    phone = models.CharField(max_length=11, blank=True, null=True)
     # cost = models.IntegerField(default=0)
     # have_capacity = models.BooleanField(default=False, blank=True)
     # capacity = models.IntegerField(default=-1)
