@@ -12,6 +12,7 @@ from rest_framework import generics
 from accounts.models import User
 from accounts.serializers.user_serializers import UserProfileSerializer
 from .models import Chat, Message, MessageRoom, UserInRoom
+from .permissions import IsRoomMember
 from .serializers import ChatSerializer, MessageSerializer, MessageRoomSerializer, UserInRoomSerializer
 
 
@@ -69,24 +70,19 @@ def room(request, room_name, username):
 class MessageViewSet(ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
-
+    permission_classes = [IsAuthenticated]
 
 
 class MessageRoomViewSet(ModelViewSet):
     queryset = MessageRoom.objects.all()
     serializer_class = MessageRoomSerializer
+    permission_classes = [IsAuthenticated]
 
 
-    @action(
-        detail=False,
-        methods=['post'],
-        url_path=r'add/user/(?P<user_id>\w+)/room/(?P<room_id>\w+)',
-        url_name='add_user_to_room',
-        # permission_classes=[IsAuthenticated] # TODO : is room owner or is in room
-    )
-    def add_user(self, request, user_id, room_id):
-        if not (user_id.isnumeric() or room_id.isnumeric()):
-            return Response({'id must be a number !'}, status.HTTP_400_BAD_REQUEST)
+class AddUserToRoomAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id, room_id, format=None):
         room = MessageRoom.objects.filter(id=room_id)
         user = User.objects.filter(id=user_id)
         print(user)
@@ -98,7 +94,7 @@ class MessageRoomViewSet(ModelViewSet):
             return Response({'room with no owner !'}, status.HTTP_400_BAD_REQUEST)
         if not (room.first().owner == self.request.user) and \
                 not UserInRoom.objects.filter(room=room.first(), user=self.request.user).exists():
-            return Response({'user not in the group !'}, status.HTTP_400_BAD_REQUEST)
+            return Response({'you are not allowed to add user in this room!'}, status.HTTP_400_BAD_REQUEST)
         has_joined_before = UserInRoom.objects.filter(user=user.first(), room=room.first()).exists()
         if has_joined_before:
             return Response({'duplicated user in a room in forbidden !'}, status.HTTP_400_BAD_REQUEST)
@@ -107,19 +103,13 @@ class MessageRoomViewSet(ModelViewSet):
         user_in_room.save()
         return Response(UserInRoomSerializer(user_in_room).data, status.HTTP_201_CREATED)
 
-class UserInRoomCreateView(generics.CreateAPIView):
-    queryset = UserInRoom.objects.all()
-    serializer_class = UserInRoomSerializer
 
 
-class RoomAllMessages(APIView):
-    queryset = Message.objects.all()
+class RoomAllMessages(generics.ListAPIView):
     serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated, IsRoomMember]
 
-    def get(self, request, pk, format=None):
-        room = MessageRoom.objects.filter(id=pk)
-        if room.exists():
-            messages = Message.objects.filter(reciever_room=room.first())
-            serializer = MessageSerializer(messages, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({'user not found'}, status=status.HTTP_404_NOT_FOUND)
+    def get_queryset(self):
+        if not MessageRoom.objects.filter(id=self.kwargs['pk']).exists():
+            return Response({'room not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Message.objects.filter(reciever_room_id=self.kwargs['pk'])
