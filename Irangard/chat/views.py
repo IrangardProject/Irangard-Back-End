@@ -110,6 +110,10 @@ class RoomAllMessages(generics.ListAPIView):
     permission_classes = [IsAuthenticated, IsRoomMember]
 
     def get_queryset(self):
-        if not MessageRoom.objects.filter(id=self.kwargs['pk']).exists():
+        try:
+            room_id = int(self.kwargs.get('pk'))
+        except Exception as e:
+            print(e)
+        if not MessageRoom.objects.filter(id=room_id).exists():
             return Response({'room not found'}, status=status.HTTP_404_NOT_FOUND)
-        return Message.objects.filter(reciever_room_id=self.kwargs['pk'])
+        return Message.objects.filter(reciever_room_id=room_id)

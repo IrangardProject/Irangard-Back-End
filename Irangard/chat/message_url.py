@@ -15,7 +15,7 @@ room_router = routers.DefaultRouter()
 room_router.register('', MessageRoomViewSet, basename='room')
 
 urlpatterns = [
-    path('add/user/<int:user_id>/room/<int:room_id>', AddUserToRoomAPIView.as_view()),
+    path('add/user/<int:user_id>/room/<int:room_id>', AddUserToRoomAPIView.as_view(), name='add-user'),
     path('room/chats/<int:pk>', RoomAllMessages.as_view(), name='room-chats'),
     path('room/', include(room_router.urls), name='room'),
     path('', include(message_router.urls), name='message'),

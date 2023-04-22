@@ -3,9 +3,10 @@ from .models import Image, Event, Tag
 
 
 class ImageSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Image
+        ref_name = 'event image serializer'
         fields = ['image', 'upload_date']
         read_only_fields = ['upload_date']
         extra_kwargs = {'event': {'write_only': True}}
@@ -14,6 +15,7 @@ class ImageSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     
     class Meta:
+        ref_name = 'event tag serializer'
         model = Tag
         fields = ['event', 'name']
         extra_kwargs = {'event': {'write_only': True}}
