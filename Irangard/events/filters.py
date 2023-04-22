@@ -18,6 +18,8 @@ class EventFilter(FilterSet):
             'start_date': ['lte', 'gte'],
             'end_date': ['lte', 'gte'],
             'is_free': ['exact'],
+            'province': ['exact'],
+            'city': ['exact']
         }
     
     def filter_by_tag(self, queryset, name, value):
