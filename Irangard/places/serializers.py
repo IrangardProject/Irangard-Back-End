@@ -10,6 +10,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Image
+        ref_name = 'place image serializer'
         fields = ['image', 'upload_date']
         read_only_fields = ['upload_date']
         extra_kwargs = {'place': {'write_only': True}}
@@ -18,6 +19,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
+        ref_name = 'event tag serializer'
         fields = ['place', 'name']
         extra_kwargs = {'place': {'write_only': True}}
 
