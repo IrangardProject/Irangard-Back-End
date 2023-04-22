@@ -1,6 +1,5 @@
 import json
-import datetime
-import mock
+from django.utils.dateparse import parse_date
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -10,6 +9,11 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from ..models import *
 from accounts.models import User, SpecialUser
+from datetime import datetime
+
+
+def parse_date(date_str):
+    return datetime.strptime(date_str[:19], '%Y-%m-%dT%H:%M:%S')
 
 
 class TourViewSetTestCase(TestCase):
@@ -65,21 +69,21 @@ class TourViewSetTestCase(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
 
         self.data = {
-            "title": "test_tour",
+            "title": "first_test_tour",
             "cost": 200,
             "capacity": 50,
             "remaining": 50,
             "start_date": "2022-05-22T15:49:49.505Z",
-            "end_date": "2022-05-23T15:49:49.505Z",
+            "end_date": "2022-05-28T15:49:49.505Z",
             "tour_type": "0"
         }
         
         self.data_1 ={
             "title": "test_tour",
-            "cost": 200,
+            "cost": 400,
             "capacity": 50,
             "remaining": 50,
-            "start_date": "2022-05-22T15:49:49.505Z",
+            "start_date": "2022-05-15T15:49:49.505Z",
             "end_date": "2022-05-23T15:49:49.505Z",
             "tour_type": "1"
         }
@@ -242,8 +246,79 @@ class TourViewSetTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for tour in tour_list:
             self.assertEqual(tour["tour_type"], "1")
+            
+    
+    def test_tour_title_contains_filter(self):
+        response = self.client.get(self.url + '?title__contains=fir')
+        response_dict = json.loads(response.content)
+        tour_list = response_dict['results']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for tour in tour_list:
+            self.assertEqual("fir" in tour["title"], True)
         
+        
+    def test_tour_cost_lte_filter(self):
+        response = self.client.get(self.url + '?cost__lte=300')
+        response_dict = json.loads(response.content)
+        tour_list = response_dict['results']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for tour in tour_list:
+            self.assertLessEqual(int(tour["cost"]), 300)
+            
+    
+    def test_tour_cost_gte_filter(self):
+        response = self.client.get(self.url + '?cost__gte=300')
+        response_dict = json.loads(response.content)
+        tour_list = response_dict['results']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for tour in tour_list:
+            self.assertGreaterEqual(int(tour["cost"]), 300)
 
+
+    def test_tour_start_date_lte_filter(self):
+        date_str = "2022-05-16T00:00:00.505Z"
+        response = self.client.get(self.url + f'?start_date__lte={date_str}')
+        response_dict = json.loads(response.content)
+        tour_list = response_dict['results']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for tour in tour_list:
+            self.assertLessEqual(
+                parse_date(tour["start_date"]), parse_date(date_str))
+            
+            
+    def test_tour_start_date_gte_filter(self):
+        date_str = "2022-05-16T00:00:00.505Z"
+        response = self.client.get(self.url + f'?start_date__gte={date_str}')
+        response_dict = json.loads(response.content)
+        tour_list = response_dict['results']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for tour in tour_list:
+            self.assertGreaterEqual(
+                parse_date(tour["start_date"]), parse_date(date_str))
+            
+    
+    def test_tour_end_date_lte_filter(self):
+        date_str = "2022-05-25T00:00:00.505Z"
+        response = self.client.get(self.url + f'?end_date__lte={date_str}')
+        response_dict = json.loads(response.content)
+        tour_list = response_dict['results']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for tour in tour_list:
+            self.assertLessEqual(
+                parse_date(tour["end_date"]), parse_date(date_str))
+            
+            
+    def test_tour_end_date_gte_filter(self):
+        date_str = "2022-05-25T00:00:00.505Z"
+        response = self.client.get(self.url + f'?end_date__gte={date_str}')
+        response_dict = json.loads(response.content)
+        tour_list = response_dict['results']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for tour in tour_list:
+            self.assertGreaterEqual(
+                parse_date(tour["end_date"]), parse_date(date_str))
+    
+    
     def test_tour_book(self):
         pass
 
