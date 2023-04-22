@@ -53,7 +53,8 @@ class EventViewsTestcase(TestCase):
             x_location=0, y_location=0, start_date='2022-05-22', 
             end_date='2022-05-23', start_time='00:00:00', end_time='00:00:00',
             added_by=self.user, address='test address', is_free=True,
-            province='تهران', city='تهران')
+            province='تهران', city='تهران',  website='www.org.com', 
+            phone='09109530195')
         
     
     def test_correct_post_event(self):     
@@ -89,7 +90,9 @@ class EventViewsTestcase(TestCase):
             "city": "تهران",
             "tags": tags,
             "address": "test address",
-            "is_free": 1
+            "is_free": 1,
+            "website": "www.org.com",
+            "phone": "09109530195"
         }
         
         response = self.client.post(self.url, data=data, format='json')
@@ -126,7 +129,9 @@ class EventViewsTestcase(TestCase):
             "city": "تهران",
             "tags": tags,
             "address": "test address",
-            "is_free": 1
+            "is_free": 1,
+            "website": "www.org.com",
+            "phone": "09109530195"
         }
         
         response = self.client.post(self.url, data=data, format='json')
@@ -187,7 +192,9 @@ class EventViewsTestcase(TestCase):
             "city": "قم",
             "tags": tags,
             "address": "test address updated",
-            "is_free": 0
+            "is_free": 0,
+            "website": "www.org.com",
+            "phone": "09109530195"
         }
         
         response = self.client.put("{}{}/".format(self.url, self.event.pk),
@@ -241,7 +248,9 @@ class EventViewsTestcase(TestCase):
             "city": "قم",
             "tags": tags,
             "address": "test address updated",
-            "is_free": 0
+            "is_free": 0,
+            "website": "www.org.com",
+            "phone": "09109530195"
         }
         
         response = self.client.put("{}{}/".format(self.url, self.event.pk),
@@ -279,7 +288,9 @@ class EventViewsTestcase(TestCase):
             "city": "قم",
             "tags": tags,
             "address": "test address updated",
-            "is_free": 0
+            "is_free": 0,
+            "website": "www.org.com",
+            "phone": "09109530195"
         }
         print(self.event.added_by)
         print(self.cheater_user)

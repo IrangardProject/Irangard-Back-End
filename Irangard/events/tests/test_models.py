@@ -40,7 +40,8 @@ class EventTestcase(TestCase):
             x_location=0, y_location=0, start_date='2022-05-22', 
             end_date='2022-05-23', start_time='00:00:00', end_time='00:00:00',
             added_by=self.user, address='test address', is_free=True,
-            province='تهران', city='تهران')
+            province='تهران', city='تهران', website='www.org.com', 
+            phone='09109530195')
         
     
     def test_title(self):
@@ -116,7 +117,17 @@ class EventTestcase(TestCase):
     def test_city(self):
         event = Event.objects.get(title="test event")
         self.assertEqual(event.city, "تهران")
-
+        
+    
+    def test_website(self):
+        event = Event.objects.get(title="test event")
+        self.assertEqual(event.website, "www.org.com")
+    
+    
+    def test_city(self):
+        event = Event.objects.get(title="test event")
+        self.assertEqual(event.phone, "09109530195")
+        
 
 class TagTestCase(TestCase):
     
@@ -148,7 +159,8 @@ class TagTestCase(TestCase):
             x_location=0, y_location=0, start_date='2022-05-22', 
             end_date='2022-05-23', start_time='00:00:00', end_time='00:00:00',
             added_by=self.user, address='test address', is_free=True,
-            province='تهران', city='تهران')
+            province='تهران', city='تهران',  website='www.org.com',
+            phone='09109530195')
         Tag.objects.create(event=self.event, name="test tag")
 
         

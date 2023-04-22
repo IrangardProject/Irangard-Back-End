@@ -32,7 +32,8 @@ class EventSerializer(serializers.ModelSerializer):
             'organizer', 'description', 'x_location',
             'y_location', 'province', 'city', 'start_date',
             'end_date', 'start_time', 'end_time', 'images',
-            'tags', 'added_by', 'address', 'is_free'
+            'tags', 'added_by', 'address', 'is_free',
+            'website', 'phone'
         ]
         read_only_fields = ['id']
 
