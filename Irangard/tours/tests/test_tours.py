@@ -73,9 +73,24 @@ class TourViewSetTestCase(TestCase):
             "end_date": "2022-05-23T15:49:49.505Z",
             "tour_type": "0"
         }
+        
+        self.data_1 ={
+            "title": "test_tour",
+            "cost": 200,
+            "capacity": 50,
+            "remaining": 50,
+            "start_date": "2022-05-22T15:49:49.505Z",
+            "end_date": "2022-05-23T15:49:49.505Z",
+            "tour_type": "1"
+        }
 
         self.tour = Tour.objects.create(**self.data, owner=self.special_user)
+        self.tour1 = Tour.objects.create(**self.data_1, owner=self.special_user)
+        self.tour2 = Tour.objects.create(**self.data_1, owner=self.special_user)
         self.tour.save()
+        self.tour1.save()
+        self.tour2.save()
+        
         
     def normal_user_client(self):
         user = User.objects.create(
@@ -218,6 +233,16 @@ class TourViewSetTestCase(TestCase):
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+    
+    def test_tour_type_filter(self):
+        response = self.client.get(self.url + '?tour_type=1')
+        response_dict = json.loads(response.content)
+        tour_list = response_dict['results']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for tour in tour_list:
+            self.assertEqual(tour["tour_type"], "1")
+        
 
     def test_tour_book(self):
         pass
