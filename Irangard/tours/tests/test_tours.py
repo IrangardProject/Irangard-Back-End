@@ -70,10 +70,11 @@ class TourViewSetTestCase(TestCase):
             "capacity": 50,
             "remaining": 50,
             "start_date": "2022-05-22T15:49:49.505Z",
-            "end_date": "2022-05-23T15:49:49.505Z"
+            "end_date": "2022-05-23T15:49:49.505Z",
+            "tour_type": "0"
         }
 
-        self.tour = Tour.objects.create(**self.data,owner = self.special_user)
+        self.tour = Tour.objects.create(**self.data, owner=self.special_user)
         self.tour.save()
         
     def normal_user_client(self):
