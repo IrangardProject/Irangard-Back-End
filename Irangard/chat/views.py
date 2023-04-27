@@ -120,7 +120,7 @@ class RoomAllMessages(generics.ListAPIView):
         return Message.objects.filter(reciever_room_id=room_id)
 
 class RoomDoesExistAPIView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
         input = RoomDoesExistInputTemplate(data=request.POST)
