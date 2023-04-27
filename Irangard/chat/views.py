@@ -126,8 +126,10 @@ class RoomDoesExistAPIView(APIView):
         input = RoomDoesExistInputTemplate(data=request.POST)
         if input.is_valid(raise_exception=True):
             one_id = input.data['user_one']
-            one_rooms = UserInRoom.objects.filter(user_id=one_id).values('room')
             two_id = input.data['user_two']
+            if request.user.id not in [one_id, two_id] :
+                return Response({'error': 'permission error'}, status=status.HTTP_400_BAD_REQUEST)
+            one_rooms = UserInRoom.objects.filter(user_id=one_id).values('room')
             two_rooms = UserInRoom.objects.filter(user_id=two_id).values('room')
             for room in one_rooms:
                 if room in two_rooms:
