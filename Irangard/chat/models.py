@@ -17,10 +17,13 @@ class Chat(models.Model):
     sender_type= models.CharField(max_length=6, choices=SenderType.choices, null=True)
 
 class MessageRoom(models.Model):
+    class RoomType(models.TextChoices):
+        pv = 'PV'
+        group = 'GROUP'
     name = models.CharField(max_length=250)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
-
+    type = models.CharField(max_length=6, choices=RoomType.choices, null=True, default=RoomType.pv, blank=True)
     def __str__(self):
         return f"room name = {self.name}, owner = {self.owner}"
 

@@ -13,7 +13,8 @@ from accounts.models import User
 from accounts.serializers.user_serializers import UserProfileSerializer
 from .models import Chat, Message, MessageRoom, UserInRoom
 from .permissions import IsRoomMember
-from .serializers import ChatSerializer, MessageSerializer, MessageRoomSerializer, UserInRoomSerializer
+from .serializers import ChatSerializer, MessageSerializer, MessageRoomSerializer, UserInRoomSerializer, \
+    RoomDoesExistInputTemplate
 
 
 class ChatViewSet(ModelViewSet):
@@ -117,3 +118,19 @@ class RoomAllMessages(generics.ListAPIView):
         if not MessageRoom.objects.filter(id=room_id).exists():
             return Response({'room not found'}, status=status.HTTP_404_NOT_FOUND)
         return Message.objects.filter(reciever_room_id=room_id)
+
+class RoomDoesExistAPIView(APIView):
+    # permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        input = RoomDoesExistInputTemplate(data=request.POST)
+        if input.is_valid(raise_exception=True):
+            one_id = input.data['user_one']
+            one_rooms = UserInRoom.objects.filter(user_id=one_id).values('room')
+            two_id = input.data['user_two']
+            two_rooms = UserInRoom.objects.filter(user_id=two_id).values('room')
+            for room in one_rooms:
+                if room in two_rooms:
+                    if MessageRoom.objects.get(id=room['room']).type == 'PV' :
+                        return Response({'True'})
+        return Response({'False'})
