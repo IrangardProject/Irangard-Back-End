@@ -1,6 +1,6 @@
 from django.db import models
 from accounts.models import User
-
+from utils.constants import EVENT_CATEGORIES
 
 class Event(models.Model):
     EVENT_TYPES = [
@@ -17,18 +17,7 @@ class Event(models.Model):
         ('10', 'مراسم'),
         ('11', 'سایر')
     ]
-    
-    EVENT_CATEGORIES = [
-        ('0', 'هنری'),
-        ('1', 'علمی'),
-        ('2', 'فرهنگی'),
-        ('3', 'ورزشی'),
-        ('4', 'سیاسی'),
-        ('5', 'اجتماعی'),
-        ('6', 'مذهبی'),
-        ('7', 'تجاری'),
-        ('8', 'سایر'),
-    ]
+
     
     event_type = models.CharField(
         max_length=20, choices=EVENT_TYPES, default='11')
