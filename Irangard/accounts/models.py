@@ -1,8 +1,21 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from multiselectfield import MultiSelectField
 
 
 class User(AbstractUser):
+    EVENT_CATEGORIES = [
+        ('0', 'هنری'),
+        ('1', 'علمی'),
+        ('2', 'فرهنگی'),
+        ('3', 'ورزشی'),
+        ('4', 'سیاسی'),
+        ('5', 'اجتماعی'),
+        ('6', 'مذهبی'),
+        ('7', 'تجاری'),
+        ('8', 'سایر'),
+    ]
+
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255, null=True, blank=True)
     image = models.ImageField(
@@ -15,7 +28,9 @@ class User(AbstractUser):
     following_number = models.IntegerField(default=0)
     follower_number = models.IntegerField(default=0)
     is_admin = models.BooleanField(default=False, blank=True)
-    
+    get_notified = models.BooleanField(default=True)
+    favorite_categories = MultiSelectField(choices=EVENT_CATEGORIES, blank=True, null=True)
+
     def follows(self, user):
         return user in self.following.all()
 
