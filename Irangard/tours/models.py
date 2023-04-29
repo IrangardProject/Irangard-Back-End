@@ -5,23 +5,11 @@ from Irangard import settings
 from accounts.models import User, SpecialUser
 from django.template.loader import render_to_string
 
+from utils.constants import TOUR_TYPES
 
 
 class Tour(models.Model):
-    TOUR_TYPES = [
-        ('0', 'فرهنگی'),
-        ('1', 'ماجراجویی'),
-        ('2', 'تفریحی'),
-        ('3', 'حیات وحش'),
-        ('4', 'آشپزی'),
-        ('5', 'معنوی'),
-        ('6', 'عکاسی'),
-        ('7', 'تاریخی'),
-        ('8', 'طبیعت گردی'),
-        ('9', 'سفرهای آموزشی'),
-        ('10', 'سایر'),
-    ]
-    
+
     tour_type = models.CharField(max_length=20, choices=TOUR_TYPES,
                                 default='10')
     title = models.CharField(max_length=255)
@@ -40,6 +28,10 @@ class Tour(models.Model):
     def __str__(self):
         return self.title
 
+    @staticmethod
+    def has_common_values(list_one, list_two):
+        return set(list_two) & set(list_one)
+
     def get_tour_notification_email_template(self, user):
         template = render_to_string('email-notification.html',
                                     {
@@ -47,6 +39,17 @@ class Tour(models.Model):
                                         'username': user.full_name,
                                     })
         return template
+
+    def get_related_users(self):
+        """
+            related users are those who have common categories with this tour categories in their favorites
+        """
+        all_users = User.objects.all()
+        related_users = []
+        for user in all_users:
+            # if   self.has_common_values(user.favorite_categories)
+            pass
+        return True
 
     def send_email_to_bookers(self):
         bookers = self.bookers.all()
