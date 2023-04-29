@@ -1,5 +1,9 @@
+from django.core.mail import EmailMessage
 from django.db import models
+
+from Irangard import settings
 from accounts.models import User, SpecialUser
+from django.template.loader import render_to_string
 
 
 
@@ -35,6 +39,43 @@ class Tour(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_tour_notification_email_template(self, user):
+        template = render_to_string('email-notification.html',
+                                    {
+                                        'tour': self,
+                                        'username': user.full_name,
+                                    })
+        return template
+
+    def send_email_to_bookers(self):
+        bookers = self.bookers.all()
+        print(f"##### sending email to bookers of tour = {self.title}, id = {self.id}")
+        try:
+            for booker in bookers:
+                email = EmailMessage('تور جدید در ایرانگرد منتظر شماست !',
+                                     self.get_tour_notification_email_template(booker),
+                                     settings.EMAIL_HOST_USER,
+                                     [booker.email]
+                                     )
+                email.content_subtype = "html"
+                email.fail_silently = False
+                email.send()
+                print(f"##### email sent to user {booker.username}, id = {booker.id}")
+        except TimeoutError as t:
+            print("timeout error")
+        except Exception as e:
+            print(e)
+        else:
+            return True
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        is_created = self.pk is None
+        super(Tour, self).save(force_insert=False, force_update=False, using=None,
+             update_fields=None)
+        if is_created :
+            self.send_email_to_bookers()
 
     def booked(self, user):
         return self.bookers.filter(id=user.id).exists()
