@@ -123,7 +123,7 @@ class RoomDoesExistAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
-        input = RoomDoesExistInputTemplate(data=request.POST)
+        input = RoomDoesExistInputTemplate(data=request.data)
         if input.is_valid(raise_exception=True):
             one_id = input.data['user_one']
             two_id = input.data['user_two']
