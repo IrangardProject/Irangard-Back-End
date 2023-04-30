@@ -47,28 +47,29 @@ class Tour(models.Model):
         all_users = User.objects.all()
         related_users = []
         for user in all_users:
-            # if   self.has_common_values(user.favorite_categories)
-            pass
-        return True
+            if self.tour_type in user.favorite_tour_types:
+                related_users.append(user)
+        return related_users
 
     def send_email_to_bookers(self):
-        bookers = self.bookers.all()
-        print(f"##### sending email to bookers of tour = {self.title}, id = {self.id}")
+        related_users = self.get_related_users()
         try:
-            for booker in bookers:
+            for user in related_users:
                 email = EmailMessage('تور جدید در ایرانگرد منتظر شماست !',
-                                     self.get_tour_notification_email_template(booker),
+                                     self.get_tour_notification_email_template(user),
                                      settings.EMAIL_HOST_USER,
-                                     [booker.email]
+                                     [user.email]
                                      )
                 email.content_subtype = "html"
                 email.fail_silently = False
                 email.send()
-                print(f"##### email sent to user {booker.username}, id = {booker.id}")
+                print(f"##### email sent to user {user.username}, id = {user.id}")
         except TimeoutError as t:
             print("timeout error")
+            return False
         except Exception as e:
             print(e)
+            return False
         else:
             return True
 
