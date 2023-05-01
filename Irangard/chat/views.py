@@ -135,5 +135,5 @@ class RoomDoesExistAPIView(APIView):
                 if room in two_rooms:
                     this_room_obj = MessageRoom.objects.get(id=room['room'])
                     if this_room_obj.type == 'PV' :
-                        return Response({'room-id' : this_room_obj.id})
-        return Response({'room-id' : 'null'})
+                        return Response({'room_id' : this_room_obj.id})
+        return Response({'room_id' : 'null'})
