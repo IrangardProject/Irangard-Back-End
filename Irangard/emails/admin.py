@@ -5,7 +5,7 @@ from emails.models import EmailQueue
 
 
 class EmailAdmin(admin.ModelAdmin):
-    list_display = ['email_title', 'email_body', 'sender', 'receiver', 'state']
+    list_display = ['email_title', 'sender', 'receiver', 'state']
 
     class Meta:
         model = EmailQueue
