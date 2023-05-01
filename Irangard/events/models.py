@@ -4,6 +4,7 @@ from django.template.loader import render_to_string
 
 from Irangard import settings
 from accounts.models import User
+from emails.models import EmailQueue
 from utils.constants import EVENT_CATEGORIES, EVENT_TYPES
 
 class Event(models.Model):
@@ -61,15 +62,11 @@ class Event(models.Model):
         related_users = self.get_related_users()
         try:
             for user in related_users:
-                email = EmailMessage('رویداد جدید در ایرانگرد منتظر شماست !',
-                                     self.get_tour_notification_email_template(user),
-                                     settings.EMAIL_HOST_USER,
-                                     [user.email]
-                                     )
-                email.content_subtype = "html"
-                email.fail_silently = False
-                email.send()
-                print(f"##### email sent to user {user.username}, id = {user.id}")
+                email = EmailQueue.objects.create(email_title='رویداد جدید در ایرانگرد منتظر شماست !',
+                                                  email_body=self.get_tour_notification_email_template(user),
+                                                  sender=settings.EMAIL_HOST_USER,
+                                                  receiver=user.email)
+                email.save()
         except TimeoutError as t:
             print("timeout error")
             return False
