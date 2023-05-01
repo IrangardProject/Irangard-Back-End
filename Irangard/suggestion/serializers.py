@@ -1,77 +1,50 @@
 from rest_framework import serializers
 from .models import TourSuggestion, EventSuggestion, PlaceSuggestion
-from accounts.models import User
-from tours.models import Tour
-from events.models import Event
-from places.models import Place
-
-
-class UserSuggestionSerializer(serializers.ModelSerializer):
-    """Serializer for user's username and Id"""
-    class Meta:
-        model = User
-        fields = ['username', 'id']
-
-
-class TourBasicInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tour
-        fields = ['title', 'id']
-
-
-class EventBasicInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Event
-        fields = ['title', 'id']
-
-
-class PlaceBasicInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Place
-        fields = ['title', 'id']
 
 
 class SuggestionSerializer(serializers.ModelSerializer):
-    sender = UserSuggestionSerializer(read_only=True)
-    receiver = UserSuggestionSerializer(read_only=True)
-    text = serializers.CharField(max_length=255, allow_blank=True)
-
+    sender_username = serializers.ReadOnlyField(source='sender.username')
+    receiver_username = serializers.ReadOnlyField(source='receiver.username')
+    
     class Meta:
         abstract = True
-   
+        extra_kwargs = {'sender': {'read_only': True}}
+
+
 
 class EventSuggestionSerializer(SuggestionSerializer):
-    event = EventBasicInfoSerializer(read_only=True)
+    event_title = serializers.SerializerMethodField('get_event_title')
 
     class Meta:
         model = EventSuggestion
-        fields = ['id', 'sender', 'receiver', 'event', 'text']
+        fields = ['id', 'sender', 'receiver', 'event', 'text', 
+                'receiver_username', 'event_title']
 
-    def create(self, validated_data):
-        print(validated_data)
-        print(self.context)
-        validated_data['experience_id'] = self.context.get("experience")
-        validated_data['sender'] = self.context['request'].user
-        return super().create(validated_data)
+    def get_event_title(self, event_suggestion):
+        return event_suggestion.event.title
 
 
 class PlaceSuggestionSerializer(SuggestionSerializer):
-    place = PlaceBasicInfoSerializer(read_only=True)
+    place_title = serializers.SerializerMethodField('get_place_title')
 
     class Meta:
         model = PlaceSuggestion
-        fields = ['id', 'sender', 'receiver', 'place', 'text']
+        fields = ['id', 'sender', 'receiver', 'place', 'text', 
+                'receiver_username', 'place_title']
+
+    def get_place_title(self, place_suggestion):
+        return place_suggestion.event.title
 
 
-class TourSuggestionSerializer(serializers.ModelSerializer):
-    sender = UserSuggestionSerializer(read_only=True)
-    receiver = UserSuggestionSerializer(read_only=True)
-    tour = TourBasicInfoSerializer(read_only=True)
+class TourSuggestionSerializer(SuggestionSerializer):
+    tour_title = serializers.SerializerMethodField('get_tour_title')
 
     class Meta:
         model = TourSuggestion
-        fields = ('sender', 'receiver', 'tour', 'text')
+        fields = ['id', 'sender', 'receiver', 'tour', 'text', 
+                'sender_username', 'receiver_username',
+                'tour_title']
+        extra_kwargs = {'sender': {'read_only': True}}
 
-    def create(self, validated_data):
-        validated_data['sender'] = self.context['request'].user
-        return super().create(validated_data)
+    def get_tour_title(self, tour_suggestion):
+        return tour_suggestion.tour.title
