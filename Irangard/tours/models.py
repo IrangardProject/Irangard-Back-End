@@ -28,9 +28,6 @@ class Tour(models.Model):
     def __str__(self):
         return self.title
 
-    @staticmethod
-    def has_common_values(list_one, list_two):
-        return set(list_two) & set(list_one)
 
     def get_tour_notification_email_template(self, user):
         template = render_to_string('email-notification.html',
@@ -51,7 +48,7 @@ class Tour(models.Model):
                 related_users.append(user)
         return related_users
 
-    def send_email_to_bookers(self):
+    def send_email_to_related_users(self):
         related_users = self.get_related_users()
         try:
             for user in related_users:
@@ -79,7 +76,7 @@ class Tour(models.Model):
         super(Tour, self).save(force_insert=False, force_update=False, using=None,
              update_fields=None)
         if is_created :
-            self.send_email_to_bookers()
+            self.send_email_to_related_users()
 
     def booked(self, user):
         return self.bookers.filter(id=user.id).exists()
