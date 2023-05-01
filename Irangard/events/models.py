@@ -1,24 +1,12 @@
+from django.core.mail import EmailMessage
 from django.db import models
+from django.template.loader import render_to_string
+
+from Irangard import settings
 from accounts.models import User
-from utils.constants import EVENT_CATEGORIES
+from utils.constants import EVENT_CATEGORIES, EVENT_TYPES
 
 class Event(models.Model):
-    EVENT_TYPES = [
-        ('0', 'همایش'),
-        ('1', 'نمایشگاه'),
-        ('2', 'نمایش'),
-        ('3', 'کنسرت یا اجرا'),
-        ('4', 'جشنواره'),
-        ('5', 'مسابقه'),
-        ('6', 'کنفرانس'),
-        ('7', 'سمینار'),
-        ('8', 'مجمع'),
-        ('9', 'جشن'),
-        ('10', 'مراسم'),
-        ('11', 'سایر')
-    ]
-
-    
     event_type = models.CharField(
         max_length=20, choices=EVENT_TYPES, default='11')
     event_category = models.CharField(
@@ -50,6 +38,54 @@ class Event(models.Model):
     def __str__(self):
         return self.title
 
+    def get_tour_notification_email_template(self, user):
+        template = render_to_string('email-notification.html',
+                                    {
+                                        'tour': self,
+                                        'username': user.full_name,
+                                    })
+        return template
+
+    def get_related_users(self):
+        """
+            related users are those who have common categories with this tour categories in their favorites
+        """
+        all_users = User.objects.all()
+        related_users = []
+        for user in all_users:
+            if self.event_type in user.favorite_event_types:
+                related_users.append(user)
+        return related_users
+
+    def send_email_to_related_users(self):
+        related_users = self.get_related_users()
+        try:
+            for user in related_users:
+                email = EmailMessage('رویداد جدید در ایرانگرد منتظر شماست !',
+                                     self.get_tour_notification_email_template(user),
+                                     settings.EMAIL_HOST_USER,
+                                     [user.email]
+                                     )
+                email.content_subtype = "html"
+                email.fail_silently = False
+                email.send()
+                print(f"##### email sent to user {user.username}, id = {user.id}")
+        except TimeoutError as t:
+            print("timeout error")
+            return False
+        except Exception as e:
+            print(e)
+            return False
+        else:
+            return True
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        is_created = self.pk is None
+        super(Event, self).save(force_insert=False, force_update=False, using=None,
+             update_fields=None)
+        if is_created:
+            self.send_email_to_related_users()
 
 class Tag(models.Model):
     event = models.ForeignKey(

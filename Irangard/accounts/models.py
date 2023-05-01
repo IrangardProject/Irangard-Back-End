@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from multiselectfield import MultiSelectField
-from utils.constants import EVENT_CATEGORIES, TOUR_TYPES
+from utils.constants import EVENT_CATEGORIES, TOUR_TYPES, EVENT_TYPES
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
@@ -17,7 +17,7 @@ class User(AbstractUser):
     follower_number = models.IntegerField(default=0)
     is_admin = models.BooleanField(default=False, blank=True)
     get_notified = models.BooleanField(default=True)
-    favorite_categories = MultiSelectField(choices=EVENT_CATEGORIES, blank=True, null=True)
+    favorite_event_types = MultiSelectField(choices=EVENT_TYPES, blank=True, null=True)
     favorite_tour_types = MultiSelectField(choices=TOUR_TYPES, blank=True, null=True)
 
     def follows(self, user):
