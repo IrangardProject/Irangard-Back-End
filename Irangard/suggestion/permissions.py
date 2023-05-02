@@ -1,5 +1,4 @@
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated
 
 
 class SuggestionPermission(IsAuthenticated):
@@ -14,6 +13,6 @@ class SuggestionPermission(IsAuthenticated):
             return obj.sender == request.user or obj.receiver == request.user \
                 or request.user.is_superuser
         if view.action in ['update', 'partial_update', 'destroy']:
-            return obj.sender == request.user or request.user.is_staff
+            return obj.sender == request.user or request.user.is_superuser
         return False
     
