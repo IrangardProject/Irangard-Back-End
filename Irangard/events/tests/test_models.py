@@ -1,4 +1,6 @@
 from django.test import TestCase
+
+from emails.models import EmailQueue
 from ..models import Event, Tag, Image
 from accounts.models import User
 from rest_framework.test import APIClient
@@ -13,10 +15,10 @@ class EventTestcase(TestCase):
     
     
     def make_user(self):
-        self.user = User.objects.create(username="amir", email="amir@gmail.com")
-        self.user.set_password("123456")
-        self.user.save()
-        return self.user
+        user = User.objects.create(username="amir", email="amir@gmail.com")
+        user.set_password("123456")
+        user.save()
+        return user
 
     def login(self, username, password):
         url = reverse('accounts:accounts-jwt-create')
@@ -131,8 +133,8 @@ class EventTestcase(TestCase):
 
 class TagTestCase(TestCase):
     
-    def make_user(self):
-        self.user = User.objects.create(username="amir", email="amir@gmail.com")
+    def make_user(self, username="amir", email="amir@gmail.com"):
+        self.user = User.objects.create(username=username, email=email)
         self.user.set_password("123456")
         self.user.save()
         return self.user
@@ -167,4 +169,45 @@ class TagTestCase(TestCase):
     def test_name(self):
         tag = Tag.objects.get(event=self.event)
         self.assertEqual(tag.name, "test tag")
-        
+
+    def test_event_email_notification(self):
+        self.user.favorite_event_types = ['1', '2', '3', '0']
+        self.user.save()
+        email_queue_count = EmailQueue.objects.count()
+        test_event = Event.objects.create(
+            event_type='0', event_category='0', title='test event',
+            organizer='test organizer', description='test description',
+            x_location=0, y_location=0, start_date='2022-05-22',
+            end_date='2022-05-23', start_time='00:00:00', end_time='00:00:00',
+            added_by=self.user, address='test address', is_free=True,
+            province='تهران', city='تهران', website='www.org.com',
+            phone='09109530195')
+        test_event.save()
+        new_email_queue = EmailQueue.objects.count()
+        self.assertEqual(new_email_queue - email_queue_count, 1)
+        self.assertEqual(EmailQueue.objects.all().last().state, '0')
+
+    def test_event_email_notification_multi_user(self):
+        EmailQueue.objects.all().delete()
+        email_queue_count = EmailQueue.objects.count()
+        user_one = self.make_user(username="user_one", email="user_one@gmail.com")
+        user_two = self.make_user(username="user_two", email="user_two@gmail.com")
+        user_one.favorite_event_types = ['0', '1']
+        user_two.favorite_event_types = ['0', '2']
+        user_two.save()
+        user_one.save()
+        test_event = Event.objects.create(
+            event_type='0', event_category='0', title='test event',
+            organizer='test organizer', description='test description',
+            x_location=0, y_location=0, start_date='2022-05-22',
+            end_date='2022-05-23', start_time='00:00:00', end_time='00:00:00',
+            added_by=self.user, address='test address', is_free=True,
+            province='تهران', city='تهران', website='www.org.com',
+            phone='09109530195')
+        test_event.save()
+        new_email_queue_count = EmailQueue.objects.count()
+        self.assertEqual(new_email_queue_count - email_queue_count, 2) # must be created for two users
+        user_one_notification = EmailQueue.objects.filter(receiver=user_one.email)
+        self.assertEqual(user_one_notification.exists(), True)
+        user_two_notification = EmailQueue.objects.filter(receiver=user_two.email)
+        self.assertEqual(user_two_notification.exists(), True)

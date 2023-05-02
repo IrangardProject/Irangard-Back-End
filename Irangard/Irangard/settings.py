@@ -65,8 +65,15 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'django_filters',
     'channels',
-    'events'
+    'events',
+    'emails',
+    'django_crontab'
 ]
+
+CRONJOBS = [
+    ('*/2 * * * *', 'emails.cron.email_send_cronjob')
+]
+
 
 ALLOWED_HOSTS=['*']
 CORS_ORIGIN_ALLOW_ALL = True

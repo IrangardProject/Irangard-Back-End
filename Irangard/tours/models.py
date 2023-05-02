@@ -1,23 +1,16 @@
+from django.core.mail import EmailMessage
 from django.db import models
-from accounts.models import User, SpecialUser
 
+from Irangard import settings
+from accounts.models import User, SpecialUser
+from django.template.loader import render_to_string
+
+from emails.models import EmailQueue
+from utils.constants import TOUR_TYPES
 
 
 class Tour(models.Model):
-    TOUR_TYPES = [
-        ('0', 'فرهنگی'),
-        ('1', 'ماجراجویی'),
-        ('2', 'تفریحی'),
-        ('3', 'حیات وحش'),
-        ('4', 'آشپزی'),
-        ('5', 'معنوی'),
-        ('6', 'عکاسی'),
-        ('7', 'تاریخی'),
-        ('8', 'طبیعت گردی'),
-        ('9', 'سفرهای آموزشی'),
-        ('10', 'سایر'),
-    ]
-    
+
     tour_type = models.CharField(max_length=20, choices=TOUR_TYPES,
                                 default='10')
     title = models.CharField(max_length=255)
@@ -35,6 +28,52 @@ class Tour(models.Model):
 
     def __str__(self):
         return self.title
+
+
+    def get_tour_notification_email_template(self, user):
+        template = render_to_string('email-notification.html',
+                                    {
+                                        'tour': self,
+                                        'username': user.full_name,
+                                    })
+        return template
+
+    def get_related_users(self):
+        """
+            related users are those who have common categories with this tour categories in their favorites
+        """
+        all_users = User.objects.all()
+        related_users = []
+        for user in all_users:
+            if self.tour_type in user.favorite_tour_types:
+                related_users.append(user)
+        return related_users
+
+    def send_email_to_related_users(self):
+        related_users = self.get_related_users()
+        try:
+            for user in related_users:
+                email = EmailQueue.objects.create(email_title='تور جدید در ایرانگرد منتظر شماست !' ,
+                                                  email_body=self.get_tour_notification_email_template(user),
+                                                  sender=settings.EMAIL_HOST_USER,
+                                                  receiver=user.email)
+                email.save()
+        except TimeoutError as t:
+            print("timeout error")
+            return False
+        except Exception as e:
+            print(e)
+            return False
+        else:
+            return True
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        is_created = self.pk is None
+        super(Tour, self).save(force_insert=False, force_update=False, using=None,
+             update_fields=None)
+        if is_created :
+            self.send_email_to_related_users()
 
     def booked(self, user):
         return self.bookers.filter(id=user.id).exists()
