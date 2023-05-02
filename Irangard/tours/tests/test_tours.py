@@ -327,3 +327,24 @@ class TourViewSetTestCase(TestCase):
 
     def test_tour_verify(self):
         pass
+
+
+    # tour email notification tests !
+    def test_tour_email_notification(self):
+        self.user.favorite_tour_types = ['0', '1', '2', '3']
+        self.user.save()
+        data_1 = {
+            "title": "test_tour",
+            "cost": 400,
+            "capacity": 50,
+            "remaining": 50,
+            "start_date": "2022-05-15T15:49:49.505Z",
+            "end_date": "2022-05-23T15:49:49.505Z",
+            "tour_type": "1"
+        }
+        email_queue_count = EmailQueue.objects.count()
+        tour = Tour.objects.create(**self.data, owner=self.special_user)
+        tour.save()
+        new_email_queue = EmailQueue.objects.count()
+        self.assertEqual(new_email_queue - email_queue_count, 1)
+        self.assertEqual(EmailQueue.objects.all().last().state, '0')
