@@ -15,5 +15,6 @@ dicount_code_router.register('discount-codes', DicountCodeViewSet, basename='tou
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('', include(dicount_code_router.urls))
+    path('', include(dicount_code_router.urls)),
+    path('recommended-tours', RecommendedTourListView.as_view())
 ]
