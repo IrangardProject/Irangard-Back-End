@@ -5,6 +5,7 @@ import json
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpRequest, HttpResponse
 from rest_framework.decorators import permission_classes
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
@@ -248,3 +249,13 @@ class TourViewSet(ModelViewSet):
             return Response('user has booked', status=status.HTTP_200_OK)
         else:
             return Response('user has not booked', status=status.HTTP_400_BAD_REQUEST)
+
+
+class RecommendedTourListView(ListAPIView):
+    serializer_class = TourSerializer
+    pagination_class = DefaultPagination
+
+    def get_queryset(self):
+        sorted_tours = sorted(Tour.objects.all(), key=lambda t : t.recommendation_rate)
+        sorted_tours.reverse()
+        return sorted_tours

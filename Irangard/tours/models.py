@@ -1,5 +1,9 @@
+import datetime
+import time
+
 from django.core.mail import EmailMessage
 from django.db import models
+from django.utils.timezone import utc
 
 from Irangard import settings
 from accounts.models import User, SpecialUser
@@ -29,6 +33,17 @@ class Tour(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def recommendation_rate(self):
+        register_rate = (self.bookers.count() / (datetime.datetime.utcnow().replace(tzinfo=utc) - self.date_created ).days )
+        tour_leader_sells_count = 0
+        for tour in Tour.objects.filter(owner=self.owner):
+            tour_leader_sells_count += tour.bookers.count()
+        tour_leader_rate = self.owner.user.follower_number + tour_leader_sells_count + Tour.objects.filter(owner=self.owner).count()
+        days_to_start_rate = (datetime.datetime.utcnow().replace(tzinfo=utc) - self.start_date ).days
+        print(f"{self.title} : register rate = {register_rate}, tour leader rate = {tour_leader_rate}, days to start = "
+              f"{days_to_start_rate}, overall = {register_rate + tour_leader_rate - days_to_start_rate}")
+        return register_rate + tour_leader_rate - days_to_start_rate
 
     def get_tour_notification_email_template(self, user):
         template = render_to_string('email-notification.html',
