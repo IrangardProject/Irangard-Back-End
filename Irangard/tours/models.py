@@ -35,15 +35,24 @@ class Tour(models.Model):
 
     @property
     def recommendation_rate(self):
-        register_rate = (self.bookers.count() / (datetime.datetime.utcnow().replace(tzinfo=utc) - self.date_created ).days )
+        if self.is_expired:
+            return None
+        try:
+            register_rate = (self.bookers.count() / (datetime.datetime.utcnow().replace(tzinfo=utc) - self.date_created ).days )
+        except ZeroDivisionError as zero_div:
+            register_rate = 0
         tour_leader_sells_count = 0
         for tour in Tour.objects.filter(owner=self.owner):
             tour_leader_sells_count += tour.bookers.count()
         tour_leader_rate = self.owner.user.follower_number + tour_leader_sells_count + Tour.objects.filter(owner=self.owner).count()
-        days_to_start_rate = (datetime.datetime.utcnow().replace(tzinfo=utc) - self.start_date ).days
+        days_to_start_rate = (self.start_date - datetime.datetime.utcnow().replace(tzinfo=utc)).days
         print(f"{self.title} : register rate = {register_rate}, tour leader rate = {tour_leader_rate}, days to start = "
               f"{days_to_start_rate}, overall = {register_rate + tour_leader_rate - days_to_start_rate}")
         return register_rate + tour_leader_rate - days_to_start_rate
+
+    @property
+    def is_expired(self):
+        return (datetime.datetime.utcnow().replace(tzinfo=utc) - self.end_date).days > 0
 
     def get_tour_notification_email_template(self, user):
         template = render_to_string('email-notification.html',

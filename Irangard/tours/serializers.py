@@ -28,6 +28,7 @@ class TourSerializer(serializers.ModelSerializer):
     owner = SpecialUserSerializer(read_only=True)
     is_booked = serializers.SerializerMethodField('booked')
     bookers = TourRegisteredUserSerializer(many=True,read_only=True)
+    is_expired = serializers.SerializerMethodField()
 
     class Meta:
         model = Tour
@@ -41,3 +42,6 @@ class TourSerializer(serializers.ModelSerializer):
     def booked(self, tour):
         request = self.context.get("request")
         return tour.booked(request.user)
+
+    def get_is_expired(self, obj):
+        return obj.is_expired

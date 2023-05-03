@@ -256,6 +256,7 @@ class RecommendedTourListView(ListAPIView):
     pagination_class = DefaultPagination
 
     def get_queryset(self):
-        sorted_tours = sorted(Tour.objects.all(), key=lambda t : t.recommendation_rate)
+        not_expired_tours = [tour for tour in Tour.objects.all() if not tour.is_expired]
+        sorted_tours = sorted(not_expired_tours, key=lambda t: t.recommendation_rate)
         sorted_tours.reverse()
         return sorted_tours
