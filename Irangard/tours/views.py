@@ -37,6 +37,7 @@ class TourViewSet(ModelViewSet):
     filterset_class = TourFilter
     pagination_class = DefaultPagination
     permission_classes = [IsOwnerOrReadOnly]
+    ordering_fields = ['date_created', 'start_date', 'cost']
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
