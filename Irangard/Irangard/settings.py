@@ -67,13 +67,13 @@ INSTALLED_APPS = [
     'channels',
     'events',
     'emails',
-    'django_crontab'
+    'django_crontab',
+    'suggestion'
 ]
 
 CRONJOBS = [
     ('*/2 * * * *', 'emails.cron.email_send_cronjob')
 ]
-
 
 ALLOWED_HOSTS=['*']
 CORS_ORIGIN_ALLOW_ALL = True
