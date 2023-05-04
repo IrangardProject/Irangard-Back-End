@@ -76,5 +76,5 @@ class EventViewSet(ModelViewSet):
     def recommended_events(self, request):
         not_expired_events = [event for event in Event.objects.all() if not event.is_expired]
         sorted_events = sorted(not_expired_events, key=lambda t: t.recommendation_rate, reverse=True)
-        serializer = EventSerializer(sorted_events, many=True)
+        serializer = self.get_serializer(sorted_events, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
