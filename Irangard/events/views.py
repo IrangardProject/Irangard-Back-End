@@ -22,6 +22,7 @@ class EventViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     permission_classes = [EventPermission]
     pagination_class = DefaultPagination
+    ordering_fields = ['date_created', 'start_date']
     
     
     def create(self, request, *args, **kwargs):
