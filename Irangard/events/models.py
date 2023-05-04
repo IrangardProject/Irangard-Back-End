@@ -1,11 +1,12 @@
+from datetime import datetime, timezone
 from django.core.mail import EmailMessage
 from django.db import models
 from django.template.loader import render_to_string
-
 from Irangard import settings
 from accounts.models import User
 from emails.models import EmailQueue
 from utils.constants import EVENT_CATEGORIES, EVENT_TYPES
+from django.utils.timezone import utc
 
 class Event(models.Model):
     event_type = models.CharField(
@@ -31,6 +32,7 @@ class Event(models.Model):
     website = models.CharField(max_length=255)
     phone = models.CharField(max_length=11, blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    views = models.PositiveIntegerField(default=0)
     # cost = models.IntegerField(default=0)
     # have_capacity = models.BooleanField(default=False, blank=True)
     # capacity = models.IntegerField(default=-1)
@@ -84,6 +86,34 @@ class Event(models.Model):
              update_fields=None)
         if is_created:
             self.send_email_to_related_users()
+    
+    @property
+    def is_expired(self):
+        end_datetime = datetime.combine(self.end_date, 
+                                    datetime.min.time()).replace(tzinfo=timezone.utc)
+        current_datetime = datetime.now(timezone.utc)
+        return (current_datetime - end_datetime).days > 0
+            
+    @property
+    def recommendation_rate(self):
+        if self.is_expired:
+            return None
+        
+        date_created = datetime.combine(self.date_created, 
+                                    datetime.min.time()).replace(tzinfo=timezone.utc)
+        current_datetime = datetime.now(timezone.utc)
+        start_date = datetime.combine(self.start_date, 
+                                    datetime.min.time()).replace(tzinfo=timezone.utc)
+        
+        try:    
+            view_rate = (self.views / (current_datetime - date_created).days)
+        except ZeroDivisionError as zero_div:
+            view_rate = 0
+        
+        days_to_start_rate = (start_date - current_datetime).days
+        
+        return view_rate - days_to_start_rate
+
 
 class Tag(models.Model):
     event = models.ForeignKey(
