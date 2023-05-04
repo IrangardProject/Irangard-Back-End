@@ -11,6 +11,7 @@ class EventFilter(FilterSet):
         fields = ['province', 'city', 'event_type', 'event_category', 
                 'title', 'start_date', 'end_date', 'is_free']
         
+        
         fields = {
             'title': ['contains'], 
             'event_type': ['exact'],
@@ -22,5 +23,7 @@ class EventFilter(FilterSet):
             'city': ['exact']
         }
     
+    
     def filter_by_tag(self, queryset, name, value):
-        return queryset.filter(tags__name=value)
+        tags = value.split(',')
+        return queryset.filter(tags__name__in=tags)
