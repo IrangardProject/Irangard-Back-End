@@ -29,15 +29,7 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = '__all__'
-        fields = [
-            'id', 'title', 'event_type', 'event_category',
-            'organizer', 'description', 'x_location',
-            'y_location', 'province', 'city', 'start_date',
-            'end_date', 'start_time', 'end_time', 'images',
-            'tags', 'added_by', 'address', 'is_free',
-            'website', 'phone'
-        ]
-        read_only_fields = ['id']
+        
 
     def create(self, validated_data):
         request = self.context.get("request")
