@@ -30,6 +30,7 @@ class Event(models.Model):
     is_free = models.BooleanField(default=False, blank=True)
     website = models.CharField(max_length=255)
     phone = models.CharField(max_length=11, blank=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     # cost = models.IntegerField(default=0)
     # have_capacity = models.BooleanField(default=False, blank=True)
     # capacity = models.IntegerField(default=-1)
