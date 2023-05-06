@@ -37,7 +37,7 @@ jobs:
             db_port: 5432
     services:
       postgres:
-        image: postgres-latest
+        image: postgres:10
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: 1234
