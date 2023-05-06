@@ -11,10 +11,11 @@ from .models import Event, Tag, Image
 from .serializers import EventSerializer
 from .permissions import EventPermission
 from .filters import EventFilter
+from django.utils import timezone
 
 
 class EventViewSet(ModelViewSet):
-    queryset = Event.objects.all()
+    queryset = Event.objects.filter(end_date__gte=timezone.now())
     serializer_class = EventSerializer
     filterset_class = EventFilter
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]

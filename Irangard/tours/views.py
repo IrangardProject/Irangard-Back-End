@@ -31,7 +31,7 @@ from .filters import TourFilter
 
 
 class TourViewSet(ModelViewSet):
-    queryset = Tour.objects.all()
+    queryset = Tour.objects.filter(end_date__gte=timezone.now())
     serializer_class = TourSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = TourFilter
