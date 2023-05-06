@@ -25,6 +25,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    
+    - name : env file
+      run : |
+        touch Irangard/Irangard/.env && echo "export DEBUG=True\nexport SECRET_KEY='django-insecure-g&@l9t5+dmgmtyi7p=@quy8h&+%@pgsb1v&0njdsfd@q6=w1gs'\nexport DB_PASSWORD='1234'\nexport WEBSITE_URL='http://127.0.0.1:8000'\nexport EMAIL_ID='irangard.se@gmail.com'\nexport EMAIL_PW='wfxwebonohrrbatv'\nexport DB_HOST='localhost'\nexport DB_NAME='dbirangard'\nexport DB_USER='postgres'" >> Irangard/Irangard/.env 
     - name: Run Tests
       run: |
         pwd && ls && python Irangard/manage.py test
