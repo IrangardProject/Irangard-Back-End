@@ -5,16 +5,50 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+env:
+  DEBUG: True
 
+  SECRET_KEY: django-insecure-g&@l9t5+dmgmtyi7p=@quy8h&+%@pgsb1v&0njdsfd@q6=w1gs
+
+  WEBSITE_URL: http://127.0.0.1:8000
+
+  EMAIL_ID: irangard.se@gmail.com
+
+  EMAIL_PW: wfxwebonohrrbatv
+
+  DB_PASSWORD: 1234
+
+  DB_NAME: irangard
+
+  DB_USER: postgres
+
+  DB_HOST: localhost
+  
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
       matrix:
+        db: [postgres]
         python-version: [3.8]
-
+        include:
+          - db: postgres
+            db_port: 5432
+    services:
+      postgres:
+        image: postgres-latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 1234
+          POSTGRES_DB: irangard
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -25,12 +59,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    
-    - name : env file
-      run : |
-        touch Irangard/Irangard/.env && printf "export DEBUG=True\nexport SECRET_KEY='django-insecure-g&@l9t5+dmgmtyi7p=@quy8h&+%@pgsb1v&0njdsfd@q6=w1gs'\nexport DB_PASSWORD='1234'\nexport WEBSITE_URL='http://127.0.0.1:8000'\nexport EMAIL_ID='irangard.se@gmail.com'\nexport EMAIL_PW='wfxwebonohrrbatv'\nexport DB_HOST='localhost'\nexport DB_NAME='dbirangard'\nexport DB_USER='postgres'" >> Irangard/Irangard/.env 
-    - name : see .env
-      run : cat Irangard/Irangard/.env
     - name: Run Tests
+      env:
+        DB: ${{ matrix.db }}
+        DB_HOST: 127.0.0.1
+        DB_PORT: ${{ matrix.db_port }}
+        DB_PASSWORD: 1234
       run: |
         pwd && ls && python Irangard/manage.py test
