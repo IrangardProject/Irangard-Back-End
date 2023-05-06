@@ -66,4 +66,4 @@ jobs:
         DB_PORT: ${{ matrix.db_port }}
         DB_PASSWORD: 1234
       run: |
-        pwd && ls && python Irangard/manage.py test
+        cd Irangard/ && ls && cat chat/tests/test_chat.py && python manage.py test
