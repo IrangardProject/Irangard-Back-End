@@ -68,7 +68,8 @@ INSTALLED_APPS = [
     'events',
     'emails',
     'django_crontab',
-    'suggestion'
+    'suggestion',
+    'place_trivia',
 ]
 
 CRONJOBS = [

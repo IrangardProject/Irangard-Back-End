@@ -51,6 +51,7 @@ urlpatterns = [
     path('tours/', include('tours.urls'), name='tours'),
     path('events/', include('events.urls'), name='events'),
     path('suggestion/', include('suggestion.urls'), name='suggestion'),
+    path('place_trivia/', include('place_trivia.urls'), name='place_trivia'),
     path('swagger/', schema_view.with_ui('swagger',
                                          cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc',
