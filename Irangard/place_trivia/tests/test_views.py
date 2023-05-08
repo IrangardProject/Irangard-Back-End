@@ -75,7 +75,7 @@ class PlaceTriviaViewTestcase(TestCase):
         self.event3 = self.make_event('Mazandaran', 'Qaemshahr')    
     
     
-    def get_place_trivia(self):
+    def test_get_place_trivia(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_json = response.json()
@@ -84,7 +84,7 @@ class PlaceTriviaViewTestcase(TestCase):
         self.assertIn('places', response_json.keys())
 
     
-    def get_place_trivia_province_filter(self):
+    def test_get_place_trivia_province_filter(self):
         response = self.client.get(self.url + 'province/Tehran/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn(response.data, 'tours')
@@ -101,7 +101,7 @@ class PlaceTriviaViewTestcase(TestCase):
             self.assertEqual(event.province, 'Tehran')
     
     
-    def get_place_trivia_city_filter(self):
+    def test_get_place_trivia_city_filter(self):
         response = self.client.get(self.url + 'city/Tehran/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn(response.data, 'tours')
