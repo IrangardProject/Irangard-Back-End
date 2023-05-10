@@ -75,7 +75,9 @@ class TourViewSetTestCase(TestCase):
             "remaining": 50,
             "start_date": "2022-05-22T15:49:49.505Z",
             "end_date": "2022-05-28T15:49:49.505Z",
-            "tour_type": "0"
+            "tour_type": "0",
+            "province": "Tehran",
+            "city": "Tehran"
         }
         
         self.data_1 ={
@@ -85,15 +87,14 @@ class TourViewSetTestCase(TestCase):
             "remaining": 50,
             "start_date": "2022-05-15T15:49:49.505Z",
             "end_date": "2022-05-23T15:49:49.505Z",
-            "tour_type": "1"
+            "tour_type": "1",
+            "province": "Tehran",
+            "city": "Tehran"
         }
 
         self.tour = Tour.objects.create(**self.data, owner=self.special_user)
         self.tour1 = Tour.objects.create(**self.data_1, owner=self.special_user)
         self.tour2 = Tour.objects.create(**self.data_1, owner=self.special_user)
-        self.tour.save()
-        self.tour1.save()
-        self.tour2.save()
         
         
     def normal_user_client(self):
@@ -210,6 +211,20 @@ class TourViewSetTestCase(TestCase):
             self.data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+    
+    # def test_tour_delete(self):
+    #     token = self.login(self.user.username, 'emad1234')
+    #     self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+    #     print(Tour.objects.get(pk=self.tour.pk))
+    #     url = f"{self.url}{self.tour.id}/"
+    #     print(url)
+    #     response = self.client.delete(url)
+    #     response1 = self.client.get(url)
+    #     print(response.content)
+    #     print(response.headers)
+    #     print(response1.content)
+    #     print(response1.headers)
+    #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_tour_delete_not_owner(self):
         data = {"title":"test_title"}

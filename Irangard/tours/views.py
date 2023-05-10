@@ -81,12 +81,12 @@ class TourViewSet(ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    def destroy(self, request, *args, **kwargs):
-        try:
-            super().destroy(request, request)
-            return Response('tour deleted', status=status.HTTP_204_NO_CONTENT)
-        except Exception as error:
-            return Response(f"{error}", status=status.HTTP_400_BAD_REQUEST)
+    # def destroy(self, request, *args, **kwargs):
+    #     try:
+    #         super().destroy(request, request)
+    #         return Response('tour deleted', status=status.HTTP_204_NO_CONTENT)
+    #     except Exception as error:
+    #         return Response(f"{error}", status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'],
             permission_classes=[IsAuthenticated])
