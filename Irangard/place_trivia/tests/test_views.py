@@ -17,7 +17,9 @@ class PlaceTriviaViewTestcase(TestCase):
             "capacity": 50,
             "remaining": 50,
             "start_date": "2022-05-22T15:49:49.505Z",
-            "end_date": "2022-05-23T15:49:49.505Z"
+            "end_date": "2022-05-23T15:49:49.505Z",
+            "province": province,
+            "city": city
         }
         tour = Tour.objects.create(**data, owner=self.special_user)
         return tour
@@ -87,33 +89,35 @@ class PlaceTriviaViewTestcase(TestCase):
     def test_get_place_trivia_province_filter(self):
         response = self.client.get(self.url + 'province/Tehran/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn(response.data, 'tours')
-        self.assertIn(response.data, 'events')
-        self.assertIn(response.data, 'places')
+        response_json = response.json()
+        self.assertIn('tours', response_json.keys())
+        self.assertIn('events', response_json.keys())
+        self.assertIn('places', response_json.keys())
         
         for tour in response.data['tours']:
-            self.assertEqual(tour.province, 'Tehran')
+            self.assertEqual(tour["province"], 'Tehran')
         
         for place in response.data['places']:
-            self.assertEqual(place.contact.province, 'Tehran')
+            self.assertEqual(place["contact"]["province"], 'Tehran')
         
         for event in response.data['events']:
-            self.assertEqual(event.province, 'Tehran')
+            self.assertEqual(event["province"], 'Tehran')
     
     
     def test_get_place_trivia_city_filter(self):
         response = self.client.get(self.url + 'city/Tehran/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn(response.data, 'tours')
-        self.assertIn(response.data, 'events')
-        self.assertIn(response.data, 'places')
+        response_json = response.json()
+        self.assertIn('tours', response_json.keys())
+        self.assertIn('events', response_json.keys())
+        self.assertIn('places', response_json.keys())
 
         for tour in response.data['tours']:
-            self.assertEqual(tour.city, 'Tehran')
+            self.assertEqual(tour["city"], 'Tehran')
         
         for place in response.data['places']:
-            self.assertEqual(place.contact.city, 'Tehran')
+            self.assertEqual(place["contact"]["city"], 'Tehran')
         
         for event in response.data['events']:
-            self.assertEqual(event.city, 'Tehran')
+            self.assertEqual(event["city"], 'Tehran')
     
