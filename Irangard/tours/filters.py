@@ -6,8 +6,14 @@ class TourFilter(FilterSet):
     
     class Meta:
         model = Tour
-        fields = ['tour_type', 'start_date',
-                'end_date', 'cost']
+        fields = [
+            'tour_type', 
+            'start_date',
+            'end_date', 
+            'cost',
+            'province',
+            'city'
+        ]
         
         fields = {
             'title': ['contains'], 
@@ -15,4 +21,6 @@ class TourFilter(FilterSet):
             'start_date': ['lte', 'gte'],
             'end_date': ['lte', 'gte'],
             'cost': ['lte', 'gte'],
+            'city': ['exact'],
+            'province': ['exact'],
         }
