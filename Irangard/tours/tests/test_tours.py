@@ -28,6 +28,7 @@ class TourViewSetTestCase(TestCase):
         else:
             return "incorrect"
 
+
     def setUp(self):
         
         #create main super-user
@@ -73,9 +74,11 @@ class TourViewSetTestCase(TestCase):
             "cost": 200,
             "capacity": 50,
             "remaining": 50,
-            "start_date": "2022-05-22T15:49:49.505Z",
-            "end_date": "2022-05-28T15:49:49.505Z",
-            "tour_type": "0"
+            "start_date": "2030-05-22T15:49:49.505Z",
+            "end_date": "2030-05-28T15:49:49.505Z",
+            "tour_type": "0",
+            "province": "Tehran",
+            "city": "Tehran"
         }
         
         self.data_1 ={
@@ -83,17 +86,16 @@ class TourViewSetTestCase(TestCase):
             "cost": 400,
             "capacity": 50,
             "remaining": 50,
-            "start_date": "2022-05-15T15:49:49.505Z",
-            "end_date": "2022-05-23T15:49:49.505Z",
-            "tour_type": "1"
+            "start_date": "2030-05-15T15:49:49.505Z",
+            "end_date": "2030-05-23T15:49:49.505Z",
+            "tour_type": "1",
+            "province": "Tehran",
+            "city": "Tehran"
         }
 
         self.tour = Tour.objects.create(**self.data, owner=self.special_user)
         self.tour1 = Tour.objects.create(**self.data_1, owner=self.special_user)
         self.tour2 = Tour.objects.create(**self.data_1, owner=self.special_user)
-        self.tour.save()
-        self.tour1.save()
-        self.tour2.save()
         
         
     def normal_user_client(self):
@@ -113,9 +115,11 @@ class TourViewSetTestCase(TestCase):
 
         return client
 
+
     @classmethod
     def setUpTestData(cls):
         return super().setUpTestData()
+
 
     def test_tour_create(self):
 
@@ -123,6 +127,7 @@ class TourViewSetTestCase(TestCase):
             self.data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
         
     def test_tour_create_incorrect(self):
 
@@ -131,6 +136,7 @@ class TourViewSetTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_301_MOVED_PERMANENTLY)
 
+
     def test_tour_create_not_superuser(self):
 
         client = self.normal_user_client()
@@ -138,6 +144,7 @@ class TourViewSetTestCase(TestCase):
             self.data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
     def test_tour_create_not_given_title(self):
 
@@ -148,6 +155,7 @@ class TourViewSetTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+
     def test_tour_create_not_given_start_date(self):
         data = self.data.copy()
         data.pop('start_date')
@@ -155,6 +163,7 @@ class TourViewSetTestCase(TestCase):
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
     def test_tour_create_not_given_end_date(self):
         data = self.data.copy()
@@ -164,6 +173,7 @@ class TourViewSetTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+
     def test_tour_update(self):
         data = self.data.copy()
         data['title'] = 'test_title'
@@ -171,6 +181,7 @@ class TourViewSetTestCase(TestCase):
         response = self.client.put(self.url + f'{self.tour.id}/', json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
         
     def test_tour_update_incorrect_url(self):
         data = self.data.copy()
@@ -180,12 +191,14 @@ class TourViewSetTestCase(TestCase):
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+
     def test_tour_partial_update(self):
         data = {"title":"test_title"}
         response = self.client.put(self.url + f'{self.tour.id}/', json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
 
     def test_tour_update_not_owner(self):
         data = {"title":"test_title"}
@@ -196,6 +209,7 @@ class TourViewSetTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         
+
     def test_tour_update_incorrect_credentials(self):
         data = {"title":"test_title"}
         client = APIClient()
@@ -205,11 +219,13 @@ class TourViewSetTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    
     def test_tour_delete(self):
-        response = self.client.delete(self.url + f'{self.tour.id}/', json.dumps(
-            self.data, indent=4, sort_keys=True, default=str), content_type='application/json')
-
+        token = self.login(self.user.username, 'emad1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.delete(f"{self.url}{self.tour.id}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
 
     def test_tour_delete_not_owner(self):
         data = {"title":"test_title"}
@@ -220,6 +236,7 @@ class TourViewSetTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
     
+
     def test_tour_delete_incorrect_credentials(self):
         data = {"title":"test_title"}
         client = APIClient()
@@ -229,6 +246,7 @@ class TourViewSetTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         
+
     def test_tour_delete_incorrect_url(self):
         data = {"title":"test_title"}
         client = APIClient()
