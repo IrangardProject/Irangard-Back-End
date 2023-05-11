@@ -1,10 +1,9 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 from places.models import Contact, Place
 from tours.models import Tour
 from events.models import Event
 from accounts.models import SpecialUser, User
 from rest_framework.test import APIClient
-from django.urls import reverse
 from rest_framework import status
 
 
