@@ -9,7 +9,8 @@ class EventFilter(FilterSet):
     class Meta:
         model = Event
         fields = ['province', 'city', 'event_type', 'event_category', 
-                'title', 'start_date', 'end_date', 'is_free']
+                'title', 'start_date', 'end_date', 'is_free',
+                'added_by__username', 'added_by__id']
         
         
         fields = {
@@ -20,7 +21,9 @@ class EventFilter(FilterSet):
             'end_date': ['lte', 'gte'],
             'is_free': ['exact'],
             'province': ['exact'],
-            'city': ['exact']
+            'city': ['exact'],
+            'added_by__username': ['exact'],
+            'added_by__id': ['exact']
         }
     
     
