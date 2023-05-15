@@ -7,6 +7,8 @@ from accounts.models import User
 from emails.models import EmailQueue
 from utils.constants import EVENT_CATEGORIES, EVENT_TYPES
 from django.utils.timezone import utc
+from utils.constants import StatusMode
+
 
 class Event(models.Model):
     event_type = models.CharField(
@@ -33,6 +35,7 @@ class Event(models.Model):
     phone = models.CharField(max_length=11, blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     views = models.PositiveIntegerField(default=0)
+    status = models.CharField(max_length=2, choices=StatusMode.choices, default=StatusMode.PENDING)
     # cost = models.IntegerField(default=0)
     # have_capacity = models.BooleanField(default=False, blank=True)
     # capacity = models.IntegerField(default=-1)
