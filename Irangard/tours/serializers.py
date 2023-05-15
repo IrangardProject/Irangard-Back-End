@@ -34,7 +34,10 @@ class TourSerializer(serializers.ModelSerializer):
         model = Tour
         fields = '__all__'
         extra_fields = ('is_booked')
-
+        extra_kwargs = {
+            'status': {'read_only': True},
+        }
+    
     def create(self, validated_data):
         validated_data['owner_id'] = self.context.get("owner")
         return super().create(validated_data)
