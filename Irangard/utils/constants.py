@@ -1,3 +1,6 @@
+from django.db import models
+
+
 EVENT_CATEGORIES = [
         ('0', 'هنری'),
         ('1', 'علمی'),
@@ -44,3 +47,8 @@ EMAIL_STATES = [
         ("1", "sent"),
         ("2", "idle")
 ]
+
+class StatusMode(models.TextChoices):
+        ACCEPTED = 'AC'
+        DENIED = 'DN'
+        PENDING = 'PN'
