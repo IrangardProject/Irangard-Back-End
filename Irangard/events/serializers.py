@@ -29,8 +29,11 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = '__all__'
+        extra_kwargs = {
+            'status': {'read_only': True},
+        }
         
-
+    
     def create(self, validated_data):
         request = self.context.get("request")
         validated_data['added_by'] = request.user
