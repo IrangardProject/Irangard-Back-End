@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 
 from emails.models import EmailQueue
 from utils.constants import TOUR_TYPES
+from utils.constants import StatusMode
 
 
 class Tour(models.Model):
@@ -31,6 +32,7 @@ class Tour(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     province = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
+    status = models.CharField(max_length=2, choices=StatusMode.choices, default=StatusMode.PENDING)
     
     def __str__(self):
         return self.title
