@@ -28,6 +28,14 @@ class TourViewSetTestCase(TestCase):
         else:
             return "incorrect"
 
+    
+    def make_admin_user(self, username, password, email):
+        user = User.objects.create_user(username, email, password)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
+        return user
+    
 
     def setUp(self):
         
@@ -93,11 +101,13 @@ class TourViewSetTestCase(TestCase):
             "city": "Tehran"
         }
 
-        self.tour = Tour.objects.create(**self.data, owner=self.special_user)
-        self.tour1 = Tour.objects.create(**self.data_1, owner=self.special_user)
-        self.tour2 = Tour.objects.create(**self.data_1, owner=self.special_user)
+        self.tour = Tour.objects.create(**self.data, owner=self.special_user, status=StatusMode.ACCEPTED)
+        self.tour1 = Tour.objects.create(**self.data_1, owner=self.special_user, status=StatusMode.ACCEPTED)
+        self.tour2 = Tour.objects.create(**self.data_1, owner=self.special_user, status=StatusMode.ACCEPTED)
+        self.pending_tour = Tour.objects.create(**self.data, owner=self.special_user)
         
-        
+        self.admin_user = self.make_admin_user("admin", "123456", "admin@gmail.com")  
+    
     def normal_user_client(self):
         user = User.objects.create(
             email="emad@gmail.com",
@@ -128,6 +138,18 @@ class TourViewSetTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    
+    def test_tour_create_ignore_status_field(self):
+        data = self.data.copy()
+        data["status"] = StatusMode.ACCEPTED
+        data["title"] = "from test_tour_create_ignore_status_field"
+        response = self.client.post(self.url, json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_tour = Tour.objects.get(title="from test_tour_create_ignore_status_field")
+        self.assertEqual(new_tour.status, StatusMode.PENDING)
+        
         
     def test_tour_create_incorrect(self):
 
@@ -181,6 +203,18 @@ class TourViewSetTestCase(TestCase):
         response = self.client.put(self.url + f'{self.tour.id}/', json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+    
+    def test_tour_update_ignore_status_field(self):
+        data = self.data.copy()
+        data['title'] = 'test_title'
+        data['cost'] = 100
+        data["status"] = StatusMode.DENIED
+        response = self.client.put(self.url + f'{self.tour.id}/', json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.tour.refresh_from_db()
+        self.assertEqual(self.tour.status, StatusMode.ACCEPTED)
 
         
     def test_tour_update_incorrect_url(self):
@@ -366,3 +400,47 @@ class TourViewSetTestCase(TestCase):
         new_email_queue = EmailQueue.objects.count()
         self.assertEqual(new_email_queue - email_queue_count, 1)
         self.assertEqual(EmailQueue.objects.all().last().state, '0')
+    
+    
+    def test_correct_accept_tour_admin_user(self):
+        token = self.login(self.admin_user.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.put(f"{self.url}{self.pending_tour.pk}/admin_acceptance/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.pending_tour.refresh_from_db()
+        self.assertEqual(self.pending_tour.status, StatusMode.ACCEPTED)
+    
+    
+    def test_incorrect_accept_tour_without_token(self):
+        client = APIClient()
+        response = client.put(f"{self.url}{self.pending_tour.pk}/admin_acceptance/")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    
+    
+    def test_incorrect_accept_tour_normal_user_token(self):
+        token = self.login(self.user.username, 'emad1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.put(f"{self.url}{self.pending_tour.pk}/admin_acceptance/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        
+    
+    def test_correct_deny_tour_admin_user(self):
+        token = self.login(self.admin_user.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.put(f"{self.url}{self.pending_tour.pk}/admin_denial/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.pending_tour.refresh_from_db()
+        self.assertTrue(self.pending_tour.status, StatusMode.ACCEPTED)
+    
+    
+    def test_incorrect_deny_tour_without_token(self):
+        client = APIClient()
+        response = client.put(f"{self.url}{self.pending_tour.pk}/admin_denial/")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    
+    
+    def test_incorrect_deny_tour_normal_user_token(self):
+        token = self.login(self.user.username, 'emad1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.put(f"{self.url}{self.pending_tour.pk}/admin_denial/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
