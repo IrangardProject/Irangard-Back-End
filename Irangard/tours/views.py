@@ -46,9 +46,9 @@ class TourViewSet(ModelViewSet):
         return context
 
 
-    @method_decorator(cache_page(CACHE_TTL))
-    def list(self, request, *args, **kwargs):
-      return super().list(self, request, *args, **kwargs)
+    # @method_decorator(cache_page(CACHE_TTL))
+    # def list(self, request, *args, **kwargs):
+    #   return super().list(self, request, *args, **kwargs)
 
     # @method_decorator(cache_page(CACHE_TTL))
     # @method_decorator(vary_on_cookie)

@@ -13,8 +13,8 @@ class TourFilter(FilterSet):
             'cost',
             'province',
             'city',
-            'owner__username',
-            'owner__id'
+            'owner__user__username',
+            'owner__user__id',
         ]
         
         fields = {
@@ -25,6 +25,6 @@ class TourFilter(FilterSet):
             'cost': ['lte', 'gte'],
             'city': ['exact'],
             'province': ['exact'],
-            'owner__username': ['exact'],
-            'owner__id': ['exact'],
+            'owner__user__username': ['exact'],
+            'owner__user__id': ['exact'],
         }
