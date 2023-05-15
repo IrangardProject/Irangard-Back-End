@@ -12,7 +12,8 @@ class PlaceFilter(FilterSet):
     class Meta:
         model = Place
         fields = ['province', 'city', 'place_type', 'is_free', 
-                'features__title', 'rooms__capacity']
+                'features__title', 'rooms__capacity',
+                'added_by__username', 'added_by__id']
         
         fields = {
             'rooms__price': ['lte', 'gte'],
@@ -21,6 +22,8 @@ class PlaceFilter(FilterSet):
             'title': ['contains'],
             'place_type': ['exact'],
             'is_free': ['exact'],
+            'added_by__username': ['exact'], 
+            'added_by__id': ['exact']
         }
     
     def filter_by_tag(self, queryset, name, value):
