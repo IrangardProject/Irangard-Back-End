@@ -28,10 +28,11 @@ from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 from django.utils.decorators import method_decorator
 from Irangard.settings import CACHE_TTL
 from .filters import TourFilter
+from utils.constants import StatusMode
 
 
 class TourViewSet(ModelViewSet):
-    queryset = Tour.objects.filter(end_date__gte=timezone.now())
+    queryset = Tour.objects.filter(end_date__gte=timezone.now(), status=StatusMode.ACCEPTED)
     serializer_class = TourSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = TourFilter
@@ -250,6 +251,32 @@ class TourViewSet(ModelViewSet):
             return Response('user has booked', status=status.HTTP_200_OK)
         else:
             return Response('user has not booked', status=status.HTTP_400_BAD_REQUEST)
+        
+    
+    @action(detail=True, methods=['put'], permission_classes=[IsAdminUser])
+    def admin_acceptance(self, request, pk=None):
+        tour = get_object_or_404(Tour, pk=pk)
+        if tour.status == StatusMode.ACCEPTED:
+            message = f"The tour with ID {pk}, was already in accepted status."
+            return Response(status=status.HTTP_200_OK, data={"message": message})
+        
+        tour.status = StatusMode.ACCEPTED
+        tour.save()
+        message = f"The tour with ID {pk}, is now in accepted status."
+        return Response(data={"message": message}, status=status.HTTP_200_OK)
+    
+    
+    @action(detail=True, methods=['put'], permission_classes=[IsAdminUser])
+    def admin_denial(self, request, pk=None):
+        tour = get_object_or_404(Tour, pk=pk)
+        if tour.status == StatusMode.DENIED:
+            message = f"The tour with ID {pk}, was already in denied status."
+            return Response(status=status.HTTP_200_OK, data={"message": message})
+        
+        tour.status = StatusMode.ACCEPTED
+        tour.save()
+        message = f"The tour with ID {pk}, is now in denied status."
+        return Response(data={"message": message}, status=status.HTTP_200_OK)
 
 
 class RecommendedTourListView(ListAPIView):
