@@ -1,5 +1,5 @@
 from django.test import TestCase
-
+from utils.constants import StatusMode
 from emails.models import EmailQueue
 from ..models import Event, Tag, Image
 from accounts.models import User
@@ -43,7 +43,8 @@ class EventTestcase(TestCase):
             end_date='2022-05-23', start_time='00:00:00', end_time='00:00:00',
             added_by=self.user, address='test address', is_free=True,
             province='تهران', city='تهران', website='www.org.com', 
-            phone='09109530195')
+            phone='09109530195'
+        )
         
     
     def test_title(self):
@@ -126,9 +127,14 @@ class EventTestcase(TestCase):
         self.assertEqual(event.website, "www.org.com")
     
     
-    def test_city(self):
+    def test_phone(self):
         event = Event.objects.get(title="test event")
         self.assertEqual(event.phone, "09109530195")
+    
+    
+    def test_status(self):
+        event = Event.objects.get(title="test event")
+        self.assertEqual(event.status, StatusMode.PENDING)
         
 
 class TagTestCase(TestCase):
