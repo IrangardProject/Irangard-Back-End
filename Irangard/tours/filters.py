@@ -12,7 +12,9 @@ class TourFilter(FilterSet):
             'end_date', 
             'cost',
             'province',
-            'city'
+            'city',
+            'owner__username',
+            'owner__id'
         ]
         
         fields = {
@@ -23,4 +25,6 @@ class TourFilter(FilterSet):
             'cost': ['lte', 'gte'],
             'city': ['exact'],
             'province': ['exact'],
+            'owner__username': ['exact'],
+            'owner__id': ['exact'],
         }
