@@ -1,7 +1,7 @@
 from django.db import models
 from accounts.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
-
+from utils.constants import StatusMode
 
 class Place(models.Model):
     PlaceTypes = [
@@ -149,14 +149,7 @@ class Hours(models.Model):
         return f"{self.place.title}: {self.day} {self.start_time}-{self.end_time}"
     
 
-class PlaceStatus(models.Model):
-    
-    class StatusMode(models.TextChoices):
-        ACCEPTED = 'AC'
-        DENIED = 'DN'
-        PENDING = 'PN'
-        
-        
+class PlaceStatus(models.Model):    
     place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name="claimed_owners")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="claimed_places")
     status = models.CharField(max_length=2, choices=StatusMode.choices, default=StatusMode.PENDING)
