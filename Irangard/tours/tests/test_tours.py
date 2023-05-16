@@ -444,3 +444,23 @@ class TourViewSetTestCase(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.put(f"{self.url}{self.pending_tour.pk}/admin_denial/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    
+    def test_correct_get_pending_tours_admin_user(self):
+        token = self.login(self.admin_user.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(f"{self.url}pending_tours/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for tour in response.data:
+            self.assertEqual(tour["status"], StatusMode.PENDING)
+
+    
+    def test_incorrect_get_pending_tours_without_token(self):
+        client = APIClient()
+        response = client.get(f"{self.url}pending_tours/")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+    
+    def test_incorrect_get_pending_tours_normal_user(self):
+        response = self.client.get(f"{self.url}pending_tours/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
