@@ -1,12 +1,10 @@
 from datetime import datetime, timezone
-from django.core.mail import EmailMessage
 from django.db import models
 from django.template.loader import render_to_string
 from Irangard import settings
 from accounts.models import User
 from emails.models import EmailQueue
 from utils.constants import EVENT_CATEGORIES, EVENT_TYPES
-from django.utils.timezone import utc
 from utils.constants import StatusMode
 
 
