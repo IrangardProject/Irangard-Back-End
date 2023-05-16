@@ -19,6 +19,7 @@ class User(AbstractUser):
     get_notified = models.BooleanField(default=True)
     favorite_event_types = MultiSelectField(choices=EVENT_TYPES, blank=True, null=True)
     favorite_tour_types = MultiSelectField(choices=TOUR_TYPES, blank=True, null=True)
+    wallet_credit = models.BigIntegerField(null=True, default=0)
 
     def follows(self, user):
         return user in self.following.all()
@@ -29,6 +30,18 @@ class User(AbstractUser):
 
     def update_following_no(self):
         self.following_number = self.following.count()
+        self.save()
+
+    def increase_wallet_credit(self, amount):
+        amount = int(amount)
+        self.wallet_credit += amount ;
+        self.save()
+
+    def decrease_wallet_credit(self, amount):
+        amount = int(amount)
+        if self.wallet_credit < amount:
+            raise Exception
+        self.wallet_credit -= amount
         self.save()
 
 
@@ -80,6 +93,7 @@ class StagedPayments(models.Model):
         User, on_delete=models.CASCADE, related_name='staged_payments_info')
     transaction_id = models.CharField(max_length=50)
     order_id = models.CharField(max_length=50)
+    amount = models.BigIntegerField(null=True)
 
     def __str__(self):
         return self.user.username

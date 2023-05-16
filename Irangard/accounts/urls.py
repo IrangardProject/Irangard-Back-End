@@ -23,6 +23,7 @@ router.register('auth', AccountAuthViewSet,
 router.register('pay',PayViewSet , basename='accounts-pay')
 router.register('admin', AdminViewSet, basename='accounts-admin')
 router.register('special-users', SpecialUserViewSet, basename='special-users')
+router.register('wallet', WalletViewSet, basename='wallet')
 router.register('', FollowViewSet)
 
 urlpatterns = [
