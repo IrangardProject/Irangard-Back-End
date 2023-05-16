@@ -20,7 +20,7 @@ from .serializers import ChatSerializer, MessageSerializer, MessageRoomSerialize
 class ChatViewSet(ModelViewSet):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
-    permission_classes = IsAuthenticated
+    permission_classes = [IsAuthenticated,]
 
     @action(
         detail=False,

@@ -13,11 +13,12 @@ class ChatTestCase(TestCase):
         self.client = APIClient()
         self.url = 'http://127.0.0.1:8000/chat/'
         self.user = self.make_user(username='test human', password='123456', email='test@gmail.com')
-        token = self.login(self.user.username, self.user.password)
+        self.token = self.login(self.user.username, self.user.password)
         # self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         self.chat = Chat.objects.create(sender=self.user, message='This is a text', 
                             room_name='room', sender_type='SERVER')
-    
+        token = self.login(self.user.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
 
     def login(self, username, password):
         url = reverse('accounts:accounts-jwt-create')
