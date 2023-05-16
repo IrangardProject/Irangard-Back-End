@@ -107,3 +107,11 @@ class EventViewSet(ModelViewSet):
         event.save()
         message = f"The event with ID {pk}, is now in denied status."
         return Response(data={"message": message}, status=status.HTTP_200_OK)
+    
+    
+    @action(detail=False, methods=['GET'], permission_classes=[IsAdminUser])
+    def pending_events(self, request):
+        pending_events = Event.objects.filter(status=StatusMode.PENDING)
+        serialized_data = self.get_serializer(pending_events, many=True)
+        return Response(serialized_data.data)
+    
