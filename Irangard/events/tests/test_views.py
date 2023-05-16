@@ -13,6 +13,7 @@ from django.utils.dateparse import parse_date
 import datetime
 from utils.constants import StatusMode
 
+
 class EventViewsTestcase(TestCase):
     
     def make_user(self, username, password, email):
@@ -356,4 +357,25 @@ class EventViewsTestcase(TestCase):
         token = self.login(self.user.username, '123456')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.put(f"{self.url}{self.event_not_active.pk}/admin_denial/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    
+    def test_correct_get_pending_events_admin_user(self):
+        token = self.login(self.admin_user.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(f"{self.url}pending_events/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for event in response.data:
+            self.assertEqual(event["status"], StatusMode.PENDING)
+
+    
+    def test_incorrect_get_pending_events_without_token(self):
+        response = self.client.get(f"{self.url}pending_events/")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+    
+    def test_incorrect_get_pending_events_normal_user(self):
+        token = self.login(self.user.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(f"{self.url}pending_events/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
