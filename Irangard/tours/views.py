@@ -277,6 +277,13 @@ class TourViewSet(ModelViewSet):
         tour.save()
         message = f"The tour with ID {pk}, is now in denied status."
         return Response(data={"message": message}, status=status.HTTP_200_OK)
+    
+    
+    @action(detail=False, methods=['GET'], permission_classes=[IsAdminUser])
+    def pending_tours(self, request):
+        pending_tours = Tour.objects.filter(status=StatusMode.PENDING)
+        serialized_data = self.get_serializer(pending_tours, many=True)
+        return Response(serialized_data.data)
 
 
 class RecommendedTourListView(ListAPIView):
