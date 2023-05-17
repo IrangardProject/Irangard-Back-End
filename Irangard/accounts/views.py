@@ -127,7 +127,7 @@ class WalletViewSet(GenericViewSet):
             "amount": amount,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
-            "callback": "http://localhost:8000/accounts/wallet/increase/verify/"
+            "callback": "https://api.quilco.ir/accounts/wallet/increase/verify/"
         }
 
         my_headers = {"Content-Type": "application/json",

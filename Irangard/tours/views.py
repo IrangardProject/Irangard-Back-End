@@ -114,6 +114,38 @@ class TourViewSet(ModelViewSet):
 
     @action(detail=True, methods=['post'],
             permission_classes=[IsAuthenticated])
+    def book_with_wallet(self, request, *args, **kwargs):
+        tour = self.get_object()
+        user = request.user
+        cost = tour.cost
+        if tour.booked(user):
+            return Response('Already booked', status=status.HTTP_400_BAD_REQUEST)
+        if tour.capacity < 1:
+            return Response("there's no reservation available", status=status.HTTP_400_BAD_REQUEST)
+
+        if ('discount_code_code' in request.data):
+            try:
+                discount_code = tour.discount_codes.get(code=request.data['discount_code_code'])
+                if (discount_code.expire_date < timezone.now()):
+                    return Response('discount code has expired', status=status.HTTP_400_BAD_REQUEST)
+                cost = cost - cost * (discount_code.off_percentage / 100)
+            except DiscountCode.DoesNotExist:
+                return Response('discount_code does not exist', status=status.HTTP_400_BAD_REQUEST)
+
+        if user.wallet_credit < cost:
+            return Response('not enough credit', status=status.HTTP_400_BAD_REQUEST)
+
+        tour.owner.deposit(cost)
+        Transaction.objects.create(
+            tour=tour, sender=user, cost=cost, date=datetime.now())
+        tour.update_revenue(cost)
+        tour.bookers.add(user)
+        tour.update_remaining()
+        tour.save()
+        return Response('user added to tour', status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'],
+            permission_classes=[IsAuthenticated])
     def book(self, request, *args, **kwargs):
         tour = self.get_object()
         user = request.user
