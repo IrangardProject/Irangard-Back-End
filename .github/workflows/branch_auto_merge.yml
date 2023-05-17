@@ -1,16 +1,1 @@
-name: Merge any branch to master
-on: [push]
-jobs:
-  merge-branch:
-    permissions: write-all
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
 
-      - name: Merge any branch -> master
-        uses: devmasx/merge-branch@master
-        with:
-          type: now
-          target_branch: master
-          message: Merge release branch into master
-          github_token: ${{ secrets.GITHUB_TOKEN }}
