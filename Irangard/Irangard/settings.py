@@ -73,7 +73,7 @@ INSTALLED_APPS = [
 ]
 
 CRONJOBS = [
-    ('*/2 * * * *', 'emails.cron.email_send_cronjob')
+    ('2 * * * *', 'emails.cron.email_send_cronjob')
 ]
 
 ALLOWED_HOSTS=['*']
