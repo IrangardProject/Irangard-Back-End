@@ -7,5 +7,10 @@ jobs:
     permissions: write-all
     runs-on: self-hosted
     steps:
+    - uses: actions/checkout@v3
     - name : test commands
-      run: cd /home/ubuntu/Irangard_Backend/ && git pull && sudo systemctl daemon-reload && sudo systemctl restart gunicorn && sudo systemctl restart nginx
+      run: cd /home/ubuntu/Irangard_Backend/ |
+        git pull |
+        sudo systemctl daemon-reload |
+        sudo systemctl restart gunicorn |
+        sudo systemctl restart nginx
