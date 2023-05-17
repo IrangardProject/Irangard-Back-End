@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
   deploy:
+    permissions: write-all
     runs-on: self-hosted
     steps:
     - name : test commands
