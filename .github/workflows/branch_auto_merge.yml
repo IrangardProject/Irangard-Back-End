@@ -1,8 +1,5 @@
 name: Merge any branch to master
-on:
-  push:
-    branches:
-      - '*'
+on: [push]
 jobs:
   merge-branch:
     permissions: write-all
@@ -15,4 +12,5 @@ jobs:
         with:
           type: now
           target_branch: master
+          message: Merge release branch into master
           github_token: ${{ secrets.GITHUB_TOKEN }}
