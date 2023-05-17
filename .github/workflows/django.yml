@@ -36,6 +36,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
   build-and-test:
+    needs: merge-branch
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
