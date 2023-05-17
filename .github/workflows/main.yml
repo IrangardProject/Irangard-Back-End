@@ -6,5 +6,5 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
-      - name : test commands
-      - run: pwd && ls -la && cd /home/ubuntu/Irangard_Backend/ && git status
+    - name : test commands
+    - run: pwd && ls -la && cd /home/ubuntu/Irangard_Backend/ && git status
