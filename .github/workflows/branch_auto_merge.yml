@@ -1,4 +1,4 @@
-name: Merge any release branch to uat
+name: Merge any release branch to master
 on:
   push:
     branches:
