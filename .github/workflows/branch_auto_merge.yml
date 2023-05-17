@@ -1,4 +1,4 @@
-name: Merge any release branch to master
+name: Merge any branch to master
 on:
   push:
     branches:
