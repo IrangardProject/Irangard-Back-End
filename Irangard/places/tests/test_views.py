@@ -1,6 +1,8 @@
 from django.test import TestCase, Client
 from rest_framework import status
 from django.urls import reverse
+
+from utils.constants import ActionDimondExchange
 from ..models import *
 from accounts.models import User
 from email.mime import image
@@ -64,6 +66,7 @@ class PlaceViewsTestCase(TestCase):
         
         token = self.login(self.user.username, 'gh1234')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        user_dimonds_before_adding_place = self.user.dimonds
         
         working_hours = [
             {
@@ -127,6 +130,10 @@ class PlaceViewsTestCase(TestCase):
 
         response = self.client.post(self.url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.user.refresh_from_db()
+        self.assertEqual(user_dimonds_before_adding_place + ActionDimondExchange.ADDING_PLACE, 
+                        self.user.dimonds
+                    )
         
     def test_incorrect_post_place_without_token(self):
         

@@ -12,7 +12,7 @@ from .serializers import EventSerializer
 from .permissions import EventPermission
 from .filters import EventFilter
 from django.utils import timezone
-from utils.constants import StatusMode
+from utils.constants import StatusMode, ActionDimondExchange
 
 
 class EventViewSet(ModelViewSet):
@@ -91,6 +91,9 @@ class EventViewSet(ModelViewSet):
         
         event.status = StatusMode.ACCEPTED
         event.save()
+        user = event.added_by
+        user.dimonds += ActionDimondExchange.ADDING_EVENT
+        user.save()
         message = f"The event with ID {pk}, is now in accepted status."
         return Response(data={"message": message}, status=status.HTTP_200_OK)
     

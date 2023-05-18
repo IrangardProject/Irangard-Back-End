@@ -11,7 +11,7 @@ import base64
 import json
 from django.utils.dateparse import parse_date
 import datetime
-from utils.constants import StatusMode
+from utils.constants import StatusMode, ActionDimondExchange
 
 
 class EventViewsTestcase(TestCase):
@@ -319,12 +319,17 @@ class EventViewsTestcase(TestCase):
     
     
     def test_correct_accept_event_admin_user(self):
+        user_dimond_before_activate = self.event_not_active.added_by.dimonds
         token = self.login(self.admin_user.username, '123456')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.put(f"{self.url}{self.event_not_active.pk}/admin_acceptance/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.event_not_active.refresh_from_db()
         self.assertEqual(self.event_not_active.status, StatusMode.ACCEPTED)
+        self.assertEqual(user_dimond_before_activate + ActionDimondExchange.ADDING_EVENT, 
+                        self.event_not_active.added_by.dimonds
+                    )
+        
     
     
     def test_incorrect_accept_event_without_token(self):

@@ -52,3 +52,12 @@ class StatusMode(models.TextChoices):
         ACCEPTED = 'AC'
         DENIED = 'DN'
         PENDING = 'PN'
+
+
+class ActionDimondExchange():
+        WRITING_EXPERIENCE = 100
+        ATTENDG_IN_TOUR = 100
+        ORGANIZING_TOUR = 250
+        ADDING_PLACE = 50
+        ADDING_EVENT = 50
+        
