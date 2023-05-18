@@ -141,3 +141,12 @@ class DiscountCode(models.Model):
     def is_owner(self, user):
         return self.tour.owner.user == user
 
+
+class Video(models.Model):
+    tour = models.ForeignKey(
+        Tour, related_name='images', on_delete=models.CASCADE)
+    video = models.FileField(upload_to='videos/tours')
+    upload_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.pk} {self.tour}'
