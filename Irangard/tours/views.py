@@ -28,7 +28,7 @@ from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 from django.utils.decorators import method_decorator
 from Irangard.settings import CACHE_TTL
 from .filters import TourFilter
-from utils.constants import StatusMode
+from utils.constants import StatusMode, ActionDimondExchange
 
 
 class TourViewSet(ModelViewSet):
@@ -262,6 +262,9 @@ class TourViewSet(ModelViewSet):
         
         tour.status = StatusMode.ACCEPTED
         tour.save()
+        user = tour.owner.user
+        user.dimonds += ActionDimondExchange.ORGANIZING_TOUR
+        user.save()
         message = f"The tour with ID {pk}, is now in accepted status."
         return Response(data={"message": message}, status=status.HTTP_200_OK)
     
