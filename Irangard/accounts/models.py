@@ -20,6 +20,8 @@ class User(AbstractUser):
     favorite_event_types = MultiSelectField(choices=EVENT_TYPES, blank=True, null=True)
     favorite_tour_types = MultiSelectField(choices=TOUR_TYPES, blank=True, null=True)
     wallet_credit = models.BigIntegerField(null=True, default=0)
+    dimonds = models.IntegerField(default=0)
+    
 
     def follows(self, user):
         return user in self.following.all()
@@ -42,6 +44,18 @@ class User(AbstractUser):
         if self.wallet_credit < amount:
             raise Exception
         self.wallet_credit -= amount
+        self.save()
+
+    def increase_dimonds(self, amount):
+        amount = int(amount)
+        self.dimonds += amount
+        self.save()
+        
+    def decrease_dimonds(self, amount):
+        amount = int(amount)
+        if self.dimonds < amount:
+            raise Exception
+        self.dimonds -= amount
         self.save()
 
 
