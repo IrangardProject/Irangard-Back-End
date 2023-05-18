@@ -1,5 +1,7 @@
 from email.mime import image
 from django.test import TestCase
+
+from utils.constants import ActionDimondExchange
 from ..models import Experience
 from places.models import Place
 from accounts.models import User
@@ -74,7 +76,7 @@ class ExperienceTestCase(TestCase):
         token = self.login(self.user.username, 'mo1234')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         image = self.temporary_image("test.jpg")
-        
+        user_dimonds_before_adding_exp = self.user.dimonds
         data = {
             "title": "new experience",
             "image": image,
@@ -86,6 +88,11 @@ class ExperienceTestCase(TestCase):
 
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.user.refresh_from_db()
+        self.assertEqual(user_dimonds_before_adding_exp + ActionDimondExchange.WRITING_EXPERIENCE, 
+                        self.user.dimonds
+                    )
+        
         
     def test_incorrect_post_experience_without_token(self):
         

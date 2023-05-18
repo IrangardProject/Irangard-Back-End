@@ -2,6 +2,8 @@ from re import M
 from django.shortcuts import get_object_or_404, render
 from rest_framework.viewsets import ModelViewSet
 
+from utils.constants import ActionDimondExchange
+
 from .filters import ExperienceFilterSet
 from .pagination import ExperiencePagination
 from .serializers import *
@@ -41,6 +43,15 @@ class ExperienceViewSet(ModelViewSet):
 	@method_decorator(cache_page(CACHE_TTL))
 	def list(self, request, *args, **kwargs):
 		return super().list(self, request, *args, **kwargs)
+
+ 
+	def perform_create(self, serializer):
+		print("from perform create")
+		instance = serializer.save()
+		user = self.request.user
+		user.dimonds += ActionDimondExchange.WRITING_EXPERIENCE
+		user.save()
+
 
 	def retrieve(self, request, pk=None):
 		# Add field is_owner for retrieve method
