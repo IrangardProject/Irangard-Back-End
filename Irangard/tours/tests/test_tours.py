@@ -7,6 +7,8 @@ from django.urls import reverse
 from django.http import HttpRequest
 from rest_framework import permissions, status
 from rest_framework.response import Response
+
+from utils.constants import ActionDimondExchange
 from ..models import *
 from accounts.models import User, SpecialUser
 from datetime import datetime
@@ -204,6 +206,15 @@ class TourViewSetTestCase(TestCase):
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
+        
+    def test_pending_tour_update(self):
+        data = self.data.copy()
+        data['title'] = 'test_title'
+        data['cost'] = 100
+        response = self.client.put(self.url + f'{self.pending_tour.id}/', json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    
     
     def test_tour_update_ignore_status_field(self):
         data = self.data.copy()
@@ -403,12 +414,16 @@ class TourViewSetTestCase(TestCase):
     
     
     def test_correct_accept_tour_admin_user(self):
+        user_dimond_before_activate = self.pending_tour.owner.user.dimonds
         token = self.login(self.admin_user.username, '123456')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.put(f"{self.url}{self.pending_tour.pk}/admin_acceptance/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.pending_tour.refresh_from_db()
         self.assertEqual(self.pending_tour.status, StatusMode.ACCEPTED)
+        self.assertEqual(user_dimond_before_activate + ActionDimondExchange.ORGANIZING_TOUR, 
+                        self.pending_tour.owner.user.dimonds
+                    )
     
     
     def test_incorrect_accept_tour_without_token(self):

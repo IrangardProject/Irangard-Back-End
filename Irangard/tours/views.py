@@ -28,11 +28,11 @@ from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 from django.utils.decorators import method_decorator
 from Irangard.settings import CACHE_TTL
 from .filters import TourFilter
-from utils.constants import StatusMode
+from utils.constants import StatusMode, ActionDimondExchange
 
 
 class TourViewSet(ModelViewSet):
-    queryset = Tour.objects.filter(end_date__gte=timezone.now(), status=StatusMode.ACCEPTED)
+    queryset = Tour.objects.all()
     serializer_class = TourSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = TourFilter
@@ -40,15 +40,24 @@ class TourViewSet(ModelViewSet):
     permission_classes = [IsOwnerOrReadOnly]
     ordering_fields = ['date_created', 'start_date', 'cost']
 
+    
+    def get_queryset(self):
+        action = self.action
+        q =  self.queryset.filter(end_date__gte=timezone.now())
+        if action == 'list' or action == 'retrieve':
+            return q.filter(status=StatusMode.ACCEPTED)
+        return q
+    
+    
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['owner'] = self.request.user.id
         return context
 
 
-    @method_decorator(cache_page(CACHE_TTL))
-    def list(self, request, *args, **kwargs):
-      return super().list(self, request, *args, **kwargs)
+    # @method_decorator(cache_page(CACHE_TTL))
+    # def list(self, request, *args, **kwargs):
+    #   return super().list(self, request, *args, **kwargs)
 
     # @method_decorator(cache_page(CACHE_TTL))
     # @method_decorator(vary_on_cookie)
@@ -262,6 +271,9 @@ class TourViewSet(ModelViewSet):
         
         tour.status = StatusMode.ACCEPTED
         tour.save()
+        user = tour.owner.user
+        user.dimonds += ActionDimondExchange.ORGANIZING_TOUR
+        user.save()
         message = f"The tour with ID {pk}, is now in accepted status."
         return Response(data={"message": message}, status=status.HTTP_200_OK)
     
@@ -273,7 +285,7 @@ class TourViewSet(ModelViewSet):
             message = f"The tour with ID {pk}, was already in denied status."
             return Response(status=status.HTTP_200_OK, data={"message": message})
         
-        tour.status = StatusMode.DENIED
+        tour.status = StatusMode.ACCEPTED
         tour.save()
         message = f"The tour with ID {pk}, is now in denied status."
         return Response(data={"message": message}, status=status.HTTP_200_OK)
