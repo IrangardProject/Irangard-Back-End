@@ -102,7 +102,7 @@ class EventViewSet(ModelViewSet):
             message = f"The event with ID {pk}, was already in denied status."
             return Response(status=status.HTTP_200_OK, data={"message": message})
         
-        event.status = StatusMode.ACCEPTED
+        event.status = StatusMode.DENIED
         event.save()
         message = f"The event with ID {pk}, is now in denied status."
         return Response(data={"message": message}, status=status.HTTP_200_OK)
