@@ -32,7 +32,7 @@ from utils.constants import StatusMode, ActionDimondExchange
 
 
 class TourViewSet(ModelViewSet):
-    queryset = Tour.objects.filter(end_date__gte=timezone.now(), status=StatusMode.ACCEPTED)
+    queryset = Tour.objects.all()
     serializer_class = TourSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = TourFilter
@@ -40,6 +40,15 @@ class TourViewSet(ModelViewSet):
     permission_classes = [IsOwnerOrReadOnly]
     ordering_fields = ['date_created', 'start_date', 'cost']
 
+    
+    def get_queryset(self):
+        action = self.action
+        q =  self.queryset.filter(end_date__gte=timezone.now())
+        if action == 'list' or action == 'retrieve':
+            return q.filter(status=StatusMode.ACCEPTED)
+        return q
+    
+    
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['owner'] = self.request.user.id
@@ -308,7 +317,7 @@ class TourViewSet(ModelViewSet):
             message = f"The tour with ID {pk}, was already in denied status."
             return Response(status=status.HTTP_200_OK, data={"message": message})
         
-        tour.status = StatusMode.DENIED
+        tour.status = StatusMode.ACCEPTED
         tour.save()
         message = f"The tour with ID {pk}, is now in denied status."
         return Response(data={"message": message}, status=status.HTTP_200_OK)

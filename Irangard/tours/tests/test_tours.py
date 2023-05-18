@@ -206,6 +206,15 @@ class TourViewSetTestCase(TestCase):
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
+        
+    def test_pending_tour_update(self):
+        data = self.data.copy()
+        data['title'] = 'test_title'
+        data['cost'] = 100
+        response = self.client.put(self.url + f'{self.pending_tour.id}/', json.dumps(
+            data, indent=4, sort_keys=True, default=str), content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    
     
     def test_tour_update_ignore_status_field(self):
         data = self.data.copy()

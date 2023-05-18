@@ -16,13 +16,21 @@ from utils.constants import StatusMode, ActionDimondExchange
 
 
 class EventViewSet(ModelViewSet):
-    queryset = Event.objects.filter(end_date__gte=timezone.now(), status=StatusMode.ACCEPTED)
+    queryset = Event.objects.all()
     serializer_class = EventSerializer
     filterset_class = EventFilter
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     permission_classes = [EventPermission]
     pagination_class = DefaultPagination
     ordering_fields = ['date_created', 'start_date']
+    
+    
+    def get_queryset(self):
+        action = self.action
+        q =  self.queryset.filter(end_date__gte=timezone.now())
+        if action == 'list' or action == 'retrieve':
+            return q.filter(status=StatusMode.ACCEPTED)
+        return q
     
     
     def create(self, request, *args, **kwargs):
@@ -105,7 +113,7 @@ class EventViewSet(ModelViewSet):
             message = f"The event with ID {pk}, was already in denied status."
             return Response(status=status.HTTP_200_OK, data={"message": message})
         
-        event.status = StatusMode.DENIED
+        event.status = StatusMode.ACCEPTED
         event.save()
         message = f"The event with ID {pk}, is now in denied status."
         return Response(data={"message": message}, status=status.HTTP_200_OK)

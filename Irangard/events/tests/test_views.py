@@ -247,6 +247,32 @@ class EventViewsTestcase(TestCase):
         self.assertEqual(self.event.status, StatusMode.ACCEPTED)
         
     
+    def test_correct_update_pending_event(self):
+        token = self.login(self.user.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.put("{}{}/".format(self.url, self.event_not_active.pk),
+                                data=self.updating_data, format='json')
+        self.event_not_active.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.event_not_active.event_type, "1")
+        self.assertEqual(self.event_not_active.event_category, "1")
+        self.assertEqual(self.event_not_active.title, "test post event updated")
+        self.assertEqual(self.event_not_active.organizer, "test organizer updated")
+        self.assertEqual(self.event_not_active.description, "test description updated")
+        self.assertEqual(self.event_not_active.x_location, 1)
+        self.assertEqual(self.event_not_active.y_location, 1)
+        self.assertEqual(self.event_not_active.start_date, parse_date("2030-05-23"))
+        self.assertEqual(self.event_not_active.end_date, parse_date("2030-05-24"))
+        self.assertEqual(self.event_not_active.added_by, self.cheater_user)
+        self.assertEqual(self.event_not_active.start_time, datetime.time(1, 0))
+        self.assertEqual(self.event_not_active.end_time, datetime.time(1, 0))
+        self.assertEqual(self.event_not_active.province, "قم")
+        self.assertEqual(self.event_not_active.city, "قم")
+        self.assertEqual(len(self.event_not_active.tags.all()), 2)
+        self.assertEqual(self.event_not_active.address, "test address updated")
+        self.assertEqual(self.event_not_active.is_free, False)
+    
+    
     def test_incorrect_update_event_without_token(self):   
         response = self.client.put("{}{}/".format(self.url, self.event.pk),
                                 data=self.updating_data, format='json')
