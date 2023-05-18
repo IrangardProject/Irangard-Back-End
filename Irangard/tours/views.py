@@ -97,10 +97,32 @@ class TourViewSet(ModelViewSet):
             return Response('tour deleted', status=status.HTTP_204_NO_CONTENT)
         except Exception as error:
             return Response(f"{error}", status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    @action(detail=True, methods=['post'],
+            permission_classes=[IsAuthenticated])
+    def apply_dimonds_discount(self, request, *args, **kwargs):
+        tour = self.get_object()
+        user = request.user
+        cost = tour.cost
+        if tour.booked(user):
+            return Response('Already booked', status=status.HTTP_400_BAD_REQUEST)
+        if tour.capacity < 1:
+            return Response("there's no reservation available", status=status.HTTP_400_BAD_REQUEST)
+        
+        if ('dimonds_discount' in request.data):
+            if user.dimonds >= 1000:
+                cost = cost - cost * (5/100)
+                return Response({"new_cost":cost}, status=status.HTTP_200_OK)
+            
+            return Response("You don't have enough dimonds", status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response("No dimonds discount provided", status=status.HTTP_400_BAD_REQUEST)
+    
 
     @action(detail=True, methods=['post'],
             permission_classes=[IsAuthenticated])
-    def apply_discount_code(self, request, *args, **kwargs):
+    def apply_discounts(self, request, *args, **kwargs):
         tour = self.get_object()
         user = request.user
         cost = tour.cost
@@ -158,7 +180,8 @@ class TourViewSet(ModelViewSet):
     def book(self, request, *args, **kwargs):
         tour = self.get_object()
         user = request.user
-        cost = tour.cost
+        primitive_cost = tour.cost
+        discount_amount = 0
         if tour.booked(user):
             return Response('Already booked', status=status.HTTP_400_BAD_REQUEST)
         if tour.capacity < 1:
@@ -169,10 +192,18 @@ class TourViewSet(ModelViewSet):
                 discount_code = tour.discount_codes.get(code=request.data['discount_code_code'])
                 if(discount_code.expire_date < timezone.now()):
                     return Response('discount code has expired',status=status.HTTP_400_BAD_REQUEST)
-                cost = cost - cost * (discount_code.off_percentage/100)
+                discount_amount += primitive_cost * (discount_code.off_percentage/100)
             except DiscountCode.DoesNotExist:
                 return Response('discount_code does not exist',status=status.HTTP_400_BAD_REQUEST)
 
+        if ('dimonds_discount' in request.data and request.data[discount_code]):
+            if user.dimonds >= 1000:
+                discount_amount += primitive_cost * (5/100)
+            
+            return Response("You don't have enough dimonds", status=status.HTTP_400_BAD_REQUEST)
+        
+        cost = primitive_cost - discount_amount
+        
         order_id = str(uuid.uuid4())
         my_data = {
             "order_id": order_id,
