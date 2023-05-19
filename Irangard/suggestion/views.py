@@ -6,6 +6,8 @@ from .serializers import (TourSuggestionSerializer,
 from rest_framework.response import Response
 from rest_framework import status
 from .permissions import SuggestionPermission
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
 
 
 class SuggestionViewSet(ModelViewSet):
@@ -29,8 +31,26 @@ class SuggestionViewSet(ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-
+    
+    
+    @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
+    def sender_suggestions(self, request):
+        user = request.user
+        objs = self.SuggestionModel.objects.filter(sender=user)
+        sorted_objs = sorted(objs, key=lambda obj: obj.date_created)
+        serializer = self.serializer_class(sorted_objs, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+    
+    
+    @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
+    def receiver_suggestions(self, request):
+        user = request.user
+        objs = self.SuggestionModel.objects.filter(receiver=user)
+        sorted_objs = sorted(objs, key=lambda obj: obj.date_created)
+        serializer = self.serializer_class(sorted_objs, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+        
+    
 class TourSuggestionViewSet(SuggestionViewSet):
     queryset = TourSuggestion.objects.all()
     serializer_class = TourSuggestionSerializer
