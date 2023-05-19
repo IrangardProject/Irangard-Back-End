@@ -269,7 +269,7 @@ class TourViewSet(ModelViewSet):
                     cost = tour.cost
                     tour.owner.deposit(cost)
                     Transaction.objects.create(
-                        tour=tour, sender=user, cost=cost, date=datetime.now())
+                        tour=tour, sender=user, cost=cost, date=datetime.datetime.now())
                     tour.update_revenue(cost)
                     tour.bookers.add(user)
                     tour.update_remaining()
