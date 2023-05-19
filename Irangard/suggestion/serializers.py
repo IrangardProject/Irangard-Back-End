@@ -48,7 +48,8 @@ class EventSuggestionSerializer(SuggestionSerializer):
     class Meta:
         model = EventSuggestion
         fields = ['id', 'sender', 'receiver', 'event', 'text', 
-                'receiver_username', 'event_title']
+                'receiver_username', 'event_title',
+                'sender_username']
         extra_kwargs = {
             'sender': {'read_only': True},
             'receiver': {'required': False},
@@ -74,7 +75,8 @@ class PlaceSuggestionSerializer(SuggestionSerializer):
     class Meta:
         model = PlaceSuggestion
         fields = ['id', 'sender', 'receiver', 'place', 'text', 
-                'receiver_username', 'place_title']
+                'receiver_username', 'place_title',
+                'sender_username']
         extra_kwargs = {
             'sender': {'read_only': True},
             'receiver': {'required': False},
