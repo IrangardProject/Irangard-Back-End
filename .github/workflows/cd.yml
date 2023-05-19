@@ -28,9 +28,4 @@ jobs:
         echo "DB_HOST='db'" >> .env |
         echo "DB_NAME='dbirangard'" >> .env |
         echo "DB_USER='postgres'" >> .env |
-        cd ../.. |
-        ls |
-        cd Irangard/ |
-        ls |
-        cd Irangard/ |
-        ls
+        cd ../.. && ls &&   cd Irangard/ &&  ls &&  cd Irangard/ &&  ls
