@@ -12,7 +12,9 @@ class SuggestionPermission(IsAuthenticated):
         if view.action == 'retrieve':
             return obj.sender == request.user or obj.receiver == request.user \
                 or request.user.is_superuser
-        if view.action in ['update', 'partial_update', 'destroy']:
+        if view.action in ['update', 'partial_update']:
             return obj.sender == request.user or request.user.is_superuser
+        if view.action == 'destroy':
+            return obj.sender == request.user or obj.receiver == request.user or request.user.is_superuser
         return False
     
