@@ -479,3 +479,11 @@ class TourViewSetTestCase(TestCase):
     def test_incorrect_get_pending_tours_normal_user(self):
         response = self.client.get(f"{self.url}pending_tours/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_tour_pay_book_cost_from_wallet_success(self):
+        self.user.wallet_credit = 200
+        self.user.save()
+        client = APIClient()
+        response = client.post(f"{self.url}book_with_wallet/{self.tour.id}")
+        print(response)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
