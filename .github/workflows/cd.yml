@@ -27,5 +27,6 @@ jobs:
         echo "EMAIL_PW='wfxwebonohrrbatv'" >> .env |
         echo "DB_HOST='db'" >> .env |
         echo "DB_NAME='dbirangard'" >> .env |
-        echo "DB_USER='postgres'" >> .env
-
+        echo "DB_USER='postgres'" >> .env |
+        cd ../.. |
+        docker compose up
