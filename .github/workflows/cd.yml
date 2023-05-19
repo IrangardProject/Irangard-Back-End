@@ -18,6 +18,7 @@ jobs:
         git status |
         ls -la |
         cd Irangard/Irangard/ |
+        touch .env/
         echo "DEBUG=True" >> .env |
         echo "SECRET_KEY='django-insecure-g&@l9t5+dmgmtyi7p=@quy8h&+%@pgsb1v&0njdsfd@q6=w1gs'" >> .env |
         echo "DB_PASSWORD='1234'" >> .env |
