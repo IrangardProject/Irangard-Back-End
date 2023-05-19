@@ -135,9 +135,11 @@ class TourViewSet(ModelViewSet):
         if user.wallet_credit < cost:
             return Response('not enough credit', status=status.HTTP_400_BAD_REQUEST)
 
+        user.wallet_credit -= cost
+        user.save()
         tour.owner.deposit(cost)
         Transaction.objects.create(
-            tour=tour, sender=user, cost=cost, date=datetime.now())
+            tour=tour, sender=user, cost=cost, date=datetime.datetime.now())
         tour.update_revenue(cost)
         tour.bookers.add(user)
         tour.update_remaining()
