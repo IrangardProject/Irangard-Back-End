@@ -13,7 +13,7 @@ class TourSuggestion(models.Model):
     tour = models.ForeignKey(Tour, related_name='suggestions', 
                             on_delete=models.CASCADE)
     text = models.CharField(max_length=255, null=True, blank=True)
-    
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
     
     def __str__(self):
         return f"{self.sender} suggests {self.tour.title} to {self.receiver}"
@@ -27,7 +27,7 @@ class EventSuggestion(models.Model):
     event = models.ForeignKey(Event, related_name='suggestions',
                             on_delete= models.CASCADE)
     text = models.CharField(max_length=255, null=True, blank=True)
-
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
     
     def __str__(self):
         return f"{self.sender} suggests {self.event.title} to {self.receiver}"
@@ -40,7 +40,7 @@ class PlaceSuggestion(models.Model):
     place = models.ForeignKey(Place, related_name='suggestions',
                             on_delete=models.CASCADE)
     text = models.CharField(max_length=255, null=True, blank=True)
-
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
     
     def __str__(self):
         return f"{self.sender} suggests {self.place.title} to {self.receiver}"
