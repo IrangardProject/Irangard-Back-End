@@ -18,6 +18,12 @@ class DiscountCodeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Video
+        fields = '__all__'
+        
+
 class TourRegisteredUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -29,6 +35,7 @@ class TourSerializer(serializers.ModelSerializer):
     is_booked = serializers.SerializerMethodField('booked')
     bookers = TourRegisteredUserSerializer(many=True,read_only=True)
     is_expired = serializers.SerializerMethodField()
+    
 
     class Meta:
         model = Tour
