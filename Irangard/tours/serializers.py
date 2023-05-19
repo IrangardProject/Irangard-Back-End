@@ -35,7 +35,7 @@ class TourSerializer(serializers.ModelSerializer):
     is_booked = serializers.SerializerMethodField('booked')
     bookers = TourRegisteredUserSerializer(many=True,read_only=True)
     is_expired = serializers.SerializerMethodField()
-    video
+    
 
     class Meta:
         model = Tour
