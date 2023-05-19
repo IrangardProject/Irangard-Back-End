@@ -5,7 +5,8 @@ on: [push]
 jobs:
   deploy:
     permissions: write-all
-    runs-on: ubuntu-latest
+#    runs-on: ubuntu-latest
+    runs-on: self-hosted
     services:
       docker:
         image: docker:latest
@@ -14,4 +15,5 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name : test commands
-      run: pwd && git status && ls -la && cd Irangard/Irangard/ && touch .env && echo "DEBUG=True" >> .env && echo "SECRET_KEY='django-insecure-g&@l9t5+dmgmtyi7p=@quy8h&+%@pgsb1v&0njdsfd@q6=w1gs'" >> .env && echo "DB_PASSWORD='1234'" >> .env && echo "WEBSITE_URL='http://127.0.0.1:8000'" >> .env && echo "EMAIL_ID='irangard.se@gmail.com'" >> .env && echo "EMAIL_PW='wfxwebonohrrbatv'" >> .env && echo "DB_HOST='db'" >> .env && echo "DB_NAME='irangard'" >> .env && echo "DB_USER='postgres'" >> .env && cd ../.. && ls &&   cd Irangard/ &&  ls &&  cd Irangard/ &&  ls -la && docker compose up
+      run: pwd && git status && ls -la
+      # && cd Irangard/Irangard/ && touch .env && echo "DEBUG=True" >> .env && echo "SECRET_KEY='django-insecure-g&@l9t5+dmgmtyi7p=@quy8h&+%@pgsb1v&0njdsfd@q6=w1gs'" >> .env && echo "DB_PASSWORD='1234'" >> .env && echo "WEBSITE_URL='http://127.0.0.1:8000'" >> .env && echo "EMAIL_ID='irangard.se@gmail.com'" >> .env && echo "EMAIL_PW='wfxwebonohrrbatv'" >> .env && echo "DB_HOST='db'" >> .env && echo "DB_NAME='irangard'" >> .env && echo "DB_USER='postgres'" >> .env && cd ../.. && ls &&   cd Irangard/ &&  ls &&  cd Irangard/ &&  ls -la && docker compose up
