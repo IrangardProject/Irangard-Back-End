@@ -1,5 +1,6 @@
 import datetime
 import time
+from decimal import Decimal
 
 from django.core.mail import EmailMessage
 from django.db import models
@@ -111,7 +112,7 @@ class Tour(models.Model):
         self.save()
 
     def update_revenue(self, amount):
-        self.total_revenue += amount
+        self.total_revenue += Decimal(amount)
         self.save()
     
     def withdraw(self, amount):
