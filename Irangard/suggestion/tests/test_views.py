@@ -106,6 +106,26 @@ class BaseTestCase(TestCase):
             tour=self.tour, 
             text="test"
         )
+        
+        self.place_suggestion2 = PlaceSuggestion.objects.create(
+            sender=self.user2, 
+            receiver=self.user1, 
+            place=self.place, 
+            text="test")
+        
+        self.event_suggestion2 = EventSuggestion.objects.create(
+            sender=self.user2, 
+            receiver=self.user1, 
+            event=self.event, 
+            text="test"
+        )
+        
+        self.tour_suggestion3 = TourSuggestion.objects.create(
+            sender=self.user2, 
+            receiver=self.user1, 
+            tour=self.tour, 
+            text="test"
+        )
  
 
 class TourSuggestionViewsTestCase(BaseTestCase):
@@ -304,11 +324,11 @@ class TourSuggestionViewsTestCase(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         
     
-    def test_incorrect_delete_receiver_user_token(self):
+    def test_correct_delete_receiver_user_token(self):
         token = self.login(self.user2.username, '123456')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.delete(self.url_tour + str(self.tour_suggestion.pk) + '/')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         
     
     def test_incorrect_delete_cheater_user_token(self):
@@ -316,6 +336,34 @@ class TourSuggestionViewsTestCase(BaseTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.delete(self.url_tour + str(self.tour_suggestion.pk) + '/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        
+    
+    def test_correct_get_sender_suggestions(self):
+        token = self.login(self.user1.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(self.url_tour + 'sender_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for es in response.data:
+            self.assertEqual(es['sender'], self.user1.pk)
+    
+    
+    def test_incorrect_get_sender_suggestions_without_token(self):
+        response = self.client.get(self.url_tour + 'sender_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+    
+    def test_correct_get_receiver_suggestions(self):
+        token = self.login(self.user2.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(self.url_tour + 'receiver_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for es in response.data:
+            self.assertEqual(es['receiver'], self.user2.pk)
+    
+    
+    def test_incorrect_get_receiver_suggestions_without_token(self):
+        response = self.client.get(self.url_tour + 'receiver_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)   
     
 
 class EventSuggestionViewsTestCase(BaseTestCase):
@@ -514,11 +562,11 @@ class EventSuggestionViewsTestCase(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         
     
-    def test_incorrect_delete_receiver_user_token(self):
+    def test_correct_delete_receiver_user_token(self):
         token = self.login(self.user2.username, '123456')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.delete(self.url_event + str(self.event_suggestion.pk) + '/')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         
     
     def test_incorrect_delete_cheater_user_token(self):
@@ -526,8 +574,36 @@ class EventSuggestionViewsTestCase(BaseTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.delete(self.url_event + str(self.event_suggestion.pk) + '/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
+        
     
+    def test_correct_get_sender_suggestions(self):
+        token = self.login(self.user1.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(self.url_event + 'sender_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for es in response.data:
+            self.assertEqual(es['sender'], self.user1.pk)
+    
+    
+    def test_incorrect_get_sender_suggestions_without_token(self):
+        response = self.client.get(self.url_event + 'sender_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+    
+    def test_correct_get_receiver_suggestions(self):
+        token = self.login(self.user2.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(self.url_event + 'receiver_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for es in response.data:
+            self.assertEqual(es['receiver'], self.user2.pk)
+    
+    
+    def test_incorrect_get_receiver_suggestions_without_token(self):
+        response = self.client.get(self.url_event + 'receiver_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+ 
 class placeSuggestionViewsTestCase(BaseTestCase):
     
     def test_correct_get_place_suggestions_super_user(self):
@@ -724,11 +800,11 @@ class placeSuggestionViewsTestCase(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         
     
-    def test_incorrect_delete_receiver_user_token(self):
+    def test_correct_delete_receiver_user_token(self):
         token = self.login(self.user2.username, '123456')
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.delete(self.url_place + str(self.place_suggestion.pk) + '/')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         
     
     def test_incorrect_delete_cheater_user_token(self):
@@ -736,3 +812,31 @@ class placeSuggestionViewsTestCase(BaseTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.delete(self.url_place + str(self.place_suggestion.pk) + '/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        
+        
+    def test_correct_get_sender_suggestions(self):
+        token = self.login(self.user1.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(self.url_place + 'sender_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for es in response.data:
+            self.assertEqual(es['sender'], self.user1.pk)
+    
+    
+    def test_incorrect_get_sender_suggestions_without_token(self):
+        response = self.client.get(self.url_place + 'sender_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+    
+    def test_correct_get_receiver_suggestions(self):
+        token = self.login(self.user2.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(self.url_place + 'receiver_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for es in response.data:
+            self.assertEqual(es['receiver'], self.user2.pk)
+    
+    
+    def test_incorrect_get_receiver_suggestions_without_token(self):
+        response = self.client.get(self.url_place + 'receiver_suggestions/')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
