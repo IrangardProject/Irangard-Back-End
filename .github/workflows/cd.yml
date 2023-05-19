@@ -6,9 +6,15 @@ jobs:
   deploy:
     permissions: write-all
     runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:latest
+
+
     steps:
     - uses: actions/checkout@v3
     - name : test commands
       run: pwd |
         git status |
-        ls -la
+        ls -la |
+        docker compose up
