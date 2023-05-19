@@ -18,5 +18,4 @@ jobs:
         git status |
         ls -la |
         cd Irangard/Irangard/ |
-        touch .env/
-
+        touch .env
