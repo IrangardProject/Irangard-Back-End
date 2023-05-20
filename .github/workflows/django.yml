@@ -85,3 +85,16 @@ jobs:
         DB_PASSWORD: 1234
       run: |
         cd Irangard/ && ls && cat chat/tests/test_chat.py && python manage.py test
+  deploy:
+    permissions: write-all
+    needs: build-and-test
+    runs-on: self-hosted
+    services:
+      docker:
+        image: docker:latest
+
+
+    steps:
+    - uses: actions/checkout@v3
+    - name : deploy
+      run: pwd && git status && cat .github/workflows/cd.yml && ls -la && cd Irangard/Irangard/ && touch .env &&  echo "DEBUG=True" >> .env && echo "SECRET_KEY='django-insecure-g&@l9t5+dmgmtyi7p=@quy8h&+%@pgsb1v&0njdsfd@q6=w1gs'" >> .env && echo "DB_PASSWORD='1234'" >> .env && echo "WEBSITE_URL='http://127.0.0.1:8000'" >> .env && echo "EMAIL_ID='irangard.se@gmail.com'" >> .env && echo "EMAIL_PW='wfxwebonohrrbatv'" >> .env && echo "DB_HOST='db'" >> .env && echo "DB_NAME='irangard'" >> .env && echo "DB_USER='postgres'" >> .env && cd ../.. && ls && docker compose down && docker image prune -a -f && sudo docker compose build --no-cache && docker compose up -d && sudo systemctl daemon-reload && sudo systemctl restart nginx
