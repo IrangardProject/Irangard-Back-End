@@ -285,7 +285,7 @@ class TourViewSet(ModelViewSet):
             message = f"The tour with ID {pk}, was already in denied status."
             return Response(status=status.HTTP_200_OK, data={"message": message})
         
-        tour.status = StatusMode.ACCEPTED
+        tour.status = StatusMode.DENIED
         tour.save()
         message = f"The tour with ID {pk}, is now in denied status."
         return Response(data={"message": message}, status=status.HTTP_200_OK)
