@@ -18,7 +18,7 @@ from utils.constants import StatusMode
 class Tour(models.Model):
 
     tour_type = models.CharField(max_length=20, choices=TOUR_TYPES,
-                                default='10')
+                                default='12')
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     cost = models.IntegerField(default=0)
