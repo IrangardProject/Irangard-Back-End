@@ -239,7 +239,7 @@ class TourViewSetTestCase(TestCase):
 
     def test_tour_partial_update(self):
         data = {"title": "test_title"}
-        response = self.client.put(self.url + f'{self.tour.id}/', json.dumps(
+        response = self.client.patch(self.url + f'{self.tour.id}/', json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

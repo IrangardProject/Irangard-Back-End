@@ -17,9 +17,7 @@ class IsOwnerOrReadOnly(IsAuthenticated):
     def has_object_permission(self, request, view, tour_obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        if request.method in ['PUT','POST','DELETE']:
-            print(tour_obj.owner.user.id)
-            print(request.user.id)
+        if request.method in ['PUT','POST','DELETE', 'PATCH']:
             return tour_obj.owner.user.id == request.user.id
         
 class IsDiscountCodeOwnerOrReadOnly(IsAuthenticated):

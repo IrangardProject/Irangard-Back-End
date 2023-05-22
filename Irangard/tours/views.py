@@ -77,7 +77,6 @@ class TourViewSet(ModelViewSet):
     def update(self, request, *args, **kwargs):
         tour = self.get_object()
         data = request.data.copy()
-        print(data)
         images = data.pop('images', None)
         tags = data.pop('tags', None)
 
