@@ -54,7 +54,8 @@ class TourSerializer(serializers.ModelSerializer):
     bookers = TourRegisteredUserSerializer(many=True,read_only=True)
     is_expired = serializers.SerializerMethodField()
     images = ImageSerializer(many=True, read_only=True)
-
+    tags = TagSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Tour
         fields = '__all__'
