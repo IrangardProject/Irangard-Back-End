@@ -42,7 +42,7 @@ schema_view = get_schema_view(  # swagger/redoc
 
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls'), name='accounts'),
     path('chat/', include('chat.urls'), name='chat'),
     path('message/', include('chat.message_url'), name='message'),
