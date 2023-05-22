@@ -90,7 +90,6 @@ class TourViewSet(ModelViewSet):
             for tag in tags:
                 Tag.objects.create(tour=tour, **tag)
 
-        print("reached")
         return super().update(request, *args, **kwargs)
     
 
