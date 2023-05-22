@@ -26,7 +26,7 @@ class Tour(models.Model):
     remaining = models.IntegerField(default=0)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    owner = models.ForeignKey("accounts.SpecialUser",related_name="tours",on_delete=models.CASCADE)
+    owner = models.ForeignKey("accounts.SpecialUser", related_name="tours", on_delete=models.CASCADE)
     bookers = models.ManyToManyField(User, blank=True, related_name='tours')
     total_revenue = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -34,6 +34,10 @@ class Tour(models.Model):
     city = models.CharField(max_length=255)
     status = models.CharField(max_length=2, choices=StatusMode.choices, default=StatusMode.PENDING)
     phone = models.CharField(max_length=11, blank=True, null=True)
+    start_point = models.CharField(max_length=255, null=True, blank=True)
+    transportation = models.CharField(max_length=255, null=True, blank=True)
+    x_location = models.DecimalField(max_digits=20, decimal_places=15, null=True)
+    y_location = models.DecimalField(max_digits=20, decimal_places=15, null=True)
     
     def __str__(self):
         return self.title
