@@ -21,7 +21,6 @@ class Tour(models.Model):
                                 default='10')
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    image = models.ImageField(upload_to=f'images/tours', blank=True, null=True)
     cost = models.IntegerField(default=0)
     capacity = models.IntegerField(default=0)
     remaining = models.IntegerField(default=0)
@@ -34,6 +33,7 @@ class Tour(models.Model):
     province = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     status = models.CharField(max_length=2, choices=StatusMode.choices, default=StatusMode.PENDING)
+    phone = models.CharField(max_length=11, blank=True, null=True)
     
     def __str__(self):
         return self.title
@@ -145,9 +145,29 @@ class DiscountCode(models.Model):
 
 class Video(models.Model):
     tour = models.ForeignKey(
-        Tour, related_name='images', on_delete=models.CASCADE)
+        Tour, related_name='videos', on_delete=models.CASCADE)
     video = models.FileField(upload_to='videos/tours')
     upload_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.pk} {self.tour}'
+
+
+class Image(models.Model):
+    tour = models.ForeignKey(
+        Tour, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to=f'images/tours')
+    upload_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.pk} {self.tour}'
+
+
+class Tag(models.Model):
+    tour = models.ForeignKey(
+        Tour, on_delete=models.CASCADE, related_name='tags')
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.tour.title} {self.name}"
+        

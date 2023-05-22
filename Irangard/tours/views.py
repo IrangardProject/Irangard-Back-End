@@ -55,12 +55,46 @@ class TourViewSet(ModelViewSet):
         return context
 
 
-    # @method_decorator(cache_page(CACHE_TTL))
-    # def list(self, request, *args, **kwargs):
-    #   return super().list(self, request, *args, **kwargs)
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        tags = data.pop('tags', [])
+        images = data.pop('images', [])
+        
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        tour = serializer.save()
+        
+        for tag in tags:
+            Tag.objects.create(tour=tour, **tag)
+            
+        for image in images:
+            Image.objects.create(tour=tour, image=image)
+            
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    
+    def update(self, request, *args, **kwargs):
+        tour = self.get_object()
+        data = request.data.copy()
+        print(data)
+        images = data.pop('images', None)
+        tags = data.pop('tags', None)
 
-    # @method_decorator(cache_page(CACHE_TTL))
-    # @method_decorator(vary_on_cookie)
+        if images:
+            tour.images.all().delete()
+            for image in images:
+                Image.objects.create(tour=tour, image=image)
+
+        if tags:
+            tour.tags.all().delete()
+            for tag in tags:
+                Tag.objects.create(tour=tour, **tag)
+
+        print("reached")
+        return super().update(request, *args, **kwargs)
+    
+
     def retrieve(self, request, *args, **kwargs):
         
         tour = None
@@ -78,18 +112,6 @@ class TourViewSet(ModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def update(self, request, *args, **kwargs):
-
-        tour = self.get_object()
-        serializer = self.get_serializer(tour, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        cache.set("Tour"+str(tour.id),tour)
-        print('update the cache')
-
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def destroy(self, request, *args, **kwargs):
         try:

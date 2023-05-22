@@ -204,7 +204,7 @@ class TourViewSetTestCase(TestCase):
         data['cost'] = 100
         response = self.client.put(self.url + f'{self.tour.id}/', json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         
     def test_pending_tour_update(self):
@@ -213,7 +213,7 @@ class TourViewSetTestCase(TestCase):
         data['cost'] = 100
         response = self.client.put(self.url + f'{self.pending_tour.id}/', json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     
     def test_tour_update_ignore_status_field(self):
@@ -223,7 +223,7 @@ class TourViewSetTestCase(TestCase):
         data["status"] = StatusMode.DENIED
         response = self.client.put(self.url + f'{self.tour.id}/', json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.tour.refresh_from_db()
         self.assertEqual(self.tour.status, StatusMode.ACCEPTED)
 
@@ -238,11 +238,11 @@ class TourViewSetTestCase(TestCase):
 
 
     def test_tour_partial_update(self):
-        data = {"title":"test_title"}
+        data = {"title": "test_title"}
         response = self.client.put(self.url + f'{self.tour.id}/', json.dumps(
             data, indent=4, sort_keys=True, default=str), content_type='application/json')
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
     def test_tour_update_not_owner(self):

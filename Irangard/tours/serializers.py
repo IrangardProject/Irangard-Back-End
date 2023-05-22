@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.viewsets import ModelViewSet
 from tours.models import *
 from accounts.serializers.user_serializers import *
 
@@ -30,12 +29,31 @@ class TourRegisteredUserSerializer(serializers.ModelSerializer):
         fields = ['username', 'full_name', 'image']
 
 
+class TagSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        ref_name = 'tour tag serializer'
+        model = Tag
+        fields = ['tour', 'name']
+        extra_kwargs = {'tour': {'write_only': True}}
+
+
+class ImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Image
+        ref_name = 'tour image serializer'
+        fields = ['image', 'upload_date']
+        read_only_fields = ['upload_date']
+        extra_kwargs = {'tour': {'write_only': True}}
+
+
 class TourSerializer(serializers.ModelSerializer):
     owner = SpecialUserSerializer(read_only=True)
     is_booked = serializers.SerializerMethodField('booked')
     bookers = TourRegisteredUserSerializer(many=True,read_only=True)
     is_expired = serializers.SerializerMethodField()
-    
+    images = ImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Tour
