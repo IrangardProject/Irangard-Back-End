@@ -4,6 +4,13 @@ from accounts.models import User, SpecialUser
 from rest_framework import serializers
 from Irangard.settings import STATIC_HOST
 
+
+class UserOnlyUserNameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('username',)
+
 class UserSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField('get_image')
 
@@ -18,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
             return ""
 class SpecialUserSerializer(serializers.ModelSerializer):
     
-    # user = UserSerializer(read_only=True)
+    user = UserOnlyUserNameSerializer(read_only=True)
     class Meta:
         model = SpecialUser
         fields = "__all__"
@@ -81,7 +88,7 @@ class UserInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
-    
+
 
 class WhoIsSeriliazer(serializers.Serializer):
     username = serializers.CharField(max_length=50, help_text="user username")
