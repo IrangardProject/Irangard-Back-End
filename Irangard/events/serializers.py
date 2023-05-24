@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Image, Event, Tag
+from accounts.serializers.user_serializers import UserImageUserNameSerializer
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -22,7 +23,7 @@ class TagSerializer(serializers.ModelSerializer):
 
         
 class EventSerializer(serializers.ModelSerializer):
-    
+    added_by = UserImageUserNameSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
 
