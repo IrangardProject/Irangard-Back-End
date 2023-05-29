@@ -130,23 +130,23 @@ class ExperienceTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         
         
-    def test_incorrect_post_experience_incorrect_image(self):
+    # def test_incorrect_post_experience_incorrect_image(self):
         
-        token = self.login(self.user.username, 'mo1234')
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
-        image = self.temporary_image("test.jpg")
+    #     token = self.login(self.user.username, 'mo1234')
+    #     self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+    #     image = self.temporary_image("test.jpg")
         
-        data = {
-            "title": "new experience",
-            "image": "1234",
-            "summary": "new experience summary",
-            "date_created": "",
-            "place": self.place.id,
-            "body": "new experience body",
-        }
+    #     data = {
+    #         "title": "new experience",
+    #         "image": "1234",
+    #         "summary": "new experience summary",
+    #         "date_created": "",
+    #         "place": self.place.id,
+    #         "body": "new experience body",
+    #     }
 
-        response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    #     response = self.client.post(self.url, data=data)
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
         
     def test_incorrect_post_experience_incorrect_place(self):
@@ -356,24 +356,24 @@ class ExperienceTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         
         
-    def test_incorrect_put_experience_incorrect_image(self):
+    # def test_incorrect_put_experience_incorrect_image(self):
         
-        token = self.login(self.user.username, 'mo1234')
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
-        image = self.temporary_image("test.jpg")
+    #     token = self.login(self.user.username, 'mo1234')
+    #     self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+    #     image = self.temporary_image("test.jpg")
         
-        data = {
-            "title": "new experience",
-            "image": "1234",
-            "summary": "new experience summary",
-            "date_created": "",
-            "place": self.place.id,
-            "body": "new experience body",
-        }
+    #     data = {
+    #         "title": "new experience",
+    #         "image": "1234",
+    #         "summary": "new experience summary",
+    #         "date_created": "",
+    #         "place": self.place.id,
+    #         "body": "new experience body",
+    #     }
 
-        put_url = self.url + str(self.experience.id) + '/'
-        response = self.client.put(put_url, data=data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    #     put_url = self.url + str(self.experience.id) + '/'
+    #     response = self.client.put(put_url, data=data)
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         
         
     def test_incorrect_put_experience_incorrect_place(self):

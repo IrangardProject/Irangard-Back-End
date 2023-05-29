@@ -24,7 +24,7 @@ class TagSerializer(serializers.ModelSerializer):
         
 class EventSerializer(serializers.ModelSerializer):
     added_by = UserImageUserNameSerializer(read_only=True)
-    images = ImageSerializer(many=True, read_only=True)
+    images = serializers.SerializerMethodField()
     tags = TagSerializer(many=True, read_only=True)
 
     class Meta:
@@ -39,3 +39,11 @@ class EventSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         validated_data['added_by'] = request.user
         return super().create(validated_data)
+
+    
+    def get_images(self, obj):
+        request = self.context.get('request')
+        if obj.images:
+            return [request.build_absolute_uri(image.url) for image in obj.images.all()]
+        else:
+            return []

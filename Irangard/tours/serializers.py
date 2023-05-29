@@ -53,7 +53,7 @@ class TourSerializer(serializers.ModelSerializer):
     is_booked = serializers.SerializerMethodField('booked')
     bookers = TourRegisteredUserSerializer(many=True,read_only=True)
     is_expired = serializers.SerializerMethodField()
-    images = ImageSerializer(many=True, read_only=True)
+    images = serializers.SerializerMethodField()
     tags = TagSerializer(many=True, read_only=True)
     
     class Meta:
@@ -74,3 +74,10 @@ class TourSerializer(serializers.ModelSerializer):
 
     def get_is_expired(self, obj):
         return obj.is_expired
+
+    def get_images(self, obj):
+        request = self.context.get('request')
+        if obj.images:
+            return [request.build_absolute_uri(image.url) for image in obj.images.all()]
+        else:
+            return []

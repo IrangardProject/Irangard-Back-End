@@ -11,11 +11,13 @@ class UserImageUserNameSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'id', 'image')
     
-    def get_image(self, user):
-        if user.image != "":
-            return 'https://api.quilco.ir' + user.image.url
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            request.build_absolute_uri(obj.image.url)
         else:
             return ""
+
 
 class UserSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField('get_image')
@@ -24,11 +26,14 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = "__all__"
 
-    def get_image(self, user):
-        if user.image != "":
-            return 'https://api.quilco.ir' + user.image.url
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            request.build_absolute_uri(obj.image.url)
         else:
             return ""
+
+
 class SpecialUserSerializer(serializers.ModelSerializer):
     
     user = UserImageUserNameSerializer(read_only=True)
@@ -68,11 +73,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
             status =  request_user.follows(user) or request_user == user
         return status
     
-    def get_image(self, user):
-        if user.image != "":
-            return 'https://api.quilco.ir' + user.image.url
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            request.build_absolute_uri(obj.image.url)
         else:
-            return "" 
+            return ""
 
 
 class UserFeedSerializer(serializers.ModelSerializer):

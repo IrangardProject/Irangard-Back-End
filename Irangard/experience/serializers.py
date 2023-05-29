@@ -11,6 +11,7 @@ class ExperienceSerializer(serializers.ModelSerializer):
     user_username = serializers.SerializerMethodField('get_user_username')
     user_image = serializers.SerializerMethodField('get_user_image')
     is_liked_new = serializers.SerializerMethodField('get_is_liked')
+    image = serializers.SerializerMethodField()
     
     class Meta:
         model = Experience     
@@ -45,6 +46,13 @@ class ExperienceSerializer(serializers.ModelSerializer):
             return True
         else:
             return False
+    
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            request.build_absolute_uri(obj.image.url)
+        else:
+            return ""
     
     def create(self, validated_data):
         request = self.context.get("request")
