@@ -10,6 +10,8 @@ class IsOwnerOrReadOnly(IsAuthenticated):
             return IsAdminUser.has_permission(request, view)
         
         if request.method in ['POST']:
+            if request.user.is_anonymous :
+                return False
             return request.user.is_special and super().has_permission(request, view) 
 
         return super().has_permission(request, view) 
