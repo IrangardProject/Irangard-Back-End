@@ -20,7 +20,7 @@ env:
 
   DB_HOST: localhost
 
-  REDIS_HOST: redis
+#  REDIS_HOST: redis
 jobs:
   merge-branch:
     permissions: write-all
