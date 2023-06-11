@@ -97,6 +97,19 @@ class FollowViewSet(ModelViewSet):
         request.user.update_following_no()
         return Response(status=status.HTTP_200_OK)
 
+    @action(detail=True, permission_classes=[IsAuthenticated],
+            methods=['post'])
+    def update_favorite_types(self, request,  *args, **kwargs):
+        user = self.get_object()
+        if 'favorite_tours' in request.data:
+            list_of_favorite_tours = request.data['favorite_tours']
+            print(list_of_favorite_tours)
+            user.favorite_tour_types = list_of_favorite_tours
+        if 'favorite_events' in request.data:
+            list_of_favorite_events = request.data['favorite_events']
+            user.favorite_event_types = list_of_favorite_events
+        user.save()
+        return Response(status=status.HTTP_200_OK)
 
 class UserInformation(GenericAPIView):
     queryset = User.objects.all()
