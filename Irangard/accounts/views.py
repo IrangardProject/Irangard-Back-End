@@ -209,3 +209,17 @@ class WalletViewSet(GenericViewSet):
             return Response({'error' : 'not enough credit'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'credit' : user.wallet_credit}, status=status.HTTP_200_OK)
 
+    @action(detail=False, url_path='user/upgrade', methods=['POST'], permission_classes=[permissions.IsAuthenticated])
+    def upgrade_user_to_superuser_with_wallet(self, request):
+        user = request.user
+        if user.is_special:
+            return Response({'error': 'user is already special'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user.decrease_wallet_credit(10000)
+        except Exception :
+            return Response({'error': 'not enough credit in wallet'}, status=status.HTTP_400_BAD_REQUEST)
+        user.is_special = True
+        user.save()
+        sp_user = SpecialUser.objects.create(user=user)
+        sp_user.save()
+        return Response({'status': 'ok'}, status=status.HTTP_200_OK)
