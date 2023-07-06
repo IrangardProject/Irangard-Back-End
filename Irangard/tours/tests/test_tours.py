@@ -109,6 +109,20 @@ class TourViewSetTestCase(TestCase):
         self.pending_tour = Tour.objects.create(**self.data, owner=self.special_user)
         
         self.admin_user = self.make_admin_user("admin", "123456", "admin@gmail.com")  
+        self.discount_code = DiscountCode.objects.create(
+            off_percentage=10,
+            expire_date="2030-05-22T15:49:49.505Z",
+            code="magorg",
+            tour=self.tour
+        )
+        
+        self.expired_discount_code = DiscountCode.objects.create(
+            off_percentage=10,
+            expire_date="2020-05-22T15:49:49.505Z",
+            code="magorgexp",
+            tour=self.tour
+        )
+    
     
     def normal_user_client(self):
         user = User.objects.create(
@@ -270,6 +284,12 @@ class TourViewSetTestCase(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.delete(f"{self.url}{self.tour.id}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        
+    def test_tour_delete(self):
+        token = self.login(self.user.username, 'emad1234')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.delete(f"{self.url}2005/")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
     def test_tour_delete_not_owner(self):
@@ -480,10 +500,229 @@ class TourViewSetTestCase(TestCase):
         response = self.client.get(f"{self.url}pending_tours/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    # def test_tour_pay_book_cost_from_wallet_success(self):
-    #     self.user.wallet_credit = 200
-    #     self.user.save()
-    #     client = APIClient()
-    #     response = client.post(f"{self.url}book_with_wallet/{self.tour.id}")
-    #     print(response)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_retrieve_tour(self):
+        response = self.client.get(self.url + str(self.tour1.pk) + "/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+   
+    def test_apply_dimonds_discount(self):
+        self.second_user.dimonds = 1500
+        self.second_user.save()
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/apply_dimonds_discount/'
+        data = {
+            "dimonds_discount" : 1
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    def test_apply_dimonds_discount_no_capacity(self):
+        self.second_user.dimonds = 1500
+        self.second_user.save()
+        self.tour.capacity = 0
+        self.tour.save()
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/apply_dimonds_discount/'
+        data = {
+            "dimonds_discount" : 1
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    
+    def test_apply_dimonds_discount_not_enough_dimonds(self):
+        self.second_user.dimonds = 500
+        self.second_user.save()
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/apply_dimonds_discount/'
+        data = {
+            "dimonds_discount" : 1
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    def test_apply_dimonds_discount_not_in_json(self):
+        self.second_user.dimonds = 500
+        self.second_user.save()
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/apply_dimonds_discount/'
+        data = {}
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    #########################################################################
+    def test_apply_code_discount(self):
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/apply_discounts/'
+        data = {
+            "discount_code_code" : self.discount_code.code
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    def test_apply_code_discount_no_capacity(self):
+        self.tour.capacity = 0
+        self.tour.save()
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/apply_discounts/'
+        data = {
+            "discount_code_code" : self.discount_code.code
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+      
+    def test_apply_dimonds_discount_not_in_json(self):
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/apply_discounts/'
+        data = {}
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    def test_apply_code_discount_not_existed_code(self):
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/apply_discounts/'
+        data = {
+            "discount_code_code" : "magorgsdfd"
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    
+    def test_apply_code_discount_expired(self):
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/apply_discounts/'
+        data = {
+            "discount_code_code" : self.expired_discount_code.code
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    def test_apply_code_not_in_json(self):
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/apply_discounts/'
+        data = {}
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    ##############################################################################
+    
+    def test_book_with_wallet(self):
+        self.second_user.wallet_credit = 400
+        self.second_user.save()
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/book_with_wallet/'
+        data = {
+            "discount_code_code" : self.discount_code.code
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    def test_book_with_wallet_no_capacity(self):
+        self.second_user.wallet_credit = 400
+        self.second_user.save()
+        self.tour.capacity = 0
+        self.tour.save()
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/book_with_wallet/'
+        data = {
+            "discount_code_code" : self.discount_code.code
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+              
+    def test_apply_code_discount_not_existed_code(self):
+        self.second_user.wallet_credit = 400
+        self.second_user.save()
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/book_with_wallet/'
+        data = {
+            "discount_code_code" : "aldfhljdfjafd"
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    
+    def test_apply_code_discount_expired(self):
+        self.second_user.wallet_credit = 400
+        self.second_user.save()
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/book_with_wallet/'
+        data = {
+            "discount_code_code" : self.expired_discount_code.code
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    def test_apply_code_not_enough_wallet_credit(self):
+        self.second_user.wallet_credit = 150
+        self.second_user.save()
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/book_with_wallet/'
+        data = {}
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_get_recommended_tour(self):
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + 'recommended-tours'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    
+    def test_is_booked_not_booked(self):
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/is_booked/'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    
+    def test_is_booked_booked_before(self):
+        self.tour.bookers.add(self.second_user)
+        self.tour.save()
+        self.client = APIClient()
+        token = self.login(self.second_user.username, "emad123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        url = self.url + str(self.tour.pk) + '/is_booked/'
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
