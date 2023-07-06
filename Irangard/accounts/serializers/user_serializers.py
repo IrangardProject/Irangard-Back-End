@@ -14,7 +14,7 @@ class UserImageUserNameSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         request = self.context.get('request')
         if obj.image:
-            request.build_absolute_uri(obj.image.url)
+            return request.build_absolute_uri(obj.image.url)
         else:
             return ""
 
@@ -29,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         request = self.context.get('request')
         if obj.image:
-            request.build_absolute_uri(obj.image.url)
+            return request.build_absolute_uri(obj.image.url)
         else:
             return ""
 
@@ -76,7 +76,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         request = self.context.get('request')
         if obj.image:
-            request.build_absolute_uri(obj.image.url)
+            return request.build_absolute_uri(obj.image.url)
         else:
             return ""
 

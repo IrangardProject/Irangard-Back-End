@@ -34,7 +34,7 @@ class UserProfile(GenericAPIView):
             return Response({'error': 'User does not exist!'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = UserProfileSerializer(
-            user, context={'user': request.user})
+            user, context={'user': request.user, 'request' : request})
         return Response(serializer.data)
 
     def put(self, request, username, *args, **kwargs):
@@ -44,7 +44,7 @@ class UserProfile(GenericAPIView):
         # 	return Response("token is not for given username", status=status.HTTP_400_BAD_REQUEST)
         # else:
         serializer = UserProfileSerializer(
-            user, data=request.data, context={'user': request.user})
+            user, data=request.data, context={'user': request.user, 'request' : request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
