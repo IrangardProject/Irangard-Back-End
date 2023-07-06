@@ -65,7 +65,7 @@ class SpecialUser(models.Model):
     total_revenue = models.IntegerField(default=0)
 
     def follows(self, user):
-        return user in self.following.all()
+        return user in self.user.following.all()
 
     def __str__(self):
         return self.user.username
