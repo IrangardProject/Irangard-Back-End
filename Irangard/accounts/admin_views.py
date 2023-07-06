@@ -37,12 +37,6 @@ class AdminViewSet(GenericViewSet):
 
     def get_serializer_class(self):
         return None
-    # @action(detail=False, url_path='upgrade-user',  methods=['POST'], permission_classes=[IsAdmin])
-    # def UpgradeUser(self, request):
-    #     user = User.objects.get(username = request.user.username)
-    #     special_user = SpecialUser.objects.create(user = user)
-    #     special_user.save()
-    #     return Response(f"user with username {request.user.username} upgraded to special user successfully",status = HTTP_200_OK)
 
 
     @action(detail=False, url_path='add-admin', methods=['POST'], permission_classes=[permissions.AllowAny])
@@ -59,13 +53,13 @@ class AdminViewSet(GenericViewSet):
     @action(detail=False, url_path='remove-specialuser', methods=['POST'], permission_classes=[IsAdmin])
     def removeSpecialUser(self, request):
         try:
-            user = SpecialUser.objects.get(username=request.data['username'])
+            user = User.objects.get(username=request.data['username'])
             sp_user = SpecialUser.objects.get(user=user)
             sp_user.delete()
             user.is_special = False
             user.save()
             return Response(f'special user with username {user.username} deleted', status=status.HTTP_200_OK)
-        except SpecialUser.DoesNotExist:
+        except:
             return Response(f'special user with username {user.username} doesn not exist', status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(request_body=RemoveUserSerilizer, responses={200:"user deleted"})
@@ -82,7 +76,7 @@ class AdminViewSet(GenericViewSet):
             user.delete()
             return Response(f'user with username {user.username} deleted', status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return Response(f'user with username {user.username} doesn not exist', status=status.HTTP_400_BAD_REQUEST)
+            return Response(f'user does not exist', status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(request_body=AddUserSerilizer, responses={
             status.HTTP_200_OK: openapi.Response(
@@ -92,7 +86,6 @@ class AdminViewSet(GenericViewSet):
         })
     @action(detail=False, url_path='add-user', methods=['POST'], permission_classes=[IsAdmin])
     def addUser(self, request):
-
         if('username' not in request.data):
             return Response(f'no usernmae is provieded', status=status.HTTP_400_BAD_REQUEST)
         if('email' not in request.data):
