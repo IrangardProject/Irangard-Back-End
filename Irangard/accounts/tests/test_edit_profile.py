@@ -17,6 +17,14 @@ class TestUserProfile(TestCase):
         self.user = User.objects.create(username="morteza", email="morteza@gmail.com")
         self.user.set_password("mo1234")
         self.user.save()
+        self.user1 = User.objects.create(username="amir", email="amir@gmail.com")
+        self.user1.set_password("123456")
+        self.user1.save()
+        self.admin_user = User.objects.create(username="admin", email="admin@gmail.com")
+        self.admin_user.set_password("admin")
+        self.admin_user.is_admin = True
+        self.admin_user.save()
+        self.url = 'http://127.0.0.1:8000/accounts/'
         
     def login(self, username, password):
         # print(username, password)
@@ -405,4 +413,107 @@ class TestUserProfile(TestCase):
         url = reverse('accounts:user-profile', args=(self.user.username,))
         response = self.client.put(url, data=put_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    
+    def test_get_followers(self):
+        url = self.url + str(self.user.pk) + '/followers/'
+        token = self.login("admin", "admin")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    
+    def test_get_following(self):
+        url = self.url + str(self.user.pk) + '/following/'
+        token = self.login("admin", "admin")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    
+    def test_correct_follow(self):
+        url = self.url + str(self.user.pk) + '/follow/'
+        token = self.login(self.user1.username, "123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    
+    def test_incorrect_follow_followed_before(self):
+        self.user1.following.add(self.user)
+        self.user1.save()
+        url = self.url + str(self.user.pk) + '/follow/'
+        token = self.login(self.user1.username, "123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+        
+    def test_correct_follow(self):
+        self.user1.following.add(self.user)
+        self.user1.save()
+        url = self.url + str(self.user.pk) + '/unfollow/'
+        token = self.login(self.user1.username, "123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    
+    def test_incorrect_unfollow_not_followed_before(self):
+        url = self.url + str(self.user.pk) + '/unfollow/'
+        token = self.login(self.user1.username, "123456")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    
+    def test_update_favorite_types(self):
+        url = self.url + str(self.user.pk) + '/update_favorite_types/'
+        token = self.login(self.user.username, "mo1234")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        data = {
+            "favorite_events" : [1, 2],
+            "favorite_tours" : [1, 2]
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    
+    def test_correct_get_user_information(self):
+        url = self.url + 'information'
+        token = self.login(self.user.username, "mo1234")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_incorrect_get_user_information(self):
+        url = self.url + 'information'
+        token = self.login(self.user.username, "mo1234")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token + "aa")
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    
+    def test_correct_get_claim_place_ownership(self):
+        url = self.url + 'claimed-places'
+        token = self.login(self.user.username, "mo1234")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        
+    def test_correct_who_is(self):
+        url = self.url + 'who-is'
+        token = self.login(self.user.username, "mo1234")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        
+    def test_correct_get_all_users(self):
+        url = self.url + 'users'
+        token = self.login(self.user.username, "mo1234")
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         
