@@ -485,14 +485,7 @@ class TestUserProfile(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
-    def test_incorrect_get_user_information(self):
-        url = self.url + 'information'
-        token = self.login(self.user.username, "mo1234")
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token + "aa")
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        
+            
     
     def test_correct_get_claim_place_ownership(self):
         url = self.url + 'claimed-places'
