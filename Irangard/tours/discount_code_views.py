@@ -50,11 +50,8 @@ class DicountCodeViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Tour.DoesNotExist:
-                return Response('tour does not exist', status=status.HTTP_400_BAD_REQUEST)
         except Exception as error:
-            print(error)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(error)}, status=status.HTTP_400_BAD_REQUEST)
 
 
     @method_decorator(cache_page(CACHE_TTL))
