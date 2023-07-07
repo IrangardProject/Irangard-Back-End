@@ -7,12 +7,26 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from ..models import *
 import mock
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 
 class AccountAuthViewSetTestCase(TestCase):
+    
+    def login(self, username, password):
+        url = reverse('accounts:accounts-jwt-create')
+        data = json.dumps({'username': username, 'password': password})
+        response = self.client.post(url, data, content_type='application/json')
+        if response.status_code == status.HTTP_200_OK:
+            access_token = response.data['access']
+            return access_token
+        else:
+            return "incorrect"
+    
     def setUp(self):
 
-        User.objects.create(
+        self.user = User.objects.create(
             email="emad@gmail.com",
             username="Emad",
             first_name="سید عماد",
@@ -27,6 +41,11 @@ class AccountAuthViewSetTestCase(TestCase):
             token='4321'
         )
 
+        self.token = Token.objects.create(
+            uid="maguid",
+            token="magtoken"
+        )
+        
         self.viewset_url = 'http://127.0.0.1:8000/accounts/auth/'
 
     @classmethod
@@ -170,8 +189,101 @@ class AccountAuthViewSetTestCase(TestCase):
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
-    def test_check_code(self):
-        pass
+    def test_correct_check_code(self):
+        url = self.viewset_url + 'check-code/'
+        data = {
+            "email" : "admin@gmail.com",
+            "token" : "4321"
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        
+    def test_incorrect_check_code_invalid_token(self):
+        url = self.viewset_url + 'check-code/'
+        data = {
+            "email" : "admin@gmail.com",
+            "token" : "4321uf"
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_incorrect_check_code_no_verification(self):
+        url = self.viewset_url + 'check-code/'
+        data = {
+            "email" : "adminaa@gmail.com",
+            "token" : "4321"
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    
+    def test_reset_pass_email(self):
+        url = self.viewset_url + 'reset-password/'
+        data = {
+            "email" : "emad@gmail.com"
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        
+    
+    def test_reset_pass_confirm(self):
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.token.uid = uid
+        self.token.save() 
+        url = self.viewset_url + 'reset-password/confirm/'
+        print(url)
+        data = {
+            "uid" : uid,
+            "token" : "magtoken",
+            "password" : "magpass"
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        
+    
+    def test_reset_pass_confirm_same_username_password(self):
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.token.uid = uid
+        self.token.save() 
+        url = self.viewset_url + 'reset-password/confirm/'
+        print(url)
+        data = {
+            "uid" : uid,
+            "token" : "magtoken",
+            "password" : "Emad"
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+        
+    def test_reset_pass_confirm_incorrect_token(self):
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.token.uid = uid
+        self.token.save() 
+        url = self.viewset_url + 'reset-password/confirm/'
+        print(url)
+        data = {
+            "uid" : uid,
+            "token" : "magtokensdfsd",
+            "password" : "magpass"
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    
+    def test_reset_pass_confirm_not_exist_token(self):
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.token.uid = uid
+        self.token.save() 
+        url = self.viewset_url + 'reset-password/confirm/'
+        print(url)
+        data = {
+            "uid" : uid,
+            "token" : "sdffssdff",
+            "password" : "magpass"
+        }
+        response = self.client.post(url, format='json', data=data)
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # @mock.patch('django.core.mail.EmailMessage.send', return_value=1)
     # def test_activation_email(self, mocked_email_send):
