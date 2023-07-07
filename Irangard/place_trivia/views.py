@@ -34,8 +34,8 @@ class PlaceTriviaAPIView(generics.ListAPIView):
         
         
         tour_serializer = TourSerializer(tour_queryset, many=True, context={'request': request})
-        place_serializer = PlaceSerializer(place_queryset, many=True)
-        event_serializer = EventSerializer(event_queryset, many=True)
+        place_serializer = PlaceSerializer(place_queryset, many=True, context={'request': request})
+        event_serializer = EventSerializer(event_queryset, many=True, context={'request': request})
 
         data = {
             "tours": tour_serializer.data,
