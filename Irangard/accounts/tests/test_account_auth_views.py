@@ -231,7 +231,6 @@ class AccountAuthViewSetTestCase(TestCase):
         self.token.uid = uid
         self.token.save() 
         url = self.viewset_url + 'reset-password/confirm/'
-        print(url)
         data = {
             "uid" : uid,
             "token" : "magtoken",
@@ -246,7 +245,6 @@ class AccountAuthViewSetTestCase(TestCase):
         self.token.uid = uid
         self.token.save() 
         url = self.viewset_url + 'reset-password/confirm/'
-        print(url)
         data = {
             "uid" : uid,
             "token" : "magtoken",
@@ -261,7 +259,6 @@ class AccountAuthViewSetTestCase(TestCase):
         self.token.uid = uid
         self.token.save() 
         url = self.viewset_url + 'reset-password/confirm/'
-        print(url)
         data = {
             "uid" : uid,
             "token" : "magtokensdfsd",
@@ -276,7 +273,6 @@ class AccountAuthViewSetTestCase(TestCase):
         self.token.uid = uid
         self.token.save() 
         url = self.viewset_url + 'reset-password/confirm/'
-        print(url)
         data = {
             "uid" : uid,
             "token" : "sdffssdff",

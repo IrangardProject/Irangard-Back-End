@@ -182,3 +182,58 @@ class AdminViewSetTestCase(TestCase):
         }
         response = self.client.post(url, data=data, format='json')   
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+        
+    def test_basicStatistics(self):
+        url = 'http://127.0.0.1:8000/accounts/admin/basic-statistics/'
+        token = self.login(self.admin.username, 'admin')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(url, format='json')   
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    
+    def test_dailyStatistics(self):
+        url = 'http://127.0.0.1:8000/accounts/admin/daily-statistics/'
+        token = self.login(self.admin.username, 'admin')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        data = {
+            "start_date": "2023-05-02",
+            "end_date": "2023-05-05"
+        }
+        response = self.client.post(url, format='json', data=data)   
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    
+    def test_IndividualStatistics(self):
+        url = 'http://127.0.0.1:8000/accounts/admin/individual-statistics/'
+        token = self.login(self.admin.username, 'admin')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        data = {
+            "username" : "amir"
+        }
+        response = self.client.post(url, format='json', data=data)   
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        
+    def test_weeklyStatistics(self):
+        url = 'http://127.0.0.1:8000/accounts/admin/weekly-statistics/'
+        token = self.login(self.admin.username, 'admin')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        data = {
+            "start_date": "2023-05-02",
+            "end_date": "2023-05-05"
+        }
+        response = self.client.post(url, format='json', data=data)   
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    
+    def test_monthlyStatistics(self):
+        url = 'http://127.0.0.1:8000/accounts/admin/monthly-statistics/'
+        token = self.login(self.admin.username, 'admin')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        data = {
+            "start_date": "2023-05-02",
+            "end_date": "2023-07-05"
+        }
+        response = self.client.post(url, format='json', data=data)   
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
