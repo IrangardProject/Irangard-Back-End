@@ -39,8 +39,8 @@ class EventTestcase(TestCase):
         Event.objects.create(
             event_type='0', event_category='0', title='test event', 
             organizer='test organizer', description='test description', 
-            x_location=0, y_location=0, start_date='2022-05-22', 
-            end_date='2022-05-23', start_time='00:00:00', end_time='00:00:00',
+            x_location=0, y_location=0, start_date='2032-05-22', 
+            end_date='2032-05-23', start_time='00:00:00', end_time='00:00:00',
             added_by=self.user, address='test address', is_free=True,
             province='تهران', city='تهران', website='www.org.com', 
             phone='09109530195'
@@ -89,12 +89,12 @@ class EventTestcase(TestCase):
     
     def test_start_date(self):
         event = Event.objects.get(title="test event")
-        self.assertEqual(event.start_date, parse_date('2022-05-22'))
+        self.assertEqual(event.start_date, parse_date('2032-05-22'))
         
         
     def test_end_date(self):
         event = Event.objects.get(title="test event")
-        self.assertEqual(event.end_date, parse_date('2022-05-23'))
+        self.assertEqual(event.end_date, parse_date('2032-05-23'))
         
         
     def test_start_time(self):
@@ -136,6 +136,21 @@ class EventTestcase(TestCase):
         event = Event.objects.get(title="test event")
         self.assertEqual(event.status, StatusMode.PENDING)
         
+    
+    def test_to_str(self):
+        event = Event.objects.get(title="test event")
+        self.assertEqual(event.__str__(), event.title)
+        
+    
+    def test_expire_date(self):
+        event = Event.objects.get(title="test event")
+        self.assertFalse(event.is_expired)
+        
+    
+    def test_recomendation_rate(self):
+        event = Event.objects.get(title="test event")
+        self.assertEqual(event.recommendation_rate, -3241)
+    
 
 class TagTestCase(TestCase):
     
@@ -175,6 +190,11 @@ class TagTestCase(TestCase):
     def test_name(self):
         tag = Tag.objects.get(event=self.event)
         self.assertEqual(tag.name, "test tag")
+        
+    def test_to_str(self):
+        tag = Tag.objects.get(event=self.event)
+        self.assertEqual(tag.__str__(), "test event test tag")
+    
 
     def test_event_email_notification(self):
         self.user.favorite_event_types = ['1', '2', '3', '0']
