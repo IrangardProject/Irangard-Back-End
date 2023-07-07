@@ -354,6 +354,12 @@ class EventViewsTestcase(TestCase):
                     )
         
     
+    def test_correct_accept_event_admin_user_accepted_before(self):
+        token = self.login(self.admin_user.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.put(f"{self.url}{self.event.pk}/admin_acceptance/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
     
     def test_incorrect_accept_event_without_token(self):
         response = self.client.put(f"{self.url}{self.event_not_active.pk}/admin_acceptance/")
@@ -374,6 +380,15 @@ class EventViewsTestcase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.event_not_active.refresh_from_db()
         self.assertTrue(self.event_not_active.status, StatusMode.ACCEPTED)
+    
+    
+    def test_correct_denial_event_admin_user_accepted_before(self):
+        self.event.status = StatusMode.DENIED
+        self.event.save()
+        token = self.login(self.admin_user.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.put(f"{self.url}{self.event.pk}/admin_denial/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     
     def test_incorrect_deny_event_without_token(self):
@@ -407,3 +422,10 @@ class EventViewsTestcase(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         response = self.client.get(f"{self.url}pending_events/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        
+    
+    def test_get_recommended_events(self):
+        token = self.login(self.user.username, '123456')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+        response = self.client.get(self.url + 'recommended_events/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
