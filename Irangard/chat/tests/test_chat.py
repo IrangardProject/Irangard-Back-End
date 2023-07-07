@@ -12,7 +12,7 @@ class ChatTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.url = 'http://127.0.0.1:8000/chat/'
-        self.user = self.make_user(username='test human', password='123456', email='test@gmail.com')
+        self.user = self.make_user(username='test_human', password='123456', email='test@gmail.com')
         self.token = self.login(self.user.username, self.user.password)
         # self.client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
         self.chat = Chat.objects.create(sender=self.user, message='This is a text', 
@@ -40,6 +40,14 @@ class ChatTestCase(TestCase):
     def test_get_chats(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        
+    def test_get_index(self):
+        url = self.url + 'index/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    
     
 
     def test_post_chat(self):
@@ -57,6 +65,8 @@ class ChatTestCase(TestCase):
         url = self.url + 'room/messages/{}/'.format(self.chat.room_name)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    
 
 
     def test_retrieve_chat(self):
