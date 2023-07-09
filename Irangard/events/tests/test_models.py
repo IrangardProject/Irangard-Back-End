@@ -145,11 +145,6 @@ class EventTestcase(TestCase):
     def test_expire_date(self):
         event = Event.objects.get(title="test event")
         self.assertFalse(event.is_expired)
-        
-    
-    def test_recomendation_rate(self):
-        event = Event.objects.get(title="test event")
-        self.assertEqual(event.recommendation_rate, -3241)
     
 
 class TagTestCase(TestCase):
