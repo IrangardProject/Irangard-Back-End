@@ -39,7 +39,7 @@ class PayViewSet(GenericViewSet):
 
         my_headers = {"Content-Type": "application/json",
                       'X-API-KEY': '6f304859-1d0c-461a-b5f3-1d7bd9d3fd5b',
-                      'X-SANDBOX': '1'}
+                      'X-SANDBOX': '0'}
 
         
         response = requests.post(url="https://api.idpay.ir/v1.1/payment", data=json.dumps(my_data),
@@ -73,7 +73,7 @@ class PayViewSet(GenericViewSet):
 
             my_headers = {"Content-Type": "application/json",
                           'X-API-KEY': '6f304859-1d0c-461a-b5f3-1d7bd9d3fd5b',
-                          'X-SANDBOX': '1'
+                          'X-SANDBOX': '0'
                           }
 
             response = requests.post(url="https://api.idpay.ir/v1.1/payment/verify", data=json.dumps(my_data),
@@ -132,7 +132,7 @@ class WalletViewSet(GenericViewSet):
 
         my_headers = {"Content-Type": "application/json",
                       'X-API-KEY': '6f304859-1d0c-461a-b5f3-1d7bd9d3fd5b',
-                      'X-SANDBOX': '1'}
+                      'X-SANDBOX': '0'}
 
         response = requests.post(url="https://api.idpay.ir/v1.1/payment", data=json.dumps(my_data),
                                  headers=my_headers)
@@ -162,7 +162,7 @@ class WalletViewSet(GenericViewSet):
             }
             my_headers = {"Content-Type": "application/json",
                           'X-API-KEY': '6f304859-1d0c-461a-b5f3-1d7bd9d3fd5b',
-                          'X-SANDBOX': '1'
+                          'X-SANDBOX': '0'
                           }
             response = requests.post(url="https://api.idpay.ir/v1.1/payment/verify", data=json.dumps(my_data),
                                      headers=my_headers)
