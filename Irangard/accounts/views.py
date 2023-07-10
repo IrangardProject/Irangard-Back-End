@@ -31,7 +31,7 @@ class PayViewSet(GenericViewSet):
         order_id = str(uuid.uuid4())
         my_data = {
             "order_id": order_id,
-            "amount": 10000,
+            "amount": 20000,
             "name": f"{request.user.username}",
             "mail": f"{request.user.email}",
             "callback": "https://api.quilco.ir/accounts/pay/verify/"
